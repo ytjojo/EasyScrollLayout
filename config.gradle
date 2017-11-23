@@ -1,0 +1,12 @@
+ext {
+//如果有相同的配置提取到这儿，方便统一管理和统一配置
+    android = [compileSdkVersion: 25,
+               buildToolsVersion: "25.0.3",
+               applicationId    : "com.github.ytjojo.easyscrolllayout.demo",
+               minSdkVersion    : 17,
+               targetSdkVersion : 21,
+               versionCode      : 1,
+               versionName      : "1.0.0"]
+
+    lintOptions=[abortOnError:false]
+}

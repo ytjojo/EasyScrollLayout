@@ -1,0 +1,72 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: "config.gradle"
+buildscript {
+  repositories {
+    jcenter()
+//    maven { url "http://116.62.195.181:8081/artifactory/libs-release-local" }
+//    maven { url "http://116.62.195.181:8081/artifactory/libs-snapshot-local/" }
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:2.3.3'
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    classpath 'com.jakewharton:butterknife-gradle-plugin:8.6.0'
+    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+
+    // NOTE: Do not place your application dependencies here; they belong
+    // in the individual module build.gradle files
+  }
+}
+
+allprojects {
+  repositories {
+    jcenter()
+    maven { url "http://116.62.195.181:8081/artifactory/libs-release-local" }
+    maven { url "http://116.62.195.181:8081/artifactory/libs-snapshot-local/" }
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven { url 'http://repo1.maven.org/maven2' }
+    maven { url "http://clojars.org/repo" }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
+
+  }
+  configurations.all {
+    resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
+  }
+  tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_7
+    targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_7
+  }
+  tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+  }
+
+  configurations.all {
+    // Check for updates every build
+//        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    resolutionStrategy {
+      // fail eagerly on version conflict (includes transitive dependencies)
+      // e.g. multiple different versions of the same dependency (group and name are equal)
+//            failOnVersionConflict()
+      // prefer modules that are part of this build (multi-project or composite build) over external modules
+      preferProjectModules()
+      // force certain versions of dependencies (including transitive)
+      //  *append new forced modules:
+
+      force 'com.android.support:appcompat-v7:25.3.1', 'com.squareup.okhttp3:okhttp:3.8.1'
+
+      // cache dynamic versions for 10 minutes
+      cacheDynamicVersionsFor 24*60*60, 'seconds'
+      // don't cache changing modules at all
+      cacheChangingModulesFor 0, 'seconds'
+
+    }
+
+  }
+}
+
+task clean(type: Delete) {
+  delete rootProject.buildDir
+}
