@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ytjojo.easyscrolllayout.EasyScrollLayout;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +103,10 @@ public class StickyLayoutActivity extends AppCompatActivity {
 
                 if(mFirstView !=null){
                     int dy = mFirstView.getTop() - mLastTop;
-                    Logger.e("mListView onScroll" + dy);
+                    if(dy != 0){
+//                        Logger.e("mListView onScroll   : " + dy);
+
+                    }
                     mFirstView = view.getChildAt(0);
                     mLastTop = mFirstView.getTop();
 

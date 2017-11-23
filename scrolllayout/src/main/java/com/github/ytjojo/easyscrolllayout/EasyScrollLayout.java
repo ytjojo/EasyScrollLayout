@@ -302,16 +302,15 @@ public class EasyScrollLayout extends ViewGroup {
                     if (Math.abs(dy) > mTouchSlop) {
                         if (Math.abs(dy) > Math.abs(dx)) {
                             mDragging = true;
-                            if(dy >0){
-                                dy -= mTouchSlop;
-                            }else {
-                                dy += mTouchSlop;
-                            }
-//                            isHandlar = doScrollAndCallSupper(event, dy);
+//                            if(dy >0){
+//                                dy -= mTouchSlop;
+//                            }else {
+//                                dy += mTouchSlop;
+//                            }
                             isHandlar =true;
                             dispatchScroll(vtev,dy);
-                            mLastMotionY = (int) y;
-                            mLastMotionX = (int) x;
+                            mLastMotionY =  y;
+                            mLastMotionX =  x;
                         } else {
                             mDragging = false;
                             isVerticalScroll = false;
@@ -324,18 +323,15 @@ public class EasyScrollLayout extends ViewGroup {
                         isHandlar = true;
                     }
                 }else {
-                    int dy = y - mLastMotionY;
-                    Logger.e(" dispatch move envent"+ dy);
                     isHandlar = true;
+                    int dy = y - mLastMotionY;
+                    if(Math.abs(dy)<=1){
+                        dispatchTouchEventSupper(vtev);
+                        break;
+                    }
                     dispatchScroll(vtev,dy);
-//                    isHandlar = doScrollAndCallSupper(event, dy);
-//                    ParentState curState = getParnetState();
-//                    if (mParentState != curState && curState != ParentState.SCROLL) {
-//                        mParentState = curState;
-//                        isChanged = false;
-//                    }
-                    mLastMotionY = (int) y;
-                    mLastMotionX = (int) x;
+                    mLastMotionY =  y;
+                    mLastMotionX =  x;
                 }
                 break;
             case MotionEventCompat.ACTION_POINTER_DOWN:
@@ -349,8 +345,6 @@ public class EasyScrollLayout extends ViewGroup {
                 break;
             case MotionEventCompat.ACTION_POINTER_UP:
                 onSecondaryPointerUp(event);
-//                mLastMotionY = (int) MotionEventCompat.getY(event,
-//                        MotionEventCompat.findPointerIndex(event, mActivePointerId));
                 isHandlar = dispatchTouchEventSupper(event);
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -480,6 +474,7 @@ public class EasyScrollLayout extends ViewGroup {
         int activePointerIndex = event.findPointerIndex( mActivePointerId);
         float curY = event.getY(activePointerIndex);
         parentPreScroll(0, dy,mScrollConsumed,mScrollOffset);
+        int preScrollConsumed = mScrollConsumed[1];
         mNestedYOffset+=mScrollConsumed[1];
         int unconsumedY =  (dy-mScrollConsumed[1]);
         childScroll(event,0, unconsumedY,mScrollConsumed,mScrollOffset);
@@ -487,12 +482,16 @@ public class EasyScrollLayout extends ViewGroup {
         unconsumedY = unconsumedY- mScrollConsumed[1];
 
         int totaldy = (int) (curY-mFirstMotionY);
-        Logger.e(mNestedYOffset+"mChildYOffset"+mChildYOffset +"totaldy"+totaldy + " dy " + dy + "child mScrollConsumed"+ mScrollConsumed[1]);
-
+        int childConsumed = mScrollConsumed[1];
+        if(Math.abs(dy)+1<Math.abs(childConsumed)||dy*childConsumed<0){
+            Logger.e( "出错了 dy " + dy + " child "+ childConsumed + "   preScrollConsumed"+ preScrollConsumed );
+        }
         if(unconsumedY!=0){
             parentScroll(0, unconsumedY,mScrollConsumed,mScrollOffset);
-            Logger.e("parentScroll"+ mScrollConsumed[1]);
+            mChildYOffset += mScrollConsumed[1];
+            Logger.e("parentScroll   "+ mScrollConsumed[1]);
         }
+        Logger.e(mNestedYOffset+"mChildYOffset  "+mChildYOffset +"totaldy  "+totaldy + " dy " + dy + " child "+ childConsumed);
 
     }
 
@@ -504,7 +503,7 @@ public class EasyScrollLayout extends ViewGroup {
         int lastScrolly = getScrollY();
         scrollBy(0, (int) -dy);
         consumed[1]= lastScrolly - getScrollY();
-        Logger.e("parentPreScroll " + consumed[1]);
+        Logger.e("parentPreScroll  " + consumed[1]);
     }
     private void childScroll(MotionEvent event,int dx, int dy, int[] consumed, int[] offsetInWindow){
         if(dy==0){
@@ -514,10 +513,8 @@ public class EasyScrollLayout extends ViewGroup {
         int activePointerIndex = event.findPointerIndex( mActivePointerId);
         float curX = event.getX(activePointerIndex);
         float curY = event.getY(activePointerIndex);
-        int totaldy = (int) (curY-mFirstMotionY);
-//        event.offsetLocation(mLastMotionX - curX ,0);
-//        event.setLocation(mFirstMotionX,curY);
-        event.offsetLocation(mFirstMotionX - curX,-consumed[1]);
+//        event.offsetLocation(mFirstMotionX - curX,-consumed[1]);
+        event.offsetLocation(mFirstMotionX - curX,0);
         dispatchTouchEventSupper(event);
         childScrollConsumed(mScrollConsumed,mScrollOffset);
 
