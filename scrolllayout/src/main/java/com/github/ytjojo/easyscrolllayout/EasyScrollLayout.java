@@ -78,8 +78,16 @@ public class EasyScrollLayout extends ViewGroup {
     private int mNestedYOffset;
     private int mChildYOffset;
 
+    public EasyScrollLayout(Context context) {
+        this(context,null);
+    }
+
     public EasyScrollLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs,0);
+    }
+
+    public EasyScrollLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         mScroller = new OverScroller(context);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         mMaximumVelocity = ViewConfiguration.get(context)
@@ -90,6 +98,7 @@ public class EasyScrollLayout extends ViewGroup {
         mVelocityTracker = VelocityTracker.obtain();
 
     }
+
 
     @Override
     protected void onFinishInflate() {

@@ -79,6 +79,7 @@
       </intent-filter>
     </activity>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.StickyLayoutActivity"/>
+    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.WebViewActivity"/>
   </application>
 
 </manifest>
