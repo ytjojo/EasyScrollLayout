@@ -3,6 +3,7 @@ package com.github.ytjojo.easyscrolllayout;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
@@ -12,11 +13,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+
 /**
  * Created by Administrator on 2017/11/24 0024.
  */
 
 public class ContentWraperView extends FrameLayout {
+
+    /** @hide */
+    @IntDef({HORIZONTAL, VERTICAL,ORIENTATION_BOTH})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OrientationMode {}
+
+    public static final int HORIZONTAL = 0;
+    public static final int VERTICAL = 1;
+    public static final int ORIENTATION_BOTH = 2;
 
     private static final int DEFAULT_CHILD_GRAVITY = Gravity.TOP | Gravity.START;
     View mStartView;
@@ -46,41 +60,99 @@ public class ContentWraperView extends FrameLayout {
         layoutChildren(l,t,r,b,false);
     }
     int mContentViewHeight;
+    View mInnerTopView;
+    View mInnerBottomView;
+    View mContentView;
+    private int mOrientation;
+
+    public void setOrientation(@OrientationMode int orientation) {
+        if (mOrientation != orientation) {
+            mOrientation = orientation;
+
+        }
+    }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         final int count = getChildCount();
-        ContentWraperView contentWraperView = null;
-        int topViewHeight = 0;
+        mInnerTopView = null;
+        mInnerBottomView = null;
+        boolean isConflict =false;
+
+        ArrayList<View> contentViews =new ArrayList<>(count);
+        int maxArea =0;
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if(child instanceof ContentWraperView){
-                    contentWraperView = (ContentWraperView) child;
+                    mContentView = (ContentWraperView) child;
                     continue;
                 }
                 if(lp.mLayoutOutGravity != GRAVITY_OUT_INVALID){
+                    final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
+                    maxArea = childArea> maxArea?childArea:maxArea;
                     switch (lp.mLayoutOutGravity){
                         case GRAVITY_INNER_TOP:
-                            topViewHeight = child.getMeasuredHeight();
+                            if(mInnerTopView != null){
+                                throw new IllegalArgumentException("GRAVITY_INNER_TOP  only one child can use");
+                            }
+
+                            if(isConflict){
+                                throw new IllegalArgumentException("GRAVITY_INNER_TOP GRAVITY_INNER_BOTTOM can't both");
+                            }
+                            isConflict = true;
+                            mInnerTopView = child;
+                            mMaxVerticalScrollRange = Math.max(mInnerTopView.getMeasuredHeight() -mInnerTopView.getMinimumHeight(),mMaxVerticalScrollRange);
+
+
                             break;
                         case GRAVITY_INNER_BOTTOM:
-
+                            if(mInnerBottomView != null){
+                                throw new IllegalArgumentException("GRAVITY_INNER_BOTTOM only one child can use");
+                            }
+                            if(isConflict){
+                                throw new IllegalArgumentException("GRAVITY_INNER_TOP GRAVITY_INNER_BOTTOM  can't both");
+                            }
+                            mInnerBottomView = child;
+                            isConflict = true;
+                            break;
+                        case GRAVITY_OUT_BOTTOM:
+                            if(mInnerTopView != null){
+                                if(mInnerTopView.getMinimumHeight() >0){
+                                    throw new IllegalArgumentException("GRAVITY_INNER_TOP minHeight should not define");
+                                }
+                            }
                             break;
                         default:
 
                             break;
                     }
+                }else {
+                   contentViews.add(child);
                 }
             }
         }
-        if(topViewHeight != 0 ){
-            int heghtSize = MeasureSpec.getSize(heightMeasureSpec)-topViewHeight;
-            int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
-            measureChild(contentWraperView, widthMeasureSpec, childHeightSpec);
+        if(mContentView == null){
+           if(!contentViews.isEmpty()){
+               int contentViewsCount = contentViews.size();
+               for (int i = 0; i < contentViewsCount ; i++) {
+                   final View child = getChildAt(i);
+                   final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
+                   if(childArea > maxArea){
+                       mContentView = child;
+                       maxArea = childArea;
+                   }
+               }
+
+           }
         }
-        mContentViewHeight = contentWraperView.getMeasuredHeight();
+        if(mInnerTopView != null && mContentView != null ){
+            int heghtSize = MeasureSpec.getSize(heightMeasureSpec)-mInnerTopView.getMinimumHeight();
+            int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
+            measureChild(mContentView, widthMeasureSpec, childHeightSpec);
+            mContentViewHeight = mContentView.getMeasuredHeight();
+        }
     }
     int mMinVerticalScrollRange;
     int mMaxVerticalScrollRange;
@@ -149,7 +221,11 @@ public class ContentWraperView extends FrameLayout {
                     default:
                         childTop = parentTop + lp.topMargin;
                 }
+                if(child == mContentView){
+                    childTop += mInnerTopView.getMeasuredHeight();
+                }else {
 
+                }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
             }
         }
@@ -178,8 +254,15 @@ public class ContentWraperView extends FrameLayout {
                 break;
             case GRAVITY_OUT_BOTTOM:
                 childLeft = 0 ;
-                childTop = bottom;
-                mMaxVerticalScrollRange = (int) (height*(1f+lp.mOverScrollRatio));
+                int offset = 0;
+                if(mInnerTopView == null){
+                    childTop = bottom+(mInnerBottomView==null?0:mInnerBottomView.getMeasuredHeight());
+                }else {
+                    offset = mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight();
+                    childTop = bottom + offset;
+                }
+                int scrollRange = childTop +(int) (height*(1f+lp.mOverScrollRatio)) - (bottom-top);
+                mMaxVerticalScrollRange = Math.max(scrollRange,mMaxVerticalScrollRange);
                 break;
             case GRAVITY_INNER_TOP:
                 childLeft = 0 ;
@@ -187,7 +270,7 @@ public class ContentWraperView extends FrameLayout {
                 break;
             case GRAVITY_INNER_BOTTOM:
                 childLeft = 0 ;
-                childTop = 0;
+                childTop = bottom;
                 break;
            default:
                 break;

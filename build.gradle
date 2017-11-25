@@ -3,8 +3,6 @@ apply from: "config.gradle"
 buildscript {
   repositories {
     jcenter()
-//    maven { url "http://116.62.195.181:8081/artifactory/libs-release-local" }
-//    maven { url "http://116.62.195.181:8081/artifactory/libs-snapshot-local/" }
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:2.3.3'
@@ -21,8 +19,6 @@ buildscript {
 allprojects {
   repositories {
     jcenter()
-    maven { url "http://116.62.195.181:8081/artifactory/libs-release-local" }
-    maven { url "http://116.62.195.181:8081/artifactory/libs-snapshot-local/" }
     mavenCentral()
     maven { url "https://jitpack.io" }
     maven { url 'http://repo1.maven.org/maven2' }

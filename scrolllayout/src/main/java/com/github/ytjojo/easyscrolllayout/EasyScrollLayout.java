@@ -146,11 +146,6 @@ public class EasyScrollLayout extends ViewGroup {
                 mOnScollListener.onScroll(0,getScrollY(),mVerticalRange);
             }
         }
-//        if(changed){
-//            if(mOnScollListener !=null){
-//                mOnScollListener.onStateChanged(mState);
-//            }
-//        }
     }
 
     @Override
@@ -205,7 +200,7 @@ public class EasyScrollLayout extends ViewGroup {
             return;
         }
         MotionEvent last = mLastMoveEvent;
-        MotionEvent e = MotionEvent.obtain(last.getDownTime(), last.getEventTime() + ViewConfiguration.getLongPressTimeout(), MotionEvent.ACTION_CANCEL, last.getX(), last.getY(), last.getMetaState());
+        MotionEvent e = MotionEvent.obtain(last.getDownTime(), last.getEventTime() + ViewConfiguration.getLongPressTimeout(), MotionEvent.ACTION_CANCEL,mFirstMotionX, last.getY(), last.getMetaState());
         dispatchTouchEventSupper(e);
     }
 
@@ -240,19 +235,6 @@ public class EasyScrollLayout extends ViewGroup {
     private float mPrimaryLastY = -1;
     private float mSecondaryLastX = -1;
     private float mSecondaryLastY = -1;
-//
-//    public enum DragState {
-//        DRAGGING_NODIRECT,
-//        DRAGGING_DONOTHING,
-//        DRAGGING_TO_EXPANDED,
-//        DRAGGING_TO_COLLAPSED
-//    }
-//
-//    public enum ParentState {
-//        EXPANDED,
-//        COLLAPSED,
-//        SCROLL
-//    }
 
     boolean isChanged;
     boolean isVerticalScroll = true;
@@ -297,7 +279,7 @@ public class EasyScrollLayout extends ViewGroup {
                 childScrollConsumed(mScrollConsumed,mScrollOffset);
                 break;
             case MotionEvent.ACTION_MOVE:
-                mLastMoveEvent = event;
+                mLastMoveEvent =  MotionEvent.obtain(event);
                 int activePointerIndex = event.findPointerIndex(mActivePointerId);
                 if (activePointerIndex == -1) {
                     isHandlar = dispatchTouchEventSupper(event);
@@ -335,6 +317,7 @@ public class EasyScrollLayout extends ViewGroup {
                     isHandlar = true;
                     int dy = y - mLastMotionY;
                     if(Math.abs(dy)<=1){
+                        vtev.offsetLocation(mFirstMotionX - x,0);
                         dispatchTouchEventSupper(vtev);
                         break;
                     }
@@ -654,7 +637,6 @@ public class EasyScrollLayout extends ViewGroup {
     private boolean isViewPager(View viewGroup) {
         if (viewGroup instanceof ViewPager) {
             mViewPager = (ViewPager) viewGroup;
-            final PagerAdapter a = mViewPager.getAdapter();
             mViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
             return true;
