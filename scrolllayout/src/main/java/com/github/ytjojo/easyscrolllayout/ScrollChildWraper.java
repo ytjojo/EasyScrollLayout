@@ -54,6 +54,13 @@ public class ScrollChildWraper<E extends View> {
         isAutomaticHunting= false;
 
     }
+    boolean isScrollChanged;
+    protected void resetChildChange(){
+        isScrollChanged =false;
+    }
+    public void notifyChildScrollChaged(){
+        isScrollChanged = true;
+    }
     public boolean isAutomaticHunting(){
         return  isAutomaticHunting;
     }
