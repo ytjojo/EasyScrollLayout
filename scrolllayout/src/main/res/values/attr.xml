@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="EasyScrollLayout">
+        <attr name="scrollFlags">
+            <flag name="scroll" value="0x1"/>
+            <flag name="quickreturn" value="0x2"/>
+            <flag name="snap" value="0x4"/>
+        </attr>
+
+        <attr name="HeaderQuickReturnHeight" format="dimension">
+            <enum name="allHeaderHeigth" value="-1"/>
+        </attr>
+        <attr name="easylayout_layoutGravity">
+            <flag name="outleft" value="0x0"/>
+            <flag name="outtop" value="0x1"/>
+            <flag name="outright" value="0x2"/>
+            <flag name="innertop" value="0x3"/>
+        </attr>
+        <attr name="contentwrper_layoutGravity">
+            <flag name="outtop" value="0x0"/>
+            <flag name="outbottom" value="0x1"/>
+            <flag name="innerbottom" value="0x2"/>
+        </attr>
+    </declare-styleable>
+</resources>

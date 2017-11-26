@@ -1,19 +1,20 @@
 package com.github.ytjojo.easyscrolllayout;
 
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.SystemClock;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -21,32 +22,36 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
-import android.webkit.WebView;
-import android.widget.AbsListView;
+import android.widget.FrameLayout;
 import android.widget.OverScroller;
-import android.widget.ScrollView;
 
 import com.orhanobut.logger.Logger;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 
-public class EasyScrollLayout extends ViewGroup {
+public class EasyScrollLayout extends FrameLayout {
 
     private static String TAG = "TAG";
 
-    /**
-     * 最顶部的View
-     */
-    private View mTopView;
-    /**
-     * 导航的View
-     */
-    private ViewPager mViewPager;
+    /** @hide */
+    @IntDef({HORIZONTAL, VERTICAL,ORIENTATION_BOTH})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OrientationMode {}
 
-    private int mVerticalRange;
-    //    private ScrollView mInnerScrollView;
-    private boolean isTopHidden = false;
+    public static final int HORIZONTAL = 0;
+    public static final int VERTICAL = 1;
+    public static final int ORIENTATION_BOTH = 2;
+
+    private static final int DEFAULT_CHILD_GRAVITY = Gravity.TOP | Gravity.START;
+    public final static int GRAVITY_OUT_INVALID = -1;
+    public final static int GRAVITY_OUT_LEFT = 0;
+    public final static int GRAVITY_OUT_TOP = 1;
+    public final static int GRAVITY_OUT_RIGHT = 2;
+    public final static int GRAVITY_INNER_TOP = 3;
+
 
     private OverScroller mScroller;
     private VelocityTracker mVelocityTracker;
@@ -59,14 +64,11 @@ public class EasyScrollLayout extends ViewGroup {
     private int mFirstMotionY;
     private int mFirstMotionX;
     // 是否是下拉
-    private boolean isDownSlide;
+
 
     private boolean mDragging;
     public static final int INITSTATE = -16;
     private int mState = INITSTATE;
-
-    private View mScrollableView;
-    private View mContentView;
     private boolean mHasSendCancelEvent;
     private MotionEvent mLastMoveEvent;
     private boolean mPreventForHorizontal;
@@ -77,7 +79,14 @@ public class EasyScrollLayout extends ViewGroup {
     private final int[] mScrollConsumed = new int[2];
     private int mNestedYOffset;
     private int mChildYOffset;
-
+    ContentWraperView mContentView;
+    View mInnerTopView;
+    View mOuterLeftView;
+    View mOuterRightView;
+    int mMinVerticalScrollRange;
+    int mMaxVerticalScrollRange;
+    int mMinHorizontalScrollRange;
+    int mMaxHorizontalScrollRange;
     public EasyScrollLayout(Context context) {
         this(context,null);
     }
@@ -99,99 +108,163 @@ public class EasyScrollLayout extends ViewGroup {
 
     }
 
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        if (getChildCount() >= 2) {
-            mTopView = getChildAt(0);
-            mContentView = getChildAt(1);
-            mContentView.setBackgroundColor(Color.WHITE);
-            findViewPagerAndScrollView((ViewGroup) mContentView);
-        }
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (getChildCount() < 2) {
-            return;
-        }
-        if (mContentView == null) {
-            mTopView = getChildAt(0);
-            mContentView = getChildAt(1);
-            findViewPagerAndScrollView((ViewGroup) mContentView);
-        }
-        if(mViewPager !=null){
-            findPagerInitScrollView();
-        }
-        // 这是为了设置ViewPager的高度，保证TopView消失之后，能够正好和NavView填充整个屏幕
-        measureChildWithMargins(mTopView, widthMeasureSpec, 0, heightMeasureSpec, 0);
-//        mMaxTopTranslationY = mTopView.getMeasuredHeight()/2;
-        int heghtSize = MeasureSpec.getSize(heightMeasureSpec)-mTopView.getMinimumHeight();
-        int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
-        measureChild(mContentView, widthMeasureSpec, childHeightSpec);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        final int count = getChildCount();
+        int maxArea =0;
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if(child instanceof ContentWraperView){
+                    mContentView = (ContentWraperView) child;
+                    continue;
+                }
+                if(lp.mLayoutOutGravity != GRAVITY_OUT_INVALID){
+                    final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
+                    maxArea = childArea> maxArea?childArea:maxArea;
+                    switch (lp.mLayoutOutGravity){
+                        case GRAVITY_INNER_TOP:
+                            mInnerTopView = child;
+                            break;
+                    }
+                }
+            }
+        }
+        if(mInnerTopView != null && mContentView != null ){
+            int heghtSize = MeasureSpec.getSize(heightMeasureSpec)-mInnerTopView.getMinimumHeight();
+            int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
+            measureChild(mContentView, widthMeasureSpec, childHeightSpec);
+        }
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (getChildCount() < 2) {
-            return;
-        }
-        layoutVerticalWithMargin(mTopView, mContentView);
+        layoutChildren(l,t,r,b,false);
         if(mState == INITSTATE){
             mState = OnScollListener.STATE_EXPAND;
             if(mOnScollListener !=null){
                 mOnScollListener.onStateChanged(mState);
-                mOnScollListener.onScroll(0,getScrollY(),mVerticalRange);
+                mOnScollListener.onScroll(0,getScrollY(),getScrollY()>0||mMinVerticalScrollRange==0?mMaxVerticalScrollRange:mMinVerticalScrollRange);
             }
         }
     }
+
+    void layoutChildren(int left, int top, int right, int bottom, boolean forceLeftGravity) {
+        final int count = getChildCount();
+
+        final int parentLeft = getPaddingLeft();
+        final int parentRight = right - left - getPaddingRight();
+
+        final int parentTop = getPaddingTop();
+        final int parentBottom = bottom - top - getPaddingBottom();
+
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if(lp.mLayoutOutGravity != GRAVITY_OUT_INVALID){
+                    layoutChildOuter(child,lp,left,top,right,bottom);
+                    continue;
+                }
+                final int width = child.getMeasuredWidth();
+                final int height = child.getMeasuredHeight();
+
+                int childLeft;
+                int childTop;
+
+                int gravity = lp.gravity;
+                if (gravity == -1) {
+                    gravity = DEFAULT_CHILD_GRAVITY;
+                }
+
+                final int layoutDirection = getLayoutDirection();
+                final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
+                final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
+
+                switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
+                    case Gravity.CENTER_HORIZONTAL:
+                        childLeft = parentLeft + (parentRight - parentLeft - width) / 2 +
+                                lp.leftMargin - lp.rightMargin;
+                        break;
+                    case Gravity.RIGHT:
+                        if (!forceLeftGravity) {
+                            childLeft = parentRight - width - lp.rightMargin;
+                            break;
+                        }
+                    case Gravity.LEFT:
+                    default:
+                        childLeft = parentLeft + lp.leftMargin;
+                }
+
+                switch (verticalGravity) {
+                    case Gravity.TOP:
+                        childTop = parentTop + lp.topMargin;
+                        break;
+                    case Gravity.CENTER_VERTICAL:
+                        childTop = parentTop + (parentBottom - parentTop - height) / 2 +
+                                lp.topMargin - lp.bottomMargin;
+                        break;
+                    case Gravity.BOTTOM:
+                        childTop = parentBottom - height - lp.bottomMargin;
+                        break;
+                    default:
+                        childTop = parentTop + lp.topMargin;
+                        break;
+                }
+                if(child == mContentView){
+                    childTop += mInnerTopView.getMeasuredHeight();
+                }else {
+
+                }
+                child.layout(childLeft, childTop, childLeft + width, childTop + height);
+            }
+        }
+    }
+    private void layoutChildOuter(View child ,LayoutParams lp, int left, int top, int right, int bottom){
+        final int width = child.getMeasuredWidth();
+        final int height = child.getMeasuredHeight();
+        int childLeft = 0;
+        int childTop = 0;
+
+        switch (lp.mLayoutOutGravity){
+            case GRAVITY_OUT_TOP:
+                childLeft = 0;
+                childTop = -height;
+                mMinVerticalScrollRange = (int) (-height*(1f+lp.mOverScrollRatio));
+                lp.mMinScrollY = mMinVerticalScrollRange;
+                lp.mMaxScrollY = 0;
+                break;
+            case GRAVITY_OUT_LEFT:
+                childLeft = -width;
+                childTop = 0;
+                mMinHorizontalScrollRange = (int) (-width*(1f+lp.mOverScrollRatio));
+                break;
+            case GRAVITY_OUT_RIGHT:
+                childLeft = right ;
+                childTop = 0;
+                mMaxHorizontalScrollRange = (int) (width*(1f+lp.mOverScrollRatio));
+                break;
+
+            case GRAVITY_INNER_TOP:
+                childLeft = 0 ;
+                childTop = 0;
+                lp.mMinScrollY =0;
+                lp.mMaxScrollY = child.getMeasuredHeight() -child.getMinimumHeight();
+                mMaxVerticalScrollRange = Math.max(mInnerTopView.getMeasuredHeight() -mInnerTopView.getMinimumHeight(),mMaxVerticalScrollRange);
+                break;
+
+        }
+        child.layout(childLeft, childTop, childLeft + width, childTop + height);
+    }
+
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mViewPager = null;
-        mContentView = null;
-        mTopView =null;
-        mScrollableView = null;
     }
 
-    private void layoutVerticalWithMargin(View... childs) {
-        int paddingLeft = getPaddingLeft(), paddingTop = getPaddingTop();
-        if (childs != null) {
-            int curTop = paddingTop;
-            for (View child : childs) {
-                if (child.getVisibility() == VISIBLE) {
-                    MarginLayoutParams curParams = (MarginLayoutParams) child.getLayoutParams();
-                    curTop += curParams.topMargin;
-                    child.layout(paddingLeft, curTop, paddingLeft + child.getMeasuredWidth(), curTop + child.getMeasuredHeight());
-                    curTop += curParams.bottomMargin + child.getMeasuredHeight();
-                }
-            }
-        }
-
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mVerticalRange = (mTopView.getMeasuredHeight() -mTopView.getMinimumHeight() ) ;
-    }
-
-    public boolean reachChildTop() {
-        if (mScrollableView == null) {
-            return true;
-        }
-        return !ViewCompat.canScrollVertically(mScrollableView, -1);
-    }
-
-    public boolean reachChildBottom() {
-        if (mScrollableView == null) {
-            return true;
-        }
-        return !ViewCompat.canScrollVertically(mScrollableView, 1);
-    }
 
     private void sendCancelEvent() {
         // The ScrollChecker will update position and lead to send cancel event when mLastMoveEvent is null.
@@ -241,7 +314,7 @@ public class EasyScrollLayout extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(!isEnabled() || mContentView == null || mTopView == null){
+        if(!isEnabled() || mContentView == null){
             return super.onTouchEvent(event);
         }
         super.onTouchEvent(event);
@@ -250,7 +323,7 @@ public class EasyScrollLayout extends ViewGroup {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if (!isEnabled() || mContentView == null || mTopView == null) {
+        if (!isEnabled() || mContentView == null ) {
             return dispatchTouchEventSupper(event);
         }
         int action = MotionEventCompat.getActionMasked(event);
@@ -276,7 +349,7 @@ public class EasyScrollLayout extends ViewGroup {
                 isChanged = false;
                 isHandlar = true;
                 isVerticalScroll = true;
-                childScrollConsumed(mScrollConsumed,mScrollOffset);
+                mContentView.mScrollChildHandlar.onDownInit();
                 break;
             case MotionEvent.ACTION_MOVE:
                 mLastMoveEvent =  MotionEvent.obtain(event);
@@ -350,35 +423,42 @@ public class EasyScrollLayout extends ViewGroup {
                 isVerticalScroll = true;
                 mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                 int velocityY = (int) VelocityTrackerCompat.getYVelocity(mVelocityTracker, mActivePointerId);
-                if (mDragging &&getScrollY()>0 && getScrollY()<mVerticalRange) {
+                if (mDragging &&getScrollY()> mMinVerticalScrollRange && getScrollY() < mMaxVerticalScrollRange && getScrollY() != 0) {
                     mDragging = false;
                     isHandlar = true;
                     isFlingToNestScroll = false;
                     sendCancelEvent();
-                    // 手指离开之后，根据加速度进行滑动
-                    if (Math.abs(velocityY) > mMinimumVelocity) {
-                        fling(velocityY);
+                    if(getScrollY() < 0){
+                        if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, mMinVerticalScrollRange, 0)) {
+                            ViewCompat.postInvalidateOnAnimation(this);
+                        }
+                    }else {
+                        // 手指离开之后，根据加速度进行滑动
+                        if (Math.abs(velocityY) > mMinimumVelocity) {
+                            fling(velocityY);
 
-                    } else {
-                        if(isSnap){
-                            int currentY = getScrollY();
-                            // 下拉
-                            isDownSlide = (event.getY() - mFirstMotionY) > 0;
-                            if (isDownSlide) {
-                                if (currentY < mVerticalRange) {
-                                    mScroller.startScroll(0, currentY, 0, -currentY);
-                                    ViewCompat.postInvalidateOnAnimation(this);
-                                }
-                            } else {
-                                if (currentY > 0) {
-                                    mScroller.startScroll(0, currentY, 0, mVerticalRange
-                                            - currentY);
-                                    ViewCompat.postInvalidateOnAnimation(this);
+                        } else {
+                            if(isSnap){
+                                int currentY = getScrollY();
+                                // 下拉
+                                final boolean isDownSlide = (event.getY() - mFirstMotionY) > 0;
+                                if (isDownSlide) {
+                                    if (currentY < mMaxVerticalScrollRange) {
+                                        mScroller.startScroll(0, currentY, 0, -currentY);
+                                        ViewCompat.postInvalidateOnAnimation(this);
+                                    }
+                                } else {
+                                    if (currentY > 0) {
+                                        mScroller.startScroll(0, currentY, 0, 0
+                                                - currentY);
+                                        ViewCompat.postInvalidateOnAnimation(this);
+                                    }
                                 }
                             }
-                        }
 
+                        }
                     }
+
 
                 } else {
                     if (Math.abs(velocityY) >= mMinimumVelocity) {
@@ -401,10 +481,10 @@ public class EasyScrollLayout extends ViewGroup {
             mScroller.abortAnimation();
         }
         int currentY = getScrollY();
-        if(currentY>=mVerticalRange/2){
+        if(currentY>=mMaxVerticalScrollRange/2){
             mScroller.startScroll(0, currentY, 0, -currentY);
         }else{
-            mScroller.startScroll(0, currentY, 0, mVerticalRange
+            mScroller.startScroll(0, currentY, 0, mMaxVerticalScrollRange
                     - currentY);
         }
         ViewCompat.postInvalidateOnAnimation(this);
@@ -414,12 +494,20 @@ public class EasyScrollLayout extends ViewGroup {
             mScroller.abortAnimation();
         }
         int currentY = getScrollY();
-        if(currentY == mVerticalRange){
+        if(currentY == mMaxVerticalScrollRange){
             return;
         }
-        mScroller.startScroll(0, currentY, 0, mVerticalRange
+        mScroller.startScroll(0, currentY, 0, mMaxVerticalScrollRange
                 - currentY);
         ViewCompat.postInvalidateOnAnimation(this);
+    }
+    private void springback(){
+
+    }
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY,
+                                  boolean clampedX, boolean clampedY) {
+        super.scrollTo(scrollX, scrollY);
     }
 
     /**
@@ -443,15 +531,15 @@ public class EasyScrollLayout extends ViewGroup {
             return;
         }
         int currentY = getScrollY();
-        if(currentY ==0||currentY ==mVerticalRange){
+        if(currentY ==0||currentY ==mMaxVerticalScrollRange){
             return;
         }
         if(!mScroller.isFinished()){
             mScroller.abortAnimation();
         }
 
-        if(currentY>=mVerticalRange/2){
-            mScroller.startScroll(0, currentY, 0, mVerticalRange
+        if(currentY>=mMaxVerticalScrollRange/2){
+            mScroller.startScroll(0, currentY, 0, mMaxVerticalScrollRange
                     - currentY);
             ViewCompat.postInvalidateOnAnimation(this);
         }else{
@@ -504,24 +592,23 @@ public class EasyScrollLayout extends ViewGroup {
         }
         int activePointerIndex = event.findPointerIndex( mActivePointerId);
         float curX = event.getX(activePointerIndex);
-        float curY = event.getY(activePointerIndex);
-//        event.offsetLocation(mFirstMotionX - curX,-consumed[1]);
+//        float curY = event.getY(activePointerIndex);
         event.offsetLocation(mFirstMotionX - curX,0);
         dispatchTouchEventSupper(event);
-        childScrollConsumed(mScrollConsumed,mScrollOffset);
+        mContentView.mScrollChildHandlar.childScrollConsumed(mScrollConsumed);
 
 
     }
     private void parentScroll(int dx, int dy, int[] consumed, int[] offsetInWindow){
         consumed[1] = consumed[0] =0;
         if(dy>0){
-            if(reachChildTop()){
+            if(mContentView.reachChildTop()){
                 int lastScrolly = getScrollY();
                 scrollBy(0, (int) -dy);
                 consumed[1]= lastScrolly - getScrollY();
             }
         }else if(dy <0){
-            if(reachChildBottom()){
+            if(mContentView.reachChildBottom()){
                 int lastScrolly = getScrollY();
                 scrollBy(0, (int) -dy);
                 consumed[1]= lastScrolly - getScrollY();
@@ -532,7 +619,7 @@ public class EasyScrollLayout extends ViewGroup {
 
     private boolean checkSelfConsume(float dy){
 
-        if(dy > 0 && reachChildTop()){
+        if(dy > 0 && mContentView.reachChildTop()){
             return true;
         }else if(dy <0){
             return true;
@@ -548,7 +635,6 @@ public class EasyScrollLayout extends ViewGroup {
         isChanged = false;
         mLastMoveEvent = null;
         mScrollConsumed[0] = mScrollConsumed[1] =0;
-        mScrollviewDirectChild = null;
     }
 
     private void onSecondaryPointerUp(MotionEvent ev) {
@@ -570,129 +656,44 @@ public class EasyScrollLayout extends ViewGroup {
         }
     }
 
-    private boolean isScrollView(View child) {
-        if (child instanceof android.support.v4.view.NestedScrollingChild || child instanceof AbsListView || child instanceof ScrollView || child instanceof ViewPager || child instanceof WebView || child instanceof RecyclerView) {
-            mScrollableView = child;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Find out the scrollable child view from a ViewGroup.
-     *
-     * @param viewGroup
-     */
-    public void findScrollView(ViewGroup viewGroup) {
-        if(viewGroup ==null){
-            return;
-        }
-        if (isScrollView(viewGroup)) {
-            return;
-        }
-        if (viewGroup.getChildCount() > 0) {
-            int count = viewGroup.getChildCount();
-            View child;
-            for (int i = 0; i < count; i++) {
-                child = viewGroup.getChildAt(i);
-                if (isScrollView(child)) {
-                    return;
-                } else if (child instanceof ViewGroup) {
-                    findScrollView((ViewGroup) child);
-                }
-            }
-        }
-    }
-
-    private void findPagerInitScrollView(){
-
-        final PagerAdapter a = mViewPager.getAdapter();
-        int currentItem = mViewPager.getCurrentItem();
-        if (a == null||mScrollableView !=null) {
-            return;
-        }
-        if (a instanceof FragmentPagerAdapter) {
-            FragmentPagerAdapter fadapter = (FragmentPagerAdapter) a;
-            Fragment item = fadapter.getItem(currentItem);
-            findScrollView((ViewGroup) item.getView());
-        } else if (a instanceof FragmentStatePagerAdapter) {
-            FragmentStatePagerAdapter fsAdapter = (FragmentStatePagerAdapter) a;
-            Fragment item = fsAdapter.getItem(currentItem);
-            findScrollView((ViewGroup) item.getView());
-        } else if (a instanceof CurrentPagerAdapter) {
-            final CurrentPagerAdapter adapter = (CurrentPagerAdapter) a;
-            if (adapter.getPrimaryItem() != null) {
-                findScrollView((ViewGroup) adapter.getPrimaryItem());
-            } else {
-                mViewPager.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        findScrollView((ViewGroup) adapter.getPrimaryItem());
-                    }
-                });
-            }
-        }
-    }
-
-    private boolean isViewPager(View viewGroup) {
-        if (viewGroup instanceof ViewPager) {
-            mViewPager = (ViewPager) viewGroup;
-            mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-
-            return true;
-        }
-        return false;
-    }
-
-    private void findViewPagerAndScrollView(ViewGroup viewGroup) {
-        if (isViewPager(viewGroup)) {
-        } else if (isScrollView(viewGroup)) {
-
-        } else {
-            if (viewGroup.getChildCount() > 0) {
-                int count = viewGroup.getChildCount();
-                View child;
-                for (int i = 0; i < count; i++) {
-                    child = viewGroup.getChildAt(i);
-                    if (isViewPager( child)) {
-
-                    } else if (isScrollView(child)) {
-
-                    } else if (child instanceof ViewGroup) {
-                        findViewPagerAndScrollView((ViewGroup) child);
-                    }
-                }
-            }
-        }
-    }
 
 
     @Override
     public boolean canScrollVertically(int direction) {
         final int offset = getScrollY();
         if (direction > 0) {
-            return offset < mVerticalRange;
+            return offset < mMaxVerticalScrollRange;
         } else {
-            return offset > 0;
+            return offset > mMinVerticalScrollRange;
+        }
+    }
+    @Override
+    public boolean canScrollHorizontally(int direction) {
+        final int offset = getScrollX();
+        if (direction > 0) {
+            return offset < mMaxHorizontalScrollRange;
+        } else {
+            return offset > mMinHorizontalScrollRange;
         }
     }
     boolean isSnap;
     public void fling(int velocityY) {
         isFlingToNestScroll = false;
         if (velocityY > 0) {
-            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, 0, isSnap?0:mVerticalRange);
+            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, 0, isSnap?0:3*mMaxVerticalScrollRange);
         } else {
-            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap?mVerticalRange:0, mVerticalRange);
+            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap?mMaxVerticalScrollRange:-2* mMaxVerticalScrollRange, mMaxVerticalScrollRange);
 
         }
         ViewCompat.postInvalidateOnAnimation(this);
     }
+
     public void flingNoSnap(int velocityY) {
         isFlingToNestScroll = false;
         if (velocityY > 0) {
             mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, 0, getScrollY());
         } else {
-            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, getScrollY(), mVerticalRange);
+            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, getScrollY(), mMaxVerticalScrollRange);
 
         }
         ViewCompat.postInvalidateOnAnimation(this);
@@ -701,6 +702,10 @@ public class EasyScrollLayout extends ViewGroup {
     boolean isFlingToNestScroll;
 
     private void flingToNestScroll(int velocityY) {
+        if(getScrollY()<= 0){
+            isFlingToNestScroll = false;
+            return;
+        }
         // For reasons I do not understand, scrolling is less janky when maxY=Integer.MAX_VALUE
         // then when maxY is set to an actual value.
         if (velocityY > 0) {
@@ -713,59 +718,41 @@ public class EasyScrollLayout extends ViewGroup {
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
-    View mScrollviewDirectChild;
-    int mLastTop;
-    private void childScrollConsumed( int[] consumed, int[] offsetInWindow){
-        if(mScrollableView ==null){
-            return;
-        }
-        ViewGroup scrollView = (ViewGroup) mScrollableView;
-        if(scrollView.getChildCount()==0){
-            return;
-        }
-
-        if(mScrollviewDirectChild !=null){
-            consumed[1] =  mScrollviewDirectChild.getTop()-mLastTop;
-        }else{
-
-        }
-        int index = scrollView.getChildCount()/2;
-        mScrollviewDirectChild = scrollView.getChildAt(index);
-        mLastTop = mScrollviewDirectChild.getTop();
-        inChild(getChildAt(0),0,0);
-
-    }
 
     @Override
     public void scrollTo(int x, int y) {
-        if (y < 0) {
-            y = 0;
+        final int  min = Math.min(mMinVerticalScrollRange,mMaxVerticalScrollRange);
+        final int  max = Math.max(mMinVerticalScrollRange,mMaxVerticalScrollRange);
+        if (y < min) {
+            y =  min;
         }
-        if (y > mVerticalRange) {
-            y = mVerticalRange;
+        if (y > max) {
+            y =  max;
         }
         if (y != getScrollY()) {
             super.scrollTo(x, y);
+            if(getScrollY() >= 0 && mInnerTopView != null){
+                float offsetRatio = ((float) getScrollY()) / mMaxVerticalScrollRange;
+                if(mOnScollListener !=null){
+                    if(offsetRatio ==0){
+                        mState = OnScollListener.STATE_EXPAND;
+                        mOnScollListener.onStateChanged(OnScollListener.STATE_EXPAND);
 
-            float offsetRatio = ((float) getScrollY()) / mVerticalRange;
-            if(mOnScollListener !=null){
-                if(offsetRatio ==0){
-                    mState = OnScollListener.STATE_EXPAND;
-                    mOnScollListener.onStateChanged(OnScollListener.STATE_EXPAND);
+                    }else if(offsetRatio ==1){
+                        mState = OnScollListener.STATE_COLLAPSED;
+                        mOnScollListener.onStateChanged(OnScollListener.STATE_COLLAPSED);
+                    }
+                    mOnScollListener.onScroll(offsetRatio,getScrollY(),max);
 
-                }else if(offsetRatio ==1){
-                    mState = OnScollListener.STATE_COLLAPSED;
-                    mOnScollListener.onStateChanged(OnScollListener.STATE_COLLAPSED);
+                    if (mMaxTopTranslationYRate != 0) {
+                        int totalOffset = (int) ((mInnerTopView.getMeasuredHeight()-mInnerTopView.getMinimumHeight()) * mMaxTopTranslationYRate);
+                        float verticalOffset = totalOffset * offsetRatio;
+                        ViewCompat.setTranslationY(mInnerTopView, (int) verticalOffset);
+                    }
                 }
-                mOnScollListener.onScroll(offsetRatio,getScrollY(),mVerticalRange);
             }
-            if(mMaxTopTranslationYRate !=0){
-                int totalOffset = (int)(mTopView.getMeasuredHeight()* mMaxTopTranslationYRate);
-                float verticalOffset = totalOffset * offsetRatio;
-                ViewCompat.setTranslationY(mTopView, (int) verticalOffset);
-            }
+
         }
-        isTopHidden = getScrollY() == mVerticalRange;
 
     }
 
@@ -777,7 +764,7 @@ public class EasyScrollLayout extends ViewGroup {
 //                int startY = mScroller.getStartY();
 //                int finalY = mScroller.getFinalY();
 //                Logger.e( reachChildTop() + "cury" + curY +"velocityY = "+velocityY + "  startY=" + startY +" finalY= " +finalY);
-                if (reachChildTop()) {
+                if (mContentView.reachChildTop()) {
                     float velocityY = mScroller.getCurrVelocity();
                     if (Math.abs(velocityY) >= mMinimumVelocity) {
                         mScroller.abortAnimation();
@@ -796,25 +783,72 @@ public class EasyScrollLayout extends ViewGroup {
         this.mMaxTopTranslationYRate = rage;
     }
 
-    @Override
-    protected boolean checkLayoutParams(LayoutParams p) {
-        return p instanceof MarginLayoutParams;
+
+
+    @Override protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof LayoutParams;
     }
 
-    @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        return new MarginLayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
+    @Override protected LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
-    @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new MarginLayoutParams(getContext(), attrs);
+    @Override public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
     }
 
-    @Override
-    protected LayoutParams generateLayoutParams(LayoutParams p) {
-        return new MarginLayoutParams(p.width, p.height);
+    @Override protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParams(p.width, p.height);
+    }
+
+    public static class LayoutParams extends FrameLayout.LayoutParams {
+        float mOverScrollRatio = 0.7f;
+        int mMinScrollY;
+        int mMaxScrollY;
+        int mLayoutOutGravity = GRAVITY_OUT_INVALID;
+
+
+        public LayoutParams(Context context, AttributeSet attrs) {
+            super(context, attrs);
+
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
+            mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_easylayout_layoutGravity, GRAVITY_OUT_INVALID);
+            a.recycle();
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(int width, int height, int gravity) {
+            super(width, height);
+            this.gravity = gravity;
+        }
+
+        public LayoutParams(@NonNull ViewGroup.LayoutParams source) {
+            super(source);
+        }
+
+        public LayoutParams(@NonNull ViewGroup.MarginLayoutParams source) {
+            super(source);
+        }
+
+        /**
+         * Copy constructor. Clones the width, height, margin values, and
+         * gravity of the source.
+         *
+         * @param source The layout params to copy from.
+         */
+        @TargetApi(Build.VERSION_CODES.KITKAT)
+        public LayoutParams(@NonNull LayoutParams source) {
+            super(source);
+            this.gravity = source.gravity;
+        }
+        @TargetApi(Build.VERSION_CODES.KITKAT)
+        public LayoutParams(@NonNull FrameLayout.LayoutParams source) {
+            super(source);
+        }
+
     }
     public OnScollListener mOnScollListener;
     public void setOnScollListener(OnScollListener l){
@@ -952,40 +986,5 @@ public class EasyScrollLayout extends ViewGroup {
         }
     }
 
-    ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            mScrollableView = null;
-            final PagerAdapter a = mViewPager.getAdapter();
-            if (a instanceof FragmentPagerAdapter) {
-                FragmentPagerAdapter fadapter = (FragmentPagerAdapter) a;
-                Fragment item = fadapter.getItem(position);
-                findScrollView((ViewGroup) item.getView());
-            } else if (a instanceof FragmentStatePagerAdapter) {
-                FragmentStatePagerAdapter fsAdapter = (FragmentStatePagerAdapter) a;
-                Fragment item = fsAdapter.getItem(position);
-                findScrollView((ViewGroup) item.getView());
-            } else if (a instanceof CurrentPagerAdapter) {
-                CurrentPagerAdapter currentPagerAdapter = (CurrentPagerAdapter)a;
-                findScrollView((ViewGroup)currentPagerAdapter.getCurentView(position));
-                Log.e(TAG,currentPagerAdapter.getPrimaryItem()+ "             onPageSelected" + mScrollableView );
-            }else{
-
-            }
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-
-
-    };
 
 }

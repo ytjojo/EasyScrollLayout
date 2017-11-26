@@ -17,8 +17,8 @@ import android.widget.ScrollView;
  * Created by Administrator on 2017/11/25 0025.
  */
 
-public class ScrollChildWraper<E extends View> {
-    E mScrollChild;
+public class ScrollChildHandlar {
+    View mScrollChild;
     ViewPager mViewPager;
     boolean isAutomaticHunting = true;
     final protected boolean isVerticalScrollView(View child) {
@@ -45,17 +45,17 @@ public class ScrollChildWraper<E extends View> {
     public boolean isHorizontalScrollChild(View child){
         return false;
     }
-    public E getCurrentScrollChild(){
+    public View getCurrentScrollChild(){
         return mScrollChild;
     }
 
-    public void setScrollChild(E scrollChild){
+    public void setScrollChild(View scrollChild){
         this.mScrollChild = scrollChild;
         isAutomaticHunting= false;
 
     }
     boolean isScrollChanged;
-    protected void resetChildChange(){
+    protected void resetChildScrollChange(){
         isScrollChanged =false;
     }
     public void notifyChildScrollChaged(){
@@ -64,9 +64,49 @@ public class ScrollChildWraper<E extends View> {
     public boolean isAutomaticHunting(){
         return  isAutomaticHunting;
     }
-    protected void huntingScrollChild(ViewGroup viewGroup,int orientation){
+    protected void huntingScrollChild(View child){
+        findViewPagerAndScrollView(child);
+    }
+    View mScrollviewDirectChild;
+    int mLastTop;
+    public void childScrollConsumed( int[] consumed){
+        consumed[0] = consumed[1] =0;
+        if(mScrollChild ==null){
+            return;
+        }
+        if(mScrollChild instanceof ViewGroup){
+            ViewGroup scrollView = (ViewGroup) mScrollChild;
+            if(scrollView.getChildCount()==0){
+                return;
+            }
+
+            if(mScrollviewDirectChild !=null){
+                consumed[1] =  mScrollviewDirectChild.getTop()-mLastTop;
+            }else{
+
+            }
+            int index = scrollView.getChildCount()/2;
+            mScrollviewDirectChild = scrollView.getChildAt(index);
+            mLastTop = mScrollviewDirectChild.getTop();
+        }
+
 
     }
+    public void onDownInit(){
+        if(mScrollChild ==null){
+            return;
+        }
+        if(mScrollChild instanceof ViewGroup){
+            ViewGroup scrollView = (ViewGroup) mScrollChild;
+            if(scrollView.getChildCount()==0){
+                return;
+            }
+            int index = scrollView.getChildCount()/2;
+            mScrollviewDirectChild = scrollView.getChildAt(index);
+            mLastTop = mScrollviewDirectChild.getTop();
+        }
+    }
+
 
     /**
      * Find out the scrollable child view from a ViewGroup.
@@ -126,28 +166,40 @@ public class ScrollChildWraper<E extends View> {
 
     private boolean isViewPager(View viewGroup) {
         if (viewGroup instanceof ViewPager) {
-            mViewPager = (ViewPager) viewGroup;
-            mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-
             return true;
         }
         return false;
     }
 
-    private void findViewPagerAndScrollView(ViewGroup viewGroup) {
+    private void findViewPagerAndScrollView(View  parent) {
+        if(!(parent instanceof ViewGroup)){
+            if(parent instanceof WebView){
+                mScrollChild = parent;
+            }
+            return;
+        }
+        ViewGroup viewGroup = (ViewGroup) parent;
         if (isViewPager(viewGroup)) {
+            mViewPager = (ViewPager) viewGroup;
+            mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+            findPagerInitScrollView();
         } else if (isVerticalScrollView(viewGroup)) {
-
+            mScrollChild = viewGroup;
         } else {
             if (viewGroup.getChildCount() > 0) {
                 int count = viewGroup.getChildCount();
                 View child;
                 for (int i = 0; i < count; i++) {
                     child = viewGroup.getChildAt(i);
-                    if (isViewPager( child)) {
-
+                    if(child instanceof WebView){
+                        mScrollChild = child;
+                        return;
+                    }else if (isViewPager( child)) {
+                        mViewPager = (ViewPager) viewGroup;
+                        mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+                        findPagerInitScrollView();
                     } else if (isVerticalScrollView(child)) {
-
+                        mScrollChild = child;
                     } else if (child instanceof ViewGroup) {
                         findViewPagerAndScrollView((ViewGroup) child);
                     }
@@ -186,7 +238,7 @@ public class ScrollChildWraper<E extends View> {
                     int childX = (int) child.getX();
                     int childY = (int) child.getY();
                     if(childX>=0 && childX <= mViewPager.getMeasuredWidth() & childY>=0 && childX <= mViewPager.getMinimumHeight()){
-                        mScrollChild = (E) child;
+                        mScrollChild = (View) child;
                         break;
                     }
                 }

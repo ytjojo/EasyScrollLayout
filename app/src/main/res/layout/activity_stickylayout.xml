@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/StickyNavLayout"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:minHeight="100dp"
         android:layout_width="match_parent"
         android:gravity="center"
+        android:background="#00ee00"
+        app:easylayout_layoutGravity="outtop"
+        android:orientation="vertical"
+        android:layout_height="80dp">
+        <TextView
+            android:text="outTopView"
+            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:gravity="center"
+        app:easylayout_layoutGravity="innertop"
         android:orientation="vertical"
         android:layout_height="300dp">
         <TextView
@@ -17,9 +31,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
-    <ListView
-        android:id="@+id/listview"
+    <com.github.ytjojo.easyscrolllayout.ContentWraperView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
+    </com.github.ytjojo.easyscrolllayout.ContentWraperView>
+
 
 </com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
