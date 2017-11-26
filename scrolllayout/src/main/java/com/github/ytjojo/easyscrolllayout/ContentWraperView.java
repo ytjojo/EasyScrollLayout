@@ -2,6 +2,7 @@ package com.github.ytjojo.easyscrolllayout;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -11,8 +12,11 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.OverScroller;
+import android.widget.Scroller;
 
 import com.orhanobut.logger.Logger;
 
@@ -32,23 +36,33 @@ public class ContentWraperView extends FrameLayout {
     public final static int GRAVITY_OUT_TOP = 1;
     public final static int GRAVITY_OUT_BOTTOM = 2;
     public final static int GRAVITY_INNER_BOTTOM = 3;
+    OverScroller mScroller;
+    private int mMinimumVelocity;
 
     public ContentWraperView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public ContentWraperView(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public ContentWraperView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mScroller = new OverScroller(context);
+        mMinimumVelocity = ViewConfiguration.get(context)
+                .getScaledMinimumFlingVelocity();
+
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
+        isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
+        a.recycle();
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        layoutChildren(l,t,r,b,false);
+        layoutChildren(l, t, r, b, false);
     }
+
     int mContentViewHeight;
     View mContentView;
     View mInnerBottomView;
@@ -62,21 +76,22 @@ public class ContentWraperView extends FrameLayout {
 
         }
     }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         final int count = getChildCount();
 
-        ArrayList<View> contentViews =new ArrayList<>(count);
-        int maxArea =0;
+        ArrayList<View> contentViews = new ArrayList<>(count);
+        int maxArea = 0;
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                if(lp.mLayoutOutGravity != GRAVITY_OUT_INVALID){
+                if (lp.mLayoutOutGravity != GRAVITY_OUT_INVALID) {
                     final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
-                    maxArea = childArea> maxArea?childArea:maxArea;
-                    switch (lp.mLayoutOutGravity){
+                    maxArea = childArea > maxArea ? childArea : maxArea;
+                    switch (lp.mLayoutOutGravity) {
                         case GRAVITY_INNER_BOTTOM:
                             mInnerBottomView = child;
                             break;
@@ -85,34 +100,35 @@ public class ContentWraperView extends FrameLayout {
 
                             break;
                     }
-                }else {
-                   contentViews.add(child);
+                } else {
+                    contentViews.add(child);
                 }
             }
         }
-        if(mContentView == null){
-           if(!contentViews.isEmpty()){
-               int contentViewsCount = contentViews.size();
-               for (int i = 0; i < contentViewsCount ; i++) {
-                   final View child = getChildAt(i);
-                   final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
-                   if(childArea > maxArea){
-                       mContentView = child;
-                       maxArea = childArea;
-                   }
-               }
+        if (mContentView == null) {
+            if (!contentViews.isEmpty()) {
+                int contentViewsCount = contentViews.size();
+                for (int i = 0; i < contentViewsCount; i++) {
+                    final View child = getChildAt(i);
+                    final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
+                    if (childArea > maxArea) {
+                        mContentView = child;
+                        maxArea = childArea;
+                    }
+                }
 
-           }
+            }
         }
-        if(mContentView !=null && mContentView instanceof ViewGroup && mScrollChildHandlar.isAutomaticHunting()){
-            mScrollChildHandlar.huntingScrollChild((ViewGroup) mContentView);
-            Logger.e(mScrollChildHandlar.getCurrentScrollChild().getClass().getName());
+        if (mContentView != null && mScrollChildHandlar.isAutomaticHunting()) {
+            mScrollChildHandlar.huntingScrollChild(mContentView);
         }
     }
+
     int mMinVerticalScrollRange;
     int mMaxVerticalScrollRange;
     int mMinHorizontalScrollRange;
     int mMaxHorizontalScrollRange;
+    int mScrollRange;
 
 
     void layoutChildren(int left, int top, int right, int bottom, boolean forceLeftGravity) {
@@ -123,13 +139,15 @@ public class ContentWraperView extends FrameLayout {
 
         final int parentTop = getPaddingTop();
         final int parentBottom = bottom - top - getPaddingBottom();
-
+        mMaxVerticalScrollRange = 0;
+        mMinVerticalScrollRange = 0;
+        mScrollRange = 0;
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                if(lp.mLayoutOutGravity != GRAVITY_OUT_INVALID){
-                    layoutChildOuter(child,lp,left,top,right,bottom);
+                if (lp.mLayoutOutGravity != GRAVITY_OUT_INVALID) {
+                    layoutChildOuter(child, lp, left, top, right, bottom);
                     continue;
                 }
                 final int width = child.getMeasuredWidth();
@@ -180,57 +198,63 @@ public class ContentWraperView extends FrameLayout {
             }
         }
     }
-    private void layoutChildOuter(View child , LayoutParams lp,int left, int top, int right, int bottom){
+
+    private void layoutChildOuter(View child, LayoutParams lp, int left, int top, int right, int bottom) {
         final int width = child.getMeasuredWidth();
         final int height = child.getMeasuredHeight();
         int childLeft = 0;
         int childTop = 0;
 
-        switch (lp.mLayoutOutGravity){
+        switch (lp.mLayoutOutGravity) {
             case GRAVITY_OUT_TOP:
                 childLeft = 0;
                 childTop = -height;
-                mMinVerticalScrollRange = (int) (-height*(1f+lp.mOverScrollRatio));
+                mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
                 lp.mMaxScrollY = mMinVerticalScrollRange;
                 lp.mMinScrollY = 0;
+                mOutTopView = child;
                 break;
             case GRAVITY_OUT_BOTTOM:
-                childLeft = 0 ;
-                int offset = 0;
-                childTop = bottom+(mInnerBottomView==null?0:mInnerBottomView.getMeasuredHeight());
-                int scrollRange = childTop +(int) (height*(1f+lp.mOverScrollRatio)) - (bottom-top);
-                mMaxVerticalScrollRange = Math.max(scrollRange,mMaxVerticalScrollRange);
+                childLeft = 0;
+                childTop = bottom-top + (mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight());
+                int scrollRange = childTop + (int) (height * (1f + lp.mOverScrollRatio)) - (bottom - top);
+                mMaxVerticalScrollRange = Math.max(scrollRange, mMaxVerticalScrollRange);
                 lp.mMaxScrollY = scrollRange;
-                lp.mMinScrollY = childTop  - (bottom-top);
+                lp.mMinScrollY = childTop - (bottom - top);
+                mScrollRange = Math.max(childTop + height  - (bottom - top),mScrollRange);
                 break;
             case GRAVITY_INNER_BOTTOM:
-                childLeft = 0 ;
-                childTop = bottom;
-                lp.mMinScrollY =0;
+                childLeft = 0;
+                childTop = bottom - top;
+                mMaxVerticalScrollRange = Math.max(height , mMaxVerticalScrollRange);
+                lp.mMinScrollY = 0;
                 lp.mMaxScrollY = child.getMeasuredHeight();
+                mScrollRange = Math.max(height,mScrollRange);
                 break;
-           default:
+            default:
                 break;
         }
         child.layout(childLeft, childTop, childLeft + width, childTop + height);
     }
 
 
-
-
-    @Override protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
         return p instanceof LayoutParams;
     }
 
-    @Override protected LayoutParams generateDefaultLayoutParams() {
+    @Override
+    protected LayoutParams generateDefaultLayoutParams() {
         return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
-    @Override public LayoutParams generateLayoutParams(AttributeSet attrs) {
+    @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new LayoutParams(getContext(), attrs);
     }
 
-    @Override protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+    @Override
+    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
         return new LayoutParams(p.width, p.height);
     }
 
@@ -241,6 +265,9 @@ public class ContentWraperView extends FrameLayout {
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
+            mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_contentwrper_layoutGravity, GRAVITY_OUT_INVALID);
+            a.recycle();
         }
 
         public LayoutParams(int width, int height) {
@@ -271,47 +298,187 @@ public class ContentWraperView extends FrameLayout {
             super(source);
             this.gravity = source.gravity;
         }
+
         @TargetApi(Build.VERSION_CODES.KITKAT)
         public LayoutParams(@NonNull FrameLayout.LayoutParams source) {
             super(source);
         }
+
         int mLayoutOutGravity = GRAVITY_OUT_INVALID;
 
     }
 
     @Override
     public void scrollTo(@Px int x, @Px int y) {
-        if(y > mMaxVerticalScrollRange){
-            y = mMaxHorizontalScrollRange;
+        if (y > mMaxVerticalScrollRange) {
+            y = mMaxVerticalScrollRange;
         }
-        if(y < mMinVerticalScrollRange){
+        if (y < mMinVerticalScrollRange) {
             y = mMinVerticalScrollRange;
         }
-        if(x < mMinHorizontalScrollRange){
+        if (x < mMinHorizontalScrollRange) {
             x = mMinHorizontalScrollRange;
         }
-        if(x > mMaxHorizontalScrollRange){
+        if (x > mMaxHorizontalScrollRange) {
             x = mMaxHorizontalScrollRange;
         }
         int lastScrollx = getScrollX();
         int lastScrolly = getScrollY();
-        if(x != lastScrollx || y != lastScrolly){
+        if (x != lastScrollx || y != lastScrolly) {
+            Logger.e("scrollTo" + (y - lastScrolly));
             super.scrollTo(x, y);
+        } else {
+            Logger.e("scrollTo 不能滚动");
         }
     }
 
-    ScrollChildHandlar mScrollChildHandlar =new ScrollChildHandlar();
+    @Override
+    public void computeScroll() {
+        if (mScroller.computeScrollOffset()) {
+            int curY = mScroller.getCurrY();
+            scrollTo(0, curY);
+            ViewCompat.postInvalidateOnAnimation(this);
+        }
+    }
+
+
+    public void preScrollConsumed(int dy, int[] consumed) {
+        if (!canPreScroll(dy)) {
+            consumed[1] = consumed[0] = 0;
+            return;
+        }
+        int lastScrolly = getScrollY();
+        int scolldy = dy;
+        if (dy > 0 && getScrollY() > 0) {
+            if (lastScrolly - dy < 0) {
+                scolldy = lastScrolly;
+            }
+        }
+        scrollBy(0, (int) -scolldy);
+        consumed[1] = lastScrolly - getScrollY();
+        Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
+    }
+
+    public boolean canFling() {
+        return getScrollY() >= mMinVerticalScrollRange && getScrollY() <= mMaxVerticalScrollRange && getScrollY() != 0;
+    }
+
+    public void dispatchScroll(int velocityY, boolean isDownSlide) {
+        if (getScrollY() < 0) {
+            if (getScrollY() < -mOutTopView.getMeasuredHeight()) {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
+                    ViewCompat.postInvalidateOnAnimation(this);
+                }
+            } else if (getScrollY() > -mOutTopView.getMeasuredHeight()) {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
+                    ViewCompat.postInvalidateOnAnimation(this);
+                }
+            }
+
+        } else {
+            if (mInnerBottomView != null) {
+                // 手指离开之后，根据加速度进行滑动
+                if(getScrollY() < mInnerBottomView.getMeasuredHeight()){
+                    if(velocityY != 0 ){
+                        fling(velocityY);
+
+                    }else {
+                        if (isSnap) {
+                            int currentY = getScrollY();
+                            // 下拉
+                            if (isDownSlide) {
+                                if (currentY < mMaxVerticalScrollRange) {
+                                    mScroller.startScroll(0, currentY, 0, -currentY);
+                                    ViewCompat.postInvalidateOnAnimation(this);
+                                }
+                            } else {
+                                if (currentY > 0) {
+                                    mScroller.startScroll(0, currentY, 0, 0
+                                            - currentY);
+                                    ViewCompat.postInvalidateOnAnimation(this);
+                                }
+                            }
+                        }
+
+                    }
+                }else {
+                    if (getScrollY() > mScrollRange) {
+                        if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, mScrollRange,mScrollRange)) {
+                            ViewCompat.postInvalidateOnAnimation(this);
+                        }
+                    } else if(getScrollY() < mScrollRange){
+                        int range = mInnerBottomView.getMeasuredHeight();
+                        if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, range, range)) {
+                            ViewCompat.postInvalidateOnAnimation(this);
+                        }
+                    }
+                }
+
+            }else {
+                if (getScrollY() > mOutTopView.getMeasuredHeight()) {
+                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, mOutTopView.getMeasuredHeight(), mOutTopView.getMeasuredHeight())) {
+                        ViewCompat.postInvalidateOnAnimation(this);
+                    }
+                } else {
+                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
+                        ViewCompat.postInvalidateOnAnimation(this);
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    boolean isSnap;
+
+    public void fling(int velocityY) {
+        if(mInnerBottomView==null){
+            return;
+        }
+        if(getScrollY() <= mInnerBottomView.getMeasuredHeight() && getScrollY() >= 0){
+            int range = mInnerBottomView.getMeasuredHeight();
+            if (velocityY > 0) {
+                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0,  isSnap ? 0:0 , isSnap ? 0 : getScrollY());
+            } else {
+                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap ? range : 0, range);
+
+            }
+            ViewCompat.postInvalidateOnAnimation(this);
+        }
+
+    }
+
+    public boolean canPreScroll(int dy) {
+        if (dy > 0 && reachChildTop()) {
+            return true;
+        } else if (dy < 0) {
+            if (getScrollY() < 0) {
+                return true;
+            }
+            if (reachChildBottom()) {
+                return true;
+            }
+
+        } else if (dy > 0 && getScrollY() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    ScrollChildHandlar mScrollChildHandlar = new ScrollChildHandlar();
+
     public boolean reachChildTop() {
         if (mScrollChildHandlar.getCurrentScrollChild() == null) {
             return true;
         }
-        return !ViewCompat.canScrollVertically(mScrollChildHandlar.getCurrentScrollChild() , -1);
+        return !ViewCompat.canScrollVertically(mScrollChildHandlar.getCurrentScrollChild(), -1);
     }
 
     public boolean reachChildBottom() {
-        if (mScrollChildHandlar.getCurrentScrollChild()  == null) {
+        if (mScrollChildHandlar.getCurrentScrollChild() == null) {
             return true;
         }
-        return !ViewCompat.canScrollVertically(mScrollChildHandlar.getCurrentScrollChild() , 1);
+        return !ViewCompat.canScrollVertically(mScrollChildHandlar.getCurrentScrollChild(), 1);
     }
 }

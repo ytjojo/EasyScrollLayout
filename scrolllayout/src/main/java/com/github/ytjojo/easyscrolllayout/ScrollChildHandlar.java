@@ -13,6 +13,8 @@ import android.widget.AbsListView;
 import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 
+import com.orhanobut.logger.Logger;
+
 /**
  * Created by Administrator on 2017/11/25 0025.
  */
@@ -118,6 +120,7 @@ public class ScrollChildHandlar {
             return;
         }
         if (isVerticalScrollView(viewGroup)) {
+            mScrollChild = viewGroup;
             return;
         }
         if (viewGroup.getChildCount() > 0) {
@@ -126,6 +129,7 @@ public class ScrollChildHandlar {
             for (int i = 0; i < count; i++) {
                 child = viewGroup.getChildAt(i);
                 if (isVerticalScrollView(child)) {
+                    mScrollChild = viewGroup;
                     return;
                 } else if (child instanceof ViewGroup) {
                     findScrollView((ViewGroup) child);
@@ -210,6 +214,7 @@ public class ScrollChildHandlar {
 
 
     ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+        int position;
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -217,37 +222,42 @@ public class ScrollChildHandlar {
 
         @Override
         public void onPageSelected(int position) {
-            mScrollChild = null;
-            final PagerAdapter a = mViewPager.getAdapter();
-            if (a instanceof FragmentPagerAdapter) {
-                FragmentPagerAdapter fadapter = (FragmentPagerAdapter) a;
-                Fragment item = fadapter.getItem(position);
-                findScrollView((ViewGroup) item.getView());
-            } else if (a instanceof FragmentStatePagerAdapter) {
-                FragmentStatePagerAdapter fsAdapter = (FragmentStatePagerAdapter) a;
-                Fragment item = fsAdapter.getItem(position);
-                findScrollView((ViewGroup) item.getView());
-            } else if (a instanceof EasyScrollLayout.CurrentPagerAdapter) {
-                EasyScrollLayout.CurrentPagerAdapter currentPagerAdapter = (EasyScrollLayout.CurrentPagerAdapter)a;
-                findScrollView((ViewGroup)currentPagerAdapter.getCurentView(position));
-
-            }else{
-                int  childCount = mViewPager.getChildCount();
-                for (int i = 0; i < childCount ; i++) {
-                    View child = mViewPager.getChildAt(i);
-                    int childX = (int) child.getX();
-                    int childY = (int) child.getY();
-                    if(childX>=0 && childX <= mViewPager.getMeasuredWidth() & childY>=0 && childX <= mViewPager.getMinimumHeight()){
-                        mScrollChild = (View) child;
-                        break;
-                    }
-                }
-            }
 
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
+            if(state == ViewPager.SCROLL_STATE_IDLE){
+                mScrollChild = null;
+                Logger.e("position" + position);
+                final PagerAdapter a = mViewPager.getAdapter();
+                if (a instanceof FragmentPagerAdapter) {
+                    FragmentPagerAdapter fadapter = (FragmentPagerAdapter) a;
+                    Fragment item = fadapter.getItem(position);
+                    findScrollView((ViewGroup) item.getView());
+                } else if (a instanceof FragmentStatePagerAdapter) {
+                    FragmentStatePagerAdapter fsAdapter = (FragmentStatePagerAdapter) a;
+                    Fragment item = fsAdapter.getItem(position);
+                    findScrollView((ViewGroup) item.getView());
+                } else if (a instanceof EasyScrollLayout.CurrentPagerAdapter) {
+                    EasyScrollLayout.CurrentPagerAdapter currentPagerAdapter = (EasyScrollLayout.CurrentPagerAdapter)a;
+                    findScrollView((ViewGroup)currentPagerAdapter.getCurentView(position));
+
+                }
+                if(mScrollChild == null){
+                    int  childCount = mViewPager.getChildCount();
+                    for (int i = 0; i < childCount ; i++) {
+                        View child = mViewPager.getChildAt(i);
+                        int childX = (int) child.getX();
+                        int childY = (int) child.getY();
+                        if(childX>=0 && childX <= mViewPager.getMeasuredWidth() & childY>=0 && childX <= mViewPager.getMinimumHeight()){
+                            mScrollChild = (View) child;
+                            break;
+                        }
+                    }
+                }
+            }
+
 
         }
 

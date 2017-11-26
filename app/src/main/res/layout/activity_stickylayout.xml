@@ -33,11 +33,34 @@
     </LinearLayout>
     <com.github.ytjojo.easyscrolllayout.ContentWraperView
         android:layout_width="match_parent"
+        android:background="#000000"
         android:layout_height="match_parent">
         <ListView
             android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></ListView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="#00ffee"
+            app:contentwrper_layoutGravity="innerbottom"
+            android:layout_height="300dp">
+            <TextView
+                android:text="bottomView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="#eeff00"
+            app:contentwrper_layoutGravity="outbottom"
+            android:layout_height="100dp">
+            <TextView
+                android:text="bottomView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </com.github.ytjojo.easyscrolllayout.ContentWraperView>
 
 

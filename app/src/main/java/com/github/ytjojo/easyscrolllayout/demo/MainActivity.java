@@ -25,6 +25,21 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
+		findViewById(R.id.tv_webview).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,WebViewActivity.class);
+				startActivity(intent);
+			}
+		});
+		findViewById(R.id.tv_viewpager).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,ViewPagerAcitivity.class);
+				startActivity(intent);
+			}
+		});
+
 	}
 
 	@Override

@@ -11,6 +11,8 @@
         <attr name="HeaderQuickReturnHeight" format="dimension">
             <enum name="allHeaderHeigth" value="-1"/>
         </attr>
+        <attr name="isSnap" format="boolean"/>
+
         <attr name="easylayout_layoutGravity">
             <flag name="outleft" value="0x0"/>
             <flag name="outtop" value="0x1"/>
@@ -18,9 +20,9 @@
             <flag name="innertop" value="0x3"/>
         </attr>
         <attr name="contentwrper_layoutGravity">
-            <flag name="outtop" value="0x0"/>
-            <flag name="outbottom" value="0x1"/>
-            <flag name="innerbottom" value="0x2"/>
+            <flag name="outtop" value="0x1"/>
+            <flag name="outbottom" value="0x2"/>
+            <flag name="innerbottom" value="0x3"/>
         </attr>
     </declare-styleable>
 </resources>
