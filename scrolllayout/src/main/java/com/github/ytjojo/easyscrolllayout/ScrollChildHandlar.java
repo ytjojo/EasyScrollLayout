@@ -222,7 +222,7 @@ public class ScrollChildHandlar {
 
         @Override
         public void onPageSelected(int position) {
-
+            this.position = position;
         }
 
         @Override

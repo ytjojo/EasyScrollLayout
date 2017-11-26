@@ -347,10 +347,15 @@ public class ContentWraperView extends FrameLayout {
             consumed[1] = consumed[0] = 0;
             return;
         }
-        int lastScrolly = getScrollY();
+        final int lastScrolly = getScrollY();
         int scolldy = dy;
-        if (dy > 0 && getScrollY() > 0) {
+        if (dy > 0 && lastScrolly > 0) {
             if (lastScrolly - dy < 0) {
+                scolldy = lastScrolly;
+            }
+        }
+        if(dy < 0 && lastScrolly < 0){
+            if (lastScrolly - dy > 0) {
                 scolldy = lastScrolly;
             }
         }
