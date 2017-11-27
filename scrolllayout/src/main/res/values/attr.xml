@@ -24,5 +24,6 @@
             <flag name="outbottom" value="0x2"/>
             <flag name="innerbottom" value="0x3"/>
         </attr>
+        <attr name="innerTop_ParallaxMultiplier" format="float"/>
     </declare-styleable>
 </resources>

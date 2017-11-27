@@ -73,7 +73,7 @@ public class EasyScrollLayout extends FrameLayout {
     public static final int INITSTATE = -16;
     private int mState = INITSTATE;
     private MotionEvent mLastMoveEvent;
-    private float mMaxTopTranslationYRate = 0.5f;
+    private float mParallaxMult = 0.5f;
 
     private final int[] mScrollOffset = new int[2];
     private final int[] mScrollConsumed = new int[2];
@@ -110,6 +110,7 @@ public class EasyScrollLayout extends FrameLayout {
 
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
         isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
+        mParallaxMult = a.getFloat(R.styleable.EasyScrollLayout_innerTop_ParallaxMultiplier, 0f);
         a.recycle();
 
 
@@ -342,7 +343,7 @@ public class EasyScrollLayout extends FrameLayout {
             return dispatchTouchEventSupper(event);
         }
         final MotionEvent vtev = MotionEvent.obtain(event);
-        boolean isHandlar = false;
+        boolean isHandlar = true;
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mNestedYOffset = 0;
@@ -360,7 +361,7 @@ public class EasyScrollLayout extends FrameLayout {
                 isChanged = false;
                 isHandlar = true;
                 isVerticalScroll = true;
-                mContentView.mScrollChildHandlar.onDownInit();
+                mContentView.mVerticalScrollCheckHandlar.onDownInit();
                 break;
             case MotionEvent.ACTION_MOVE:
                 mLastMoveEvent = MotionEvent.obtain(event);
@@ -377,11 +378,6 @@ public class EasyScrollLayout extends FrameLayout {
                     if (Math.abs(dy) > mTouchSlop) {
                         if (Math.abs(dy) > Math.abs(dx)) {
                             mDragging = true;
-//                            if(dy >0){
-//                                dy -= mTouchSlop;
-//                            }else {
-//                                dy += mTouchSlop;
-//                            }
                             isHandlar = true;
                             dispatchScroll(vtev, dy);
                             mLastMotionY = y;
@@ -392,7 +388,6 @@ public class EasyScrollLayout extends FrameLayout {
                             isHandlar = dispatchTouchEventSupper(event);
                             cancelWithAnim();
                         }
-
                     } else {
                         dispatchTouchEventSupper(event);
                         isHandlar = true;
@@ -609,7 +604,7 @@ public class EasyScrollLayout extends FrameLayout {
             return;
         }
         int lastScrolly = getScrollY();
-        scrollBy(0, (int) -dy);
+        scrollBy(0,  -dy);
         int consumedDy = consumed[1] = lastScrolly - getScrollY();
         Logger.e("parentPreScroll  " + consumed[1]);
         if (dy - consumedDy != 0) {
@@ -629,7 +624,7 @@ public class EasyScrollLayout extends FrameLayout {
 //        float curY = event.getY(activePointerIndex);
         event.offsetLocation(mFirstMotionX - curX, 0);
         dispatchTouchEventSupper(event);
-        mContentView.mScrollChildHandlar.childScrollConsumed(mScrollConsumed);
+        mContentView.mVerticalScrollCheckHandlar.childScrollConsumed(mScrollConsumed);
 
 
     }
@@ -779,8 +774,8 @@ public class EasyScrollLayout extends FrameLayout {
 
 
                 }
-                if (mMaxTopTranslationYRate != 0) {
-                    int totalOffset = (int) ((mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight()) * mMaxTopTranslationYRate);
+                if (mParallaxMult != 0) {
+                    int totalOffset = (int) ((mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight()) * mParallaxMult);
                     float verticalOffset = totalOffset * offsetRatio;
                     ViewCompat.setTranslationY(mInnerTopView, (int) verticalOffset);
                 }
@@ -818,8 +813,8 @@ public class EasyScrollLayout extends FrameLayout {
         }
     }
 
-    public void setMaxTopTranslationYRate(float rage) {
-        this.mMaxTopTranslationYRate = rage;
+    public void setParallaxMult(float parallaxMult) {
+        this.mParallaxMult = parallaxMult;
     }
 
 

@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -19,91 +20,121 @@ import com.orhanobut.logger.Logger;
  * Created by Administrator on 2017/11/25 0025.
  */
 
-public class ScrollChildHandlar {
+public class VerticalScrollCheckHandlar {
     View mScrollChild;
     ViewPager mViewPager;
     boolean isAutomaticHunting = true;
+
+    public boolean reachChildTop() {
+        if (mScrollChild == null) {
+            return true;
+        }
+        return !ViewCompat.canScrollVertically(mScrollChild, -1);
+    }
+
+    public boolean reachChildBottom() {
+        if (mScrollChild == null) {
+            return true;
+        }
+        return !ViewCompat.canScrollVertically(mScrollChild, 1);
+    }
+
     final protected boolean isVerticalScrollView(View child) {
         if (child instanceof android.support.v4.view.NestedScrollingChild || child instanceof AbsListView || child instanceof ScrollView || child instanceof ViewPager || child instanceof WebView || child instanceof RecyclerView) {
             return true;
         }
-        if(isVerticalScrollChild(child)){
+        if (isVerticalScrollChild(child)) {
             return true;
         }
         return false;
     }
+
     final protected boolean isHorizontalScrollView(View child) {
         if (child instanceof HorizontalScrollView || child instanceof ScrollView || child instanceof ViewPager || child instanceof RecyclerView) {
             return true;
         }
-        if(isHorizontalScrollChild(child)){
+        if (isHorizontalScrollChild(child)) {
             return true;
         }
         return false;
     }
-    public boolean isVerticalScrollChild(View child){
+
+    public boolean isVerticalScrollChild(View child) {
         return false;
     }
-    public boolean isHorizontalScrollChild(View child){
+
+    public boolean isHorizontalScrollChild(View child) {
         return false;
     }
-    public View getCurrentScrollChild(){
+
+    public View getCurrentScrollChild() {
         return mScrollChild;
     }
 
-    public void setScrollChild(View scrollChild){
+    public void setScrollChild(View scrollChild) {
         this.mScrollChild = scrollChild;
-        isAutomaticHunting= false;
+        isAutomaticHunting = false;
 
     }
+
     boolean isScrollChanged;
-    protected void resetChildScrollChange(){
-        isScrollChanged =false;
+
+    protected void resetChildScrollChange() {
+        isScrollChanged = false;
     }
-    public void notifyChildScrollChaged(){
+
+    public void notifyChildScrollChaged() {
         isScrollChanged = true;
     }
-    public boolean isAutomaticHunting(){
-        return  isAutomaticHunting;
+    public boolean isScrollChanged(){
+        return isScrollChanged;
     }
-    protected void huntingScrollChild(View child){
+
+    public boolean isAutomaticHunting() {
+        return isAutomaticHunting;
+    }
+
+    protected void huntingScrollChild(View child) {
         findViewPagerAndScrollView(child);
     }
+
     View mScrollviewDirectChild;
     int mLastTop;
-    public void childScrollConsumed( int[] consumed){
-        consumed[0] = consumed[1] =0;
-        if(mScrollChild ==null){
+
+    public void childScrollConsumed(int[] consumed) {
+        consumed[0] = consumed[1] = 0;
+        if (mScrollChild == null) {
             return;
         }
-        if(mScrollChild instanceof ViewGroup){
+        if (mScrollChild instanceof ViewGroup) {
             ViewGroup scrollView = (ViewGroup) mScrollChild;
-            if(scrollView.getChildCount()==0){
+            if (scrollView.getChildCount() == 0) {
                 return;
             }
 
-            if(mScrollviewDirectChild !=null){
-                consumed[1] =  mScrollviewDirectChild.getTop()-mLastTop;
-            }else{
+            if (mScrollviewDirectChild != null) {
+                consumed[1] = mScrollviewDirectChild.getTop() - mLastTop;
+            } else {
 
             }
-            int index = scrollView.getChildCount()/2;
+            int index = scrollView.getChildCount() / 2;
             mScrollviewDirectChild = scrollView.getChildAt(index);
             mLastTop = mScrollviewDirectChild.getTop();
         }
 
 
     }
-    public void onDownInit(){
-        if(mScrollChild ==null){
+
+    public void onDownInit() {
+        if (mScrollChild == null) {
             return;
         }
-        if(mScrollChild instanceof ViewGroup){
+        if (mScrollChild instanceof ViewGroup) {
             ViewGroup scrollView = (ViewGroup) mScrollChild;
-            if(scrollView.getChildCount()==0){
+            if (scrollView.getChildCount() == 0) {
                 return;
             }
-            int index = scrollView.getChildCount()/2;
+            int index = scrollView.getChildCount() / 2;
             mScrollviewDirectChild = scrollView.getChildAt(index);
             mLastTop = mScrollviewDirectChild.getTop();
         }
@@ -116,7 +147,7 @@ public class ScrollChildHandlar {
      * @param viewGroup
      */
     public void findScrollView(ViewGroup viewGroup) {
-        if(viewGroup ==null){
+        if (viewGroup == null) {
             return;
         }
         if (isVerticalScrollView(viewGroup)) {
@@ -138,20 +169,26 @@ public class ScrollChildHandlar {
         }
     }
 
-    private void findPagerInitScrollView(){
+    private void onViewpagerFound() {
 
         final PagerAdapter a = mViewPager.getAdapter();
         int currentItem = mViewPager.getCurrentItem();
-        if (a == null||mScrollChild !=null) {
+        if (a == null || mViewPager.getChildCount() > 0) {
             return;
         }
         if (a instanceof FragmentPagerAdapter) {
             FragmentPagerAdapter fadapter = (FragmentPagerAdapter) a;
             Fragment item = fadapter.getItem(currentItem);
+            if (item == null || (!item.isAdded()) || item.isDetached() || item.getActivity() == null || item.getView() == null) {
+                return;
+            }
             findScrollView((ViewGroup) item.getView());
         } else if (a instanceof FragmentStatePagerAdapter) {
             FragmentStatePagerAdapter fsAdapter = (FragmentStatePagerAdapter) a;
             Fragment item = fsAdapter.getItem(currentItem);
+            if (item == null || (!item.isAdded()) || item.isDetached() || item.getActivity() == null || item.getView() == null) {
+                return;
+            }
             findScrollView((ViewGroup) item.getView());
         } else if (a instanceof EasyScrollLayout.CurrentPagerAdapter) {
             final EasyScrollLayout.CurrentPagerAdapter adapter = (EasyScrollLayout.CurrentPagerAdapter) a;
@@ -161,10 +198,15 @@ public class ScrollChildHandlar {
                 mViewPager.post(new Runnable() {
                     @Override
                     public void run() {
-                        findScrollView((ViewGroup) adapter.getPrimaryItem());
+                        View child = adapter.getPrimaryItem();
+                        if (child != null && child instanceof ViewGroup) {
+                            findScrollView((ViewGroup) child);
+                        }
                     }
                 });
             }
+        } else {
+
         }
     }
 
@@ -175,9 +217,9 @@ public class ScrollChildHandlar {
         return false;
     }
 
-    private void findViewPagerAndScrollView(View  parent) {
-        if(!(parent instanceof ViewGroup)){
-            if(parent instanceof WebView){
+    private void findViewPagerAndScrollView(View parent) {
+        if (!(parent instanceof ViewGroup)) {
+            if (parent instanceof WebView) {
                 mScrollChild = parent;
             }
             return;
@@ -186,7 +228,7 @@ public class ScrollChildHandlar {
         if (isViewPager(viewGroup)) {
             mViewPager = (ViewPager) viewGroup;
             mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-            findPagerInitScrollView();
+            onViewpagerFound();
         } else if (isVerticalScrollView(viewGroup)) {
             mScrollChild = viewGroup;
         } else {
@@ -195,13 +237,13 @@ public class ScrollChildHandlar {
                 View child;
                 for (int i = 0; i < count; i++) {
                     child = viewGroup.getChildAt(i);
-                    if(child instanceof WebView){
+                    if (child instanceof WebView) {
                         mScrollChild = child;
                         return;
-                    }else if (isViewPager( child)) {
+                    } else if (isViewPager(child)) {
                         mViewPager = (ViewPager) viewGroup;
                         mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-                        findPagerInitScrollView();
+                        onViewpagerFound();
                     } else if (isVerticalScrollView(child)) {
                         mScrollChild = child;
                     } else if (child instanceof ViewGroup) {
@@ -215,6 +257,7 @@ public class ScrollChildHandlar {
 
     ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
         int position;
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -227,7 +270,7 @@ public class ScrollChildHandlar {
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            if(state == ViewPager.SCROLL_STATE_IDLE){
+            if (state == ViewPager.SCROLL_STATE_IDLE) {
                 mScrollChild = null;
                 Logger.e("position" + position);
                 final PagerAdapter a = mViewPager.getAdapter();
@@ -240,17 +283,17 @@ public class ScrollChildHandlar {
                     Fragment item = fsAdapter.getItem(position);
                     findScrollView((ViewGroup) item.getView());
                 } else if (a instanceof EasyScrollLayout.CurrentPagerAdapter) {
-                    EasyScrollLayout.CurrentPagerAdapter currentPagerAdapter = (EasyScrollLayout.CurrentPagerAdapter)a;
-                    findScrollView((ViewGroup)currentPagerAdapter.getCurentView(position));
+                    EasyScrollLayout.CurrentPagerAdapter currentPagerAdapter = (EasyScrollLayout.CurrentPagerAdapter) a;
+                    findScrollView((ViewGroup) currentPagerAdapter.getCurentView(position));
 
                 }
-                if(mScrollChild == null){
-                    int  childCount = mViewPager.getChildCount();
-                    for (int i = 0; i < childCount ; i++) {
+                if (mScrollChild == null) {
+                    int childCount = mViewPager.getChildCount();
+                    for (int i = 0; i < childCount; i++) {
                         View child = mViewPager.getChildAt(i);
                         int childX = (int) child.getX();
                         int childY = (int) child.getY();
-                        if(childX>=0 && childX <= mViewPager.getMeasuredWidth() & childY>=0 && childX <= mViewPager.getMinimumHeight()){
+                        if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMinimumHeight()) {
                             mScrollChild = (View) child;
                             break;
                         }

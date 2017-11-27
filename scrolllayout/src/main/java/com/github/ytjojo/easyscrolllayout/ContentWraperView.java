@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
@@ -16,12 +15,9 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.OverScroller;
-import android.widget.Scroller;
 
 import com.orhanobut.logger.Logger;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 /**
@@ -119,8 +115,8 @@ public class ContentWraperView extends FrameLayout {
 
             }
         }
-        if (mContentView != null && mScrollChildHandlar.isAutomaticHunting()) {
-            mScrollChildHandlar.huntingScrollChild(mContentView);
+        if (mContentView != null && mVerticalScrollCheckHandlar.isAutomaticHunting()) {
+            mVerticalScrollCheckHandlar.huntingScrollChild(mContentView);
         }
     }
 
@@ -471,19 +467,16 @@ public class ContentWraperView extends FrameLayout {
         return false;
     }
 
-    ScrollChildHandlar mScrollChildHandlar = new ScrollChildHandlar();
+    VerticalScrollCheckHandlar mVerticalScrollCheckHandlar = new VerticalScrollCheckHandlar();
 
     public boolean reachChildTop() {
-        if (mScrollChildHandlar.getCurrentScrollChild() == null) {
-            return true;
-        }
-        return !ViewCompat.canScrollVertically(mScrollChildHandlar.getCurrentScrollChild(), -1);
+        return mVerticalScrollCheckHandlar.reachChildTop();
     }
 
     public boolean reachChildBottom() {
-        if (mScrollChildHandlar.getCurrentScrollChild() == null) {
-            return true;
-        }
-        return !ViewCompat.canScrollVertically(mScrollChildHandlar.getCurrentScrollChild(), 1);
+        return mVerticalScrollCheckHandlar.reachChildBottom();
+    }
+    public void setScrollChildHandlar(@NonNull VerticalScrollCheckHandlar handlar){
+        this.mVerticalScrollCheckHandlar = handlar;
     }
 }
