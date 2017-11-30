@@ -64,14 +64,7 @@ public class ContentWraperView extends FrameLayout {
     View mInnerBottomView;
     View mOutTopView;
     View mOutBottomView;
-    private int mOrientation;
 
-    public void setOrientation(@EasyScrollLayout.OrientationMode int orientation) {
-        if (mOrientation != orientation) {
-            mOrientation = orientation;
-
-        }
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -357,6 +350,11 @@ public class ContentWraperView extends FrameLayout {
         }
         scrollBy(0, (int) -scolldy);
         consumed[1] = lastScrolly - getScrollY();
+        if(consumed[1] !=0){
+            if(!mScroller.isFinished()){
+                mScroller.abortAnimation();
+            }
+        }
         Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
     }
 

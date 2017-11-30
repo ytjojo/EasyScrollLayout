@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +41,20 @@ public class VerticalScrollCheckHandlar {
     }
 
     final protected boolean isVerticalScrollView(View child) {
-        if (child instanceof android.support.v4.view.NestedScrollingChild || child instanceof AbsListView || child instanceof ScrollView || child instanceof ViewPager || child instanceof WebView || child instanceof RecyclerView) {
+        if (isVerticalScrollChild(child)) {
             return true;
         }
-        if (isVerticalScrollChild(child)) {
+        if (child instanceof android.support.v4.view.NestedScrollingChild || child instanceof AbsListView || child instanceof ScrollView || child instanceof ViewPager || child instanceof WebView || child instanceof RecyclerView) {
+            if(child instanceof RecyclerView){
+                RecyclerView recyclerView = (RecyclerView) child;
+                RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+                if(manager !=null && manager instanceof RecyclerView.LayoutManager ){
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) manager;
+                    if(layoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL){
+                        return false;
+                    }
+                }
+            }
             return true;
         }
         return false;
@@ -124,8 +135,12 @@ public class VerticalScrollCheckHandlar {
 
 
     }
-
-    public void onDownInit() {
+    boolean isDonwEventHitScrollChild;
+    public boolean isDonwEventHitScrollChild(){
+        return isDonwEventHitScrollChild;
+    }
+    public void onDownInit(int rawX,int rawY) {
+        isDonwEventHitScrollChild = HorizontalScrollHandlar.isTouchPointInView(mScrollChild,rawX,rawY);
         if (mScrollChild == null) {
             return;
         }
@@ -173,7 +188,7 @@ public class VerticalScrollCheckHandlar {
 
         final PagerAdapter a = mViewPager.getAdapter();
         int currentItem = mViewPager.getCurrentItem();
-        if (a == null || mViewPager.getChildCount() > 0) {
+        if (a == null || mViewPager.getChildCount() == 0) {
             return;
         }
         if (a instanceof FragmentPagerAdapter) {
