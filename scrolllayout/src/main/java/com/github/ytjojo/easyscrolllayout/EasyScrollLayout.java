@@ -268,12 +268,6 @@ public class EasyScrollLayout extends FrameLayout {
                 mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
                 lp.mMinScrollY = mMinVerticalScrollRange;
                 lp.mMaxScrollY = 0;
-//                if(mOrientation == ORIENTATION_INVALID){
-//                    mOrientation = VERTICAL;
-//                }
-//                if(mOrientation == HORIZONTAL){
-//                    mOrientation = ORIENTATION_BOTH;
-//                }
                 mOrientation |= ORIENTATION_VERTICAL;
                 break;
             case GRAVITY_OUT_LEFT:
@@ -281,12 +275,6 @@ public class EasyScrollLayout extends FrameLayout {
                 childTop = 0;
                 mOutLeftView = child;
 
-//                if(mOrientation == ORIENTATION_INVALID){
-//                    mOrientation = HORIZONTAL;
-//                }
-//                if(mOrientation == VERTICAL){
-//                    mOrientation = ORIENTATION_BOTH;
-//                }
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
             case GRAVITY_OUT_RIGHT:
@@ -294,12 +282,6 @@ public class EasyScrollLayout extends FrameLayout {
                 childTop = 0;
                 mOutRightView = child;
 
-//                if(mOrientation == ORIENTATION_INVALID){
-//                    mOrientation = HORIZONTAL;
-//                }
-//                if(mOrientation == VERTICAL){
-//                    mOrientation = ORIENTATION_BOTH;
-//                }
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
 
@@ -309,12 +291,6 @@ public class EasyScrollLayout extends FrameLayout {
                 lp.mMinScrollY = 0;
                 lp.mMaxScrollY = height - child.getMinimumHeight();
                 mMaxVerticalScrollRange = Math.max(mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight(), mMaxVerticalScrollRange);
-//                if(mOrientation == ORIENTATION_INVALID){
-//                    mOrientation = VERTICAL;
-//                }
-//                if(mOrientation == HORIZONTAL){
-//                    mOrientation = ORIENTATION_BOTH;
-//                }
                 mOrientation |= ORIENTATION_VERTICAL;
                 break;
 
@@ -352,17 +328,6 @@ public class EasyScrollLayout extends FrameLayout {
         return ev;
     }
 
-    private boolean inChild(View child, int x, int y) {
-        if (getChildCount() > 0) {
-            final int scrollY = getScrollY();
-            final int scrollX = getScrollX();
-            return !(y < child.getTop() - scrollY
-                    || y >= child.getBottom() - scrollY
-                    || x < child.getLeft() - scrollX
-                    || x >= child.getRight() - scrollX);
-        }
-        return false;
-    }
 
     private final static int INVALID_ID = -1;
     private int mActivePointerId = INVALID_ID;
@@ -459,11 +424,6 @@ public class EasyScrollLayout extends FrameLayout {
                         mLastEventPoint.set(x,y);
                         dispatchTouchEventSupper(event);
                         if(mDragging){
-//                            if(isHorizontalScroll){
-//                                dispatchHorizontalScroll(vtev,dx);
-//                            }else if(isVerticalScroll){
-//                                dispatchVerticalScroll(vtev,dy);
-//                            }
                             if(isVerticalScroll){
                                 vtev.offsetLocation(mFirstMotionX - x, dy>0?dy-mTouchSlop:mTouchSlop-dy);
                                 dispatchTouchEventSupper(vtev);

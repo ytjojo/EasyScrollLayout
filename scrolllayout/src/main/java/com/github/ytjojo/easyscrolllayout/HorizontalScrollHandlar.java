@@ -83,7 +83,8 @@ public class HorizontalScrollHandlar {
         offsetLeftAndRight(dx);
         consumed[0] = mScrollX - startX;
     }
-    public void offsetLeftAndRight(int dx){
+
+    public void offsetLeftAndRight(int dx) {
         int mTargetScrollX = mScrollX;
         mTargetScrollX += dx;
         if (mTargetScrollX > mMaxHorizontalScrollRange) {
@@ -92,12 +93,12 @@ public class HorizontalScrollHandlar {
         if (mTargetScrollX < mMinHorizontalScrollRange) {
             mTargetScrollX = mMinHorizontalScrollRange;
         }
-        if(mScrollX < 0 &&dx > 0 && mTargetScrollX>0){
+        if (mScrollX < 0 && dx > 0 && mTargetScrollX > 0) {
             mTargetScrollX = 0;
-        }else if(mScrollX >0 && dx <0 &&mTargetScrollX <0){
+        } else if (mScrollX > 0 && dx < 0 && mTargetScrollX < 0) {
             mTargetScrollX = 0;
         }
-        int offsetDx = mTargetScrollX - mScrollX ;
+        int offsetDx = mTargetScrollX - mScrollX;
         ViewCompat.offsetLeftAndRight(mContentView, offsetDx);
 
         if (mOutLeftView != null) {
@@ -115,16 +116,7 @@ public class HorizontalScrollHandlar {
         mScrollX = mTargetScrollX;
 
     }
-    private void cancelAnim() {
 
-    }
-
-    public boolean canHorizontalScroll() {
-        if (mOutLeftView == null && mOutRightView == null) {
-            return false;
-        }
-        return true;
-    }
 
     private boolean canPreScroll(int dx) {
         if (isHorizontallyScrolled()) {
@@ -142,7 +134,6 @@ public class HorizontalScrollHandlar {
     View mScrollChild;
     boolean isAutomaticHunting = true;
     Rect mRect = new Rect();
-    int[] mLocation = new int[2];
 
     boolean shouldOffsetEvent;
 
@@ -249,22 +240,7 @@ public class HorizontalScrollHandlar {
             mScrollChild = parent;
             return mScrollChild;
         } else if (isVerticalScrollView(parent)) {
-            View child = null;
-            if (parent instanceof ScrollView || parent instanceof NestedScrollView) {
-                ViewGroup group = (ViewGroup) parent;
-                if (group.getChildCount() > 0 && group.getChildAt(0) instanceof ViewGroup) {
-                    child = group.getChildAt(0);
-                    offsetPoint(point, group, child);
-                }
-            }
-            View hitView = findChildViewUnder((ViewGroup) child, x, y);
-            if (hitView == null) {
-                return null;
-            }
-            if (isHorizontalScrollView(hitView)) {
-                mScrollChild = hitView;
-                return mScrollChild;
-            }
+            return findScrollChildInVerticalView(point, (ViewGroup) parent);
         } else {
             if (parent instanceof ViewGroup) {
                 ViewGroup viewGroup = (ViewGroup) parent;
@@ -273,23 +249,9 @@ public class HorizontalScrollHandlar {
                     return null;
                 }
                 if (isHorizontalScrollView(hitView)) {
-                    mScrollChild = hitView;
+                    return mScrollChild = hitView;
                 } else if (isVerticalScrollView(hitView)) {
-                    viewGroup = (ViewGroup) hitView;
-                    View child = null;
-                    if (viewGroup instanceof ScrollView || viewGroup instanceof NestedScrollView) {
-                        if (viewGroup.getChildCount() > 0 && viewGroup.getChildAt(0) instanceof ViewGroup) {
-                            child = viewGroup.getChildAt(0);
-                            offsetPoint(point, viewGroup, child);
-                        } else {
-                            return null;
-                        }
-                    }
-                    hitView = findChildViewUnder((ViewGroup) hitView, point.x, point.y);
-                    if (hitView != null && isHorizontalScrollView(hitView)) {
-                        mScrollChild = hitView;
-                        return mScrollChild;
-                    }
+                    return findScrollChildInVerticalView(point, (ViewGroup) hitView);
                 }
             }
 
@@ -297,13 +259,33 @@ public class HorizontalScrollHandlar {
         return null;
     }
 
-    public boolean vertiaclParentContainHorizentalScrollChild() {
-        return true;
+    public View isDirectChildCanScroll(Point point, ViewGroup parent, ViewGroup child) {
+        offsetPoint(point, parent, child);
+        return findChildViewUnder(child, point.x, point.y);
+    }
+
+    public View findScrollChildInVerticalView(Point point, ViewGroup verticalScrollView) {
+        View child = verticalScrollView;
+        if (verticalScrollView instanceof ScrollView || verticalScrollView instanceof NestedScrollView) {
+            if (verticalScrollView.getChildCount() > 0 && verticalScrollView.getChildAt(0) instanceof ViewGroup) {
+                child = verticalScrollView.getChildAt(0);
+                offsetPoint(point, verticalScrollView, child);
+            }
+        }
+        View hitView = findChildViewUnder((ViewGroup) child, x, y);
+        if (hitView == null) {
+            return null;
+        }
+        if (isHorizontalScrollView(hitView)) {
+            mScrollChild = hitView;
+            return mScrollChild;
+        } else if (hitView instanceof ViewGroup) {
+            return isDirectChildCanScroll(point, (ViewGroup) child, (ViewGroup) hitView);
+        }
+        return null;
     }
 
     Point mPoint = new Point();
-
-
     public boolean onDownEvent(int x, int y, EasyScrollLayout parent) {
         shouldOffsetEvent = false;
         mScrollChild = null;
@@ -381,13 +363,6 @@ public class HorizontalScrollHandlar {
         return false;
     }
 
-//    public static boolean pointInChild(View child, int x, int y, int scrollX, int scrollY) {
-//
-//        return !(y < child.getY() - scrollY
-//                || y > child.getY() + child.getMeasuredHeight() - scrollY
-//                || x < child.getX() - scrollX
-//                || x > child.getX() + child.getMeasuredWidth() - scrollX);
-//    }
 
     public static boolean isTouchPointInView(View view, int rawX, int rawY) {
         if (view == null) {
@@ -439,17 +414,17 @@ public class HorizontalScrollHandlar {
     Runnable mFlingRunnable;
 
     private void fiing(int velocityX) {
-        if (mScrollX > 0 ) {
-            if(velocityX>0){
+        if (mScrollX > 0) {
+            if (velocityX > 0) {
 
                 mScroller.fling(mScrollX, 0, velocityX, 0, mMaxHorizontalStableScrollRange, mMaxHorizontalStableScrollRange, 0, 0);
-            }else {
+            } else {
                 mScroller.fling(mScrollX, 0, velocityX, 0, 0, 0, 0, 0);
             }
-        }else {
-            if(velocityX>0){
-                mScroller.fling(mScrollX, 0, velocityX, 0, 0,0 , 0, 0);
-            }else {
+        } else {
+            if (velocityX > 0) {
+                mScroller.fling(mScrollX, 0, velocityX, 0, 0, 0, 0, 0);
+            } else {
                 mScroller.fling(mScrollX, 0, velocityX, 0, mMinHorizontalStableScrollRange, mMinHorizontalStableScrollRange, 0, 0);
             }
         }
@@ -474,7 +449,7 @@ public class HorizontalScrollHandlar {
             if (mLayout != null && mScroller != null) {
                 if (mScroller.computeScrollOffset()) {
                     int curX = mScroller.getCurrX();
-                    offsetLeftAndRight(curX-mScrollX);
+                    offsetLeftAndRight(curX - mScrollX);
                     // Post ourselves so that we run on the next animation
                     ViewCompat.postOnAnimation(mLayout, this);
                 } else {
