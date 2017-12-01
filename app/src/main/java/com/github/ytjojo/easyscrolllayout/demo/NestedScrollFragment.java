@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.orhanobut.logger.Logger;
+
 /**
  * Created by Administrator on 2017/11/26 0026.
  */
@@ -19,4 +21,15 @@ public class NestedScrollFragment extends Fragment {
        return LayoutInflater.from(getActivity()).inflate(R.layout.layout_nestedscrollview,container,false);
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        NestedScrollView scrollView = (NestedScrollView) view.findViewById(R.id.scrollview);
+        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                Logger.e(scrollY + "scrollY");
+            }
+        });
+    }
 }

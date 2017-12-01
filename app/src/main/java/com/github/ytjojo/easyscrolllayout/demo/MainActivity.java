@@ -3,6 +3,7 @@ package com.github.ytjojo.easyscrolllayout.demo;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View view) {
-				Intent intent = new Intent(MainActivity.this,StickyLayoutActivity.class);
+				Intent intent = new Intent(MainActivity.this,ListViewActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -39,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+		findViewById(R.id.tv_viewpagerh).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,ViewpagerHorizentalActivity.class);
+				startActivity(intent);
+			}
+		});
+        CoordinatorLayout c;
+
 
 	}
 

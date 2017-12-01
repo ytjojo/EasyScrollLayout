@@ -314,10 +314,7 @@ public class ContentWraperView extends FrameLayout {
         int lastScrollx = getScrollX();
         int lastScrolly = getScrollY();
         if (x != lastScrollx || y != lastScrolly) {
-            Logger.e("scrollTo" + (y - lastScrolly));
             super.scrollTo(x, y);
-        } else {
-            Logger.e("scrollTo 不能滚动");
         }
     }
 
@@ -362,7 +359,7 @@ public class ContentWraperView extends FrameLayout {
         return getScrollY() >= mMinVerticalScrollRange && getScrollY() <= mMaxVerticalScrollRange && getScrollY() != 0;
     }
 
-    public void dispatchScroll(int velocityY, boolean isDownSlide) {
+    public void dispatchFling(int velocityY, boolean isDownSlide) {
         if (getScrollY() < 0) {
             if (getScrollY() < -mOutTopView.getMeasuredHeight()) {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {

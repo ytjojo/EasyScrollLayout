@@ -78,10 +78,10 @@
       <action android:name="android.intent.action.VIEW"/>
       </intent-filter>
     </activity>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.StickyLayoutActivity"/>
+    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ListViewActivity"/>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ViewPagerAcitivity"/>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.WebViewActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.WiewpagerHorizentalActivity"/>
+    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ViewpagerHorizentalActivity"/>
   </application>
 
 </manifest>

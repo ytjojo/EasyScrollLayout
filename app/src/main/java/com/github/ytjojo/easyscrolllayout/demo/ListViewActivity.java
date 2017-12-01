@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ytjojo.easyscrolllayout.EasyScrollLayout;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.Map;
  * Created by Administrator on 2017/11/21 0021.
  */
 
-public class StickyLayoutActivity extends AppCompatActivity {
+public class ListViewActivity extends AppCompatActivity {
     ListView mListView;
 
 
@@ -104,7 +105,7 @@ public class StickyLayoutActivity extends AppCompatActivity {
                 if(mFirstView !=null){
                     int dy = mFirstView.getTop() - mLastTop;
                     if(dy != 0){
-//                        Logger.e("mListView onScroll   : " + dy);
+                        Logger.e("mListView onScroll   : " + dy);
 
                     }
                     mFirstView = view.getChildAt(0);

@@ -15,8 +15,6 @@ import android.widget.AbsListView;
 import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 
-import com.orhanobut.logger.Logger;
-
 /**
  * Created by Administrator on 2017/11/25 0025.
  */
@@ -287,7 +285,6 @@ public class VerticalScrollCheckHandlar {
         public void onPageScrollStateChanged(int state) {
             if (state == ViewPager.SCROLL_STATE_IDLE) {
                 mScrollChild = null;
-                Logger.e("position" + position);
                 final PagerAdapter a = mViewPager.getAdapter();
                 if (a instanceof FragmentPagerAdapter) {
                     FragmentPagerAdapter fadapter = (FragmentPagerAdapter) a;
