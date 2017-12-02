@@ -78,8 +78,6 @@ public class ContentWraperView extends FrameLayout {
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (lp.mLayoutOutGravity != GRAVITY_OUT_INVALID) {
-                    final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
-                    maxArea = childArea > maxArea ? childArea : maxArea;
                     switch (lp.mLayoutOutGravity) {
                         case GRAVITY_INNER_BOTTOM:
                             mInnerBottomView = child;
@@ -94,18 +92,15 @@ public class ContentWraperView extends FrameLayout {
                 }
             }
         }
-        if (mContentView == null) {
-            if (!contentViews.isEmpty()) {
-                int contentViewsCount = contentViews.size();
-                for (int i = 0; i < contentViewsCount; i++) {
-                    final View child = getChildAt(i);
-                    final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
-                    if (childArea > maxArea) {
-                        mContentView = child;
-                        maxArea = childArea;
-                    }
+        if (!contentViews.isEmpty()) {
+            int contentViewsCount = contentViews.size();
+            for (int i = 0; i < contentViewsCount; i++) {
+                final View child = getChildAt(i);
+                final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
+                if (childArea >= maxArea) {
+                    mContentView = child;
+                    maxArea = childArea;
                 }
-
             }
         }
         if (mContentView != null && mVerticalScrollCheckHandlar.isAutomaticHunting()) {

@@ -23,6 +23,7 @@ public class VerticalScrollCheckHandlar {
     View mScrollChild;
     ViewPager mViewPager;
     boolean isAutomaticHunting = true;
+    ContentWraperView mCurContentView;
 
     public boolean reachChildTop() {
         if (mScrollChild == null) {
@@ -43,12 +44,12 @@ public class VerticalScrollCheckHandlar {
             return true;
         }
         if (child instanceof android.support.v4.view.NestedScrollingChild || child instanceof AbsListView || child instanceof ScrollView || child instanceof ViewPager || child instanceof WebView || child instanceof RecyclerView) {
-            if(child instanceof RecyclerView){
+            if (child instanceof RecyclerView) {
                 RecyclerView recyclerView = (RecyclerView) child;
                 RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
-                if(manager !=null && manager instanceof RecyclerView.LayoutManager ){
+                if (manager != null && manager instanceof RecyclerView.LayoutManager) {
                     LinearLayoutManager layoutManager = (LinearLayoutManager) manager;
-                    if(layoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL){
+                    if (layoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
                         return false;
                     }
                 }
@@ -95,12 +96,17 @@ public class VerticalScrollCheckHandlar {
     public void notifyChildScrollChaged() {
         isScrollChanged = true;
     }
-    public boolean isScrollChanged(){
+
+    public boolean isScrollChanged() {
         return isScrollChanged;
     }
 
     public boolean isAutomaticHunting() {
         return isAutomaticHunting;
+    }
+
+    public void disableAutomaticHuunting() {
+        isAutomaticHunting = false;
     }
 
     protected void huntingScrollChild(View child) {
@@ -133,12 +139,15 @@ public class VerticalScrollCheckHandlar {
 
 
     }
+
     boolean isDonwEventHitScrollChild;
-    public boolean isDonwEventHitScrollChild(){
+
+    public boolean isDonwEventHitScrollChild() {
         return isDonwEventHitScrollChild;
     }
-    public void onDownInit(int rawX,int rawY) {
-        isDonwEventHitScrollChild = HorizontalScrollHandlar.isTouchPointInView(mScrollChild,rawX,rawY);
+
+    public void onDownInit(int rawX, int rawY) {
+        isDonwEventHitScrollChild = HorizontalScrollHandlar.isTouchPointInView(mScrollChild, rawX, rawY);
         if (mScrollChild == null) {
             return;
         }
@@ -159,27 +168,41 @@ public class VerticalScrollCheckHandlar {
      *
      * @param viewGroup
      */
-    public void findScrollView(ViewGroup viewGroup) {
+    public boolean findScrollView(ViewGroup viewGroup) {
         if (viewGroup == null) {
-            return;
+            return false;
         }
         if (isVerticalScrollView(viewGroup)) {
             mScrollChild = viewGroup;
-            return;
+            return true;
+        }
+        if (viewGroup instanceof ContentWraperView) {
+            mCurContentView = (ContentWraperView) viewGroup;
+            return true;
         }
         if (viewGroup.getChildCount() > 0) {
+
             int count = viewGroup.getChildCount();
             View child;
             for (int i = 0; i < count; i++) {
                 child = viewGroup.getChildAt(i);
                 if (isVerticalScrollView(child)) {
                     mScrollChild = viewGroup;
-                    return;
+                    return true;
+                } else if (viewGroup instanceof ContentWraperView) {
+                    mCurContentView = (ContentWraperView) viewGroup;
+                    return true;
+                } else if (viewGroup instanceof ContentWraperView) {
+                    mCurContentView = (ContentWraperView) viewGroup;
+                    return true;
                 } else if (child instanceof ViewGroup) {
-                    findScrollView((ViewGroup) child);
+//                    if (findScrollView((ViewGroup) child)) {
+//                        return true;
+//                    }
                 }
             }
         }
+        return false;
     }
 
     private void onViewpagerFound() {
@@ -219,7 +242,17 @@ public class VerticalScrollCheckHandlar {
                 });
             }
         } else {
+            int childCount = mViewPager.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View child = mViewPager.getChildAt(i);
+                int childX = (int) child.getX() - mViewPager.getScrollX();
+                int childY = (int) child.getY() - mViewPager.getScrollY();
+                if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMinimumHeight()) {
+                    mScrollChild = child;
+                    break;
+                }
 
+            }
         }
     }
 
@@ -230,20 +263,26 @@ public class VerticalScrollCheckHandlar {
         return false;
     }
 
-    private void findViewPagerAndScrollView(View parent) {
+    private boolean findViewPagerAndScrollView(View parent) {
         if (!(parent instanceof ViewGroup)) {
             if (parent instanceof WebView) {
                 mScrollChild = parent;
+                return true;
             }
-            return;
+            return false;
         }
         ViewGroup viewGroup = (ViewGroup) parent;
         if (isViewPager(viewGroup)) {
             mViewPager = (ViewPager) viewGroup;
             mViewPager.addOnPageChangeListener(mOnPageChangeListener);
             onViewpagerFound();
+            return true;
         } else if (isVerticalScrollView(viewGroup)) {
             mScrollChild = viewGroup;
+            return true;
+        } else if (viewGroup instanceof ContentWraperView) {
+            mCurContentView = (ContentWraperView) viewGroup;
+            return true;
         } else {
             if (viewGroup.getChildCount() > 0) {
                 int count = viewGroup.getChildCount();
@@ -252,19 +291,27 @@ public class VerticalScrollCheckHandlar {
                     child = viewGroup.getChildAt(i);
                     if (child instanceof WebView) {
                         mScrollChild = child;
-                        return;
+                        return true;
                     } else if (isViewPager(child)) {
                         mViewPager = (ViewPager) viewGroup;
                         mViewPager.addOnPageChangeListener(mOnPageChangeListener);
                         onViewpagerFound();
+                        return true;
                     } else if (isVerticalScrollView(child)) {
                         mScrollChild = child;
+                        return true;
+                    } else if (viewGroup instanceof ContentWraperView) {
+                        mCurContentView = (ContentWraperView) viewGroup;
+                        return true;
                     } else if (child instanceof ViewGroup) {
-                        findViewPagerAndScrollView((ViewGroup) child);
+//                        if (findViewPagerAndScrollView(child)) {
+//                            return true;
+//                        }
                     }
                 }
             }
         }
+        return false;
     }
 
 
@@ -303,12 +350,13 @@ public class VerticalScrollCheckHandlar {
                     int childCount = mViewPager.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         View child = mViewPager.getChildAt(i);
-                        int childX = (int) child.getX();
-                        int childY = (int) child.getY();
+                        int childX = (int) child.getX() - mViewPager.getScrollX();
+                        int childY = (int) child.getY() - mViewPager.getScrollY();
                         if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMinimumHeight()) {
                             mScrollChild = (View) child;
                             break;
                         }
+
                     }
                 }
             }

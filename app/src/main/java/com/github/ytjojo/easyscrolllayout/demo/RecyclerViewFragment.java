@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,12 +30,31 @@ public class RecyclerViewFragment extends Fragment {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                Logger.e(dy + "dy");
+                Logger.e(dy + "dy   recyclerView" );
+            }
+        });
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        mLastY = (int) event.getY();
+                        mFirstY =mLastY;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        mLastY = (int) event.getY();
+                        Logger.e("mFirstY" + mFirstY  + " mLastY" + mLastY);
+                        break;
+                }
+
+                return false;
             }
         });
         return  recyclerView;
     }
-
+    int mLastY;
+    int mFirstY;
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

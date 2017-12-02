@@ -176,9 +176,21 @@ public class EasyScrollLayout extends FrameLayout {
         if (mHorizontalScrollHandlar != null) {
             mHorizontalScrollHandlar.setViews(mContentView, mOutLeftView, mOutRightView);
             mHorizontalScrollHandlar.setTopViews(mInnerTopView, mOutTopView);
+            mHorizontalScrollHandlar.onLayout();
         }
         if(mContentView.mMinVerticalScrollRange<0 || mContentView.mMaxVerticalScrollRange>0){
             mOrientation |= ORIENTATION_VERTICAL;
+        }
+        if(getScrollY() != 0){
+            final int scrollY = getScrollY();
+            if(mOutLeftView !=null){
+                final int top = mOutLeftView.getTop();
+                ViewCompat.offsetTopAndBottom(mOutLeftView,scrollY - top);
+            }
+            if(mOutRightView !=null){
+                final int top = mOutRightView.getTop();
+                ViewCompat.offsetTopAndBottom(mOutRightView,scrollY - top);
+            }
         }
     }
 
@@ -337,7 +349,6 @@ public class EasyScrollLayout extends FrameLayout {
     private float mSecondaryLastX = -1;
     private float mSecondaryLastY = -1;
 
-    boolean isChanged;
     boolean mIsUnableToDrag;
     boolean isVerticalScroll = true;
     boolean isHorizontalScroll = true;
@@ -351,12 +362,17 @@ public class EasyScrollLayout extends FrameLayout {
         return true;
     }
     Point mLastEventPoint = new Point();
+    boolean mIgnoreTouchEvent;
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if (!isEnabled() || mContentView == null) {
+
+        if (!isEnabled()) {
             return dispatchTouchEventSupper(event);
         }
         int action = MotionEventCompat.getActionMasked(event);
+        if(action != MotionEvent.ACTION_DOWN && mIgnoreTouchEvent){
+            return true;
+        }
         if (action != MotionEvent.ACTION_DOWN && mIsUnableToDrag) {
             return dispatchTouchEventSupper(event);
         }
@@ -374,10 +390,10 @@ public class EasyScrollLayout extends FrameLayout {
                 mActivePointerId = MotionEventCompat.getPointerId(event, 0);
                 mPrimaryLastY = event.getY();
                 dispatchTouchEventSupper(event);
-                isChanged = false;
                 isHandlar = true;
                 isVerticalScroll = false;
                 isHorizontalScroll = false;
+                mIgnoreTouchEvent = false;
                 if(isFlingToNestScroll){
                     if(!mScroller.isFinished()){
                       mScroller.abortAnimation();
@@ -415,12 +431,36 @@ public class EasyScrollLayout extends FrameLayout {
                         mLastMotionY = y;
                         mLastMotionX = x;
                     } else if (yDiff > mTouchSlop && yDiff > xDiff && (mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL ) {
+                        if(mHorizontalScrollHandlar !=null &&mHorizontalScrollHandlar.isHorizontallyScrolled()){
+                            if(mHorizontalScrollHandlar.shouldOffsetEvent){
+                               sendCancelEvent();
+                                mIgnoreTouchEvent = true;
+                                break;
+                            }else {
+                                mIsUnableToDrag=true;
+                                dispatchTouchEventSupper(event);
+                                break;
+                            }
+                        }
                         isVerticalScroll = true;
                         mDragging = true;
                         dispatchVerticalScroll(vtev, dy);
                         mLastMotionY = y;
                         mLastMotionX = x;
                     } else {
+                        if(yDiff > mTouchSlop){
+                            if(mHorizontalScrollHandlar !=null &&mHorizontalScrollHandlar.isHorizontallyScrolled()){
+                                if(mHorizontalScrollHandlar.shouldOffsetEvent){
+                                    sendCancelEvent();
+                                    mIgnoreTouchEvent = true;
+                                    break;
+                                }else {
+                                    mIsUnableToDrag=true;
+                                    dispatchTouchEventSupper(event);
+                                    break;
+                                }
+                            }
+                        }
                         mLastEventPoint.set(x,y);
                         dispatchTouchEventSupper(event);
                         if(mDragging){
@@ -665,7 +705,7 @@ public class EasyScrollLayout extends FrameLayout {
 //            mChildYOffset += mScrollConsumed[1];
 //            Logger.e("parentScroll   " + mScrollConsumed[1] + "   " + getScrollY());
 //        }
-//        Logger.e(mNestedYOffset + "mChildYOffset  " + mChildYOffset + "totaldy  " + totaldy + " dy " + dy + " child " + childConsumed);
+        Logger.e(mNestedYOffset + "mChildYOffset  " + mChildYOffset + "totaldy  " + totaldy + " dy " + dy + " child " + childConsumed);
     }
     private void dispatchHorizontalScroll(MotionEvent event, int dx) {
         int activePointerIndex = event.findPointerIndex(mActivePointerId);
@@ -754,7 +794,7 @@ public class EasyScrollLayout extends FrameLayout {
         mVelocityTracker.clear();
         mActivePointerId = INVALID_ID;
         mDragging = false;
-        isChanged = false;
+        mIgnoreTouchEvent = false;
         mLastMoveEvent = null;
         mScrollConsumed[0] = mScrollConsumed[1] = 0;
     }
@@ -832,8 +872,17 @@ public class EasyScrollLayout extends FrameLayout {
     boolean isFlingToNestScroll;
 
     private void flingToNestScroll(int velocityY) {
+        isFlingToNestScroll = false;
+        if((mOrientation & ORIENTATION_VERTICAL) !=ORIENTATION_VERTICAL){
+            return;
+        }
         if (getScrollY() <= 0) {
-            isFlingToNestScroll = false;
+            return;
+        }
+        if(mContentView.mInnerBottomView ==null && velocityY <0){
+            return;
+        }
+        if(mContentView.reachChildBottom() ||mContentView.reachChildTop()){
             return;
         }
         isFlingToNestScroll = true;
@@ -864,7 +913,6 @@ public class EasyScrollLayout extends FrameLayout {
                 final int top = mOutRightView.getTop();
                 ViewCompat.offsetTopAndBottom(mOutRightView,scrollY - top);
             }
-
             if (getScrollY() >= 0 && mInnerTopView != null) {
                 float offsetRatio = ((float) getScrollY()) / mMaxVerticalScrollRange;
                 if (mOnScollListener != null) {
@@ -925,29 +973,33 @@ public class EasyScrollLayout extends FrameLayout {
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         Logger.e(disallowIntercept + "disallowIntercept");
+        super.requestDisallowInterceptTouchEvent(disallowIntercept);
+        if(mIsUnableToDrag){
+            return;
+        }
         if(!mDragging  &&!isVerticalScroll && !isHorizontalScroll ){
             final int dy = Math.abs( mLastEventPoint.y - mFirstMotionY);
             final int dx = Math.abs(mLastEventPoint.x - mFirstMotionX);
             Logger.e(dx + "dx  dy" + dy);
             if(dy -mTouchSlop>0&& dx -mTouchSlop >0){
-                if(dy-mTouchSlop > dx -mTouchSlop){
+                if(dy-mTouchSlop > dx -mTouchSlop && (mOrientation&ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL){
                     isHorizontalScroll = true;
                     mDragging = true;
-                }else {
+                }else if((mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL){
                     isVerticalScroll = true;
                     mDragging = true;
                 }
             }else {
-                if(dx-mTouchSlop > 0){
+                if(dx-mTouchSlop > 0 &&(mOrientation&ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL){
                     isHorizontalScroll = true;
                     mDragging = true;
-                }else if(dy - mTouchSlop > 0){
+                }else if(dy - mTouchSlop > 0 && (mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL){
                     isVerticalScroll = true;
                     mDragging = true;
                 }
             }
         }
-        super.requestDisallowInterceptTouchEvent(disallowIntercept);
+
     }
 
     @Override
@@ -975,13 +1027,14 @@ public class EasyScrollLayout extends FrameLayout {
         int mMinScrollY;
         int mMaxScrollY;
         int mLayoutOutGravity = GRAVITY_OUT_INVALID;
-
+        float mParallaxMultiplier;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
 
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
             mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_easylayout_layoutGravity, GRAVITY_OUT_INVALID);
+            mParallaxMultiplier = a.getFloat(R.styleable.EasyScrollLayout_innerTop_ParallaxMultiplier, 0);
             a.recycle();
         }
 
