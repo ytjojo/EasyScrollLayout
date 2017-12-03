@@ -6,6 +6,7 @@
 
     <ImageView
         android:id="@+id/head"
+        android:src="@mipmap/ic_launcher_round"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp" />
@@ -17,6 +18,7 @@
 
         <TextView
             android:id="@+id/name"
+            android:text=" 谁谁谁谁谁谁水水水水水水水水水水水水水水水水"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20dp"
@@ -26,6 +28,7 @@
 
         <TextView
             android:id="@+id/desc"
+            android:text="listitem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14dp"

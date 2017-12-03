@@ -16,8 +16,6 @@ import android.widget.ScrollView;
 
 import com.orhanobut.logger.Logger;
 
-import static android.R.attr.childDivider;
-import static android.R.attr.pivotX;
 import static android.R.attr.x;
 import static android.R.attr.y;
 
@@ -44,6 +42,7 @@ public class HorizontalScrollHandlar {
         this.mOutRightView = outRightView;
         this.mContentView = contentWraperView;
         if (mOutLeftView != null) {
+            mOutLeftView.setClickable(true);
             mMaxHorizontalStableScrollRange = mOutLeftView.getMeasuredWidth();
             EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutLeftView.getLayoutParams();
             if (lp.mOverScrollRatio > 0) {
@@ -57,6 +56,7 @@ public class HorizontalScrollHandlar {
             mMaxHorizontalScrollRange = mMaxHorizontalStableScrollRange = 0;
         }
         if (mOutRightView != null) {
+            mOutRightView.setClickable(true);
             mMinHorizontalStableScrollRange = -mOutRightView.getMeasuredWidth();
             EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutRightView.getLayoutParams();
             if (lp.mOverScrollRatio > 0) {
@@ -69,8 +69,13 @@ public class HorizontalScrollHandlar {
         } else {
             mMinHorizontalScrollRange = mMinHorizontalStableScrollRange = 0;
         }
+        if (mContentView != null) {
+            EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mContentView.getLayoutParams();
+            mContentParallaxMult = lp.mParallaxMultiplier;
+        }
     }
-    public void onLayout(){
+
+    public void onLayout() {
         offsetLeftAndRight(0);
     }
 
@@ -92,8 +97,10 @@ public class HorizontalScrollHandlar {
         offsetLeftAndRight(dx);
         consumed[0] = mScrollX - startX;
     }
+
     float mLeftParallaxMult = 0.5f;
     float mRightParallaxMult = 0f;
+    float mContentParallaxMult = 0.5f;
 
     public void offsetLeftAndRight(int dx) {
         int mTargetScrollX = mScrollX;
@@ -110,59 +117,69 @@ public class HorizontalScrollHandlar {
             mTargetScrollX = 0;
         }
         int offsetDx = mTargetScrollX - mScrollX;
-        ViewCompat.offsetLeftAndRight(mContentView, offsetDx);
+        if (mContentParallaxMult != 0) {
+            int contentLeft = (int) (mTargetScrollX * (1 - mContentParallaxMult));
+            ViewCompat.offsetLeftAndRight(mContentView, contentLeft - mContentView.getLeft());
+        } else {
+
+            ViewCompat.offsetLeftAndRight(mContentView, mTargetScrollX- mContentView.getLeft());
+        }
         mScrollX = mTargetScrollX;
         if (mOutLeftView != null) {
             if (mLeftParallaxMult != 0) {
-                if(mScrollX>=0 && mScrollX< mMaxHorizontalStableScrollRange){
-                    float offsetRatio = ((float) mScrollX)/mMaxHorizontalStableScrollRange;
+                if (mScrollX >= 0 && mScrollX < mMaxHorizontalStableScrollRange) {
+                    float offsetRatio = ((float) mScrollX) / mMaxHorizontalStableScrollRange;
                     int totalOffset = (int) (mMaxHorizontalStableScrollRange * mLeftParallaxMult);
                     float horizontalOffset = mMaxHorizontalStableScrollRange - totalOffset + totalOffset * offsetRatio;
-                    int offset = (int) (horizontalOffset- mOutLeftView.getRight());
-                    ViewCompat.offsetLeftAndRight(mOutLeftView, (int) offset);
-                }else {
-                    int offset = (mScrollX- mOutLeftView.getRight());
-                    ViewCompat.offsetLeftAndRight(mOutLeftView, (int) offset);
+                    int offset = (int) (horizontalOffset - mOutLeftView.getRight());
+                    ViewCompat.offsetLeftAndRight(mOutLeftView, offset);
+                } else {
+                    int offset = (mScrollX - mOutLeftView.getRight());
+                    ViewCompat.offsetLeftAndRight(mOutLeftView, offset);
                 }
-            }else {
-                ViewCompat.offsetLeftAndRight(mOutLeftView, offsetDx);
+            } else {
+                int offset = (mScrollX - mOutLeftView.getRight());
+                ViewCompat.offsetLeftAndRight(mOutLeftView, offset);
             }
 
         }
         if (mOutRightView != null) {
-            if(mRightParallaxMult != 0){
-                if(mScrollX <=0 && mScrollX > mMinHorizontalStableScrollRange){
-                    float offsetRatio = ((float) mScrollX)/mMinHorizontalStableScrollRange;
+            if (mRightParallaxMult != 0) {
+                if (mScrollX <= 0 && mScrollX > mMinHorizontalStableScrollRange) {
+                    float offsetRatio = ((float) mScrollX) / mMinHorizontalStableScrollRange;
                     int totalOffset = (int) (mMinHorizontalStableScrollRange * mRightParallaxMult);
-                    float horizontalOffset =  mMinHorizontalStableScrollRange - totalOffset+ totalOffset * offsetRatio;
+                    float horizontalOffset = mMinHorizontalStableScrollRange - totalOffset + totalOffset * offsetRatio;
 
-                    Logger.e(" mOutRightView "+ (mOutRightView.getLeft() - mContentView.getMeasuredWidth()));
-                    int offset = (int) (horizontalOffset- mOutRightView.getLeft() + mContentView.getMeasuredWidth());
-                    ViewCompat.offsetLeftAndRight(mOutRightView,  offset);
-                }else if(mScrollX < 0){
-                    int offset = (mScrollX- mOutRightView.getLeft()+mContentView.getMeasuredWidth());
+                    Logger.e(" mOutRightView " + (mOutRightView.getLeft() - mContentView.getMeasuredWidth()));
+                    int offset = (int) (horizontalOffset - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
                     ViewCompat.offsetLeftAndRight(mOutRightView, offset);
-                }else {
+                } else if (mScrollX < 0) {
+                    int offset = (mScrollX - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
+                    ViewCompat.offsetLeftAndRight(mOutRightView, offset);
+                } else {
                     int totalOffset = (int) (mMinHorizontalStableScrollRange * mRightParallaxMult);
                     totalOffset += mScrollX;
-                    final int offset = totalOffset- mOutRightView.getLeft() + mContentView.getMeasuredWidth();
-                    ViewCompat.offsetLeftAndRight(mOutRightView,  offset);
+                    final int offset = totalOffset - mOutRightView.getLeft() + mContentView.getMeasuredWidth();
+                    ViewCompat.offsetLeftAndRight(mOutRightView, offset);
 
                 }
-            }else {
-                ViewCompat.offsetLeftAndRight(mOutRightView, offsetDx);
+            } else {
+                int offset = (mScrollX - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
+                ViewCompat.offsetLeftAndRight(mOutRightView, offset);
             }
         }
         if (mInnerTopView != null) {
-            ViewCompat.offsetLeftAndRight(mInnerTopView, offsetDx);
+//            ViewCompat.offsetLeftAndRight(mInnerTopView, offsetDx);
+            int offset = (mScrollX - mInnerTopView.getLeft());
+            ViewCompat.offsetLeftAndRight(mInnerTopView, offset);
         }
         if (mOutTopView != null) {
-            ViewCompat.offsetLeftAndRight(mOutTopView, offsetDx);
+            int offset = (mScrollX - mOutTopView.getLeft());
+            ViewCompat.offsetLeftAndRight(mOutTopView, offset);
         }
 
 
     }
-
 
 
     private boolean canPreScroll(int dx) {
@@ -182,10 +199,10 @@ public class HorizontalScrollHandlar {
     boolean isAutomaticHunting = true;
     Rect mRect = new Rect();
 
-    boolean shouldOffsetEvent;
+    boolean mIsDownInOuterViews;
 
     public boolean shouldOffsetEvent() {
-        return shouldOffsetEvent;
+        return mIsDownInOuterViews;
     }
 
     public boolean reachChildLeft() {
@@ -284,9 +301,9 @@ public class HorizontalScrollHandlar {
 
     protected View huntingScrollChild(View parent, Point point) {
         if (isHorizontalScrollView(parent)) {
-             if( pointInView(parent,point.x,point.y,0)){
-                 mScrollChild = parent;
-             }
+            if (pointInView(parent, point.x, point.y, 0)) {
+                mScrollChild = parent;
+            }
             return mScrollChild;
         } else if (isVerticalScrollView(parent)) {
             return findScrollChildInVerticalView(point, (ViewGroup) parent);
@@ -337,46 +354,76 @@ public class HorizontalScrollHandlar {
     }
 
     Point mPoint = new Point();
+
     public boolean onDownEvent(int x, int y, EasyScrollLayout parent) {
-        shouldOffsetEvent = false;
+        mIsDownInOuterViews = false;
         mScrollChild = null;
+        if (mContentView != null && (mOutRightView != null || mOutLeftView != null)) {
+            int contentIndex = parent.indexOfChild(mContentView);
+            if (mOutLeftView != null) {
+                int outLeftIndex = parent.indexOfChild(mOutLeftView);
+                if (outLeftIndex > contentIndex) {
+                    mPoint.set(x, y);
+                    offsetPoint(mPoint, parent, mOutLeftView);
+                    mIsDownInOuterViews |= pointInView(mOutLeftView, mPoint.x, mPoint.y, 0);
+                    if (mIsDownInOuterViews) {
+                        return true;
+                    }
+
+                }
+            }
+            if (mOutRightView != null) {
+                int outLeftIndex = parent.indexOfChild(mOutRightView);
+                if (outLeftIndex > contentIndex) {
+                    mPoint.set(x, y);
+                    offsetPoint(mPoint, parent, mOutRightView);
+                    mIsDownInOuterViews |= pointInView(mOutRightView, mPoint.x, mPoint.y, 0);
+                    if (mIsDownInOuterViews) {
+                        return true;
+                    }
+
+                }
+            }
+        }
+
         if (mContentView != null) {
             mPoint.set(x, y);
             offsetPoint(mPoint, parent, mContentView);
-            shouldOffsetEvent |= pointInView(mContentView,mPoint.x,mPoint.y,0);
-            if(mContentView instanceof ViewPager){
-                if(shouldOffsetEvent){
+            boolean isPointInView = pointInView(mContentView, mPoint.x, mPoint.y, 0);
+            if (mContentView instanceof ViewPager) {
+                if (isPointInView) {
                     mScrollChild = mContentView;
-                    return  shouldOffsetEvent;
+                    return mIsDownInOuterViews;
                 }
             }
-            if (shouldOffsetEvent && mContentView instanceof ContentWraperView) {
+            if (isPointInView && mContentView instanceof ContentWraperView) {
                 final ContentWraperView contentWraperView = (ContentWraperView) mContentView;
                 offsetPoint(mPoint, mContentView, ((ContentWraperView) mContentView).mContentView);
-                if(!pointInView(contentWraperView.mContentView,mPoint.x,mPoint.y,0)){
-                    return shouldOffsetEvent;
+                if (!pointInView(contentWraperView.mContentView, mPoint.x, mPoint.y, 0)) {
+                    return mIsDownInOuterViews;
                 }
                 huntingScrollChild(contentWraperView.mContentView, mPoint);
-               if(shouldOffsetEvent){
-                   return  shouldOffsetEvent;
-               }
+                return mIsDownInOuterViews;
             }
         }
         if (mInnerTopView != null) {
             mPoint.set(x, y);
             offsetPoint(mPoint, parent, mInnerTopView);
-            shouldOffsetEvent |= pointInView(mInnerTopView,mPoint.x,mPoint.y,0);
-            if (shouldOffsetEvent) {
+            boolean isPointInView = pointInView(mInnerTopView, mPoint.x, mPoint.y, 0);
+            if (isPointInView) {
                 huntingScrollChild(mInnerTopView, mPoint);
-                return shouldOffsetEvent;
+                return mIsDownInOuterViews;
             }
         }
         if (mOutTopView != null) {
             mPoint.set(x, y);
             offsetPoint(mPoint, parent, mOutTopView);
-            shouldOffsetEvent |= pointInView(mOutTopView,mPoint.x,mPoint.y,0);
+            boolean isPointInView = pointInView(mOutTopView, mPoint.x, mPoint.y, 0);
+            if (isPointInView) {
+                return mIsDownInOuterViews;
+            }
         }
-        return shouldOffsetEvent;
+        return mIsDownInOuterViews = true;
     }
 
     public void offsetPoint(Point point, ViewGroup parent, View child) {
@@ -413,7 +460,8 @@ public class HorizontalScrollHandlar {
             return offset > mMinHorizontalScrollRange;
         }
     }
-    public boolean pointInView(View child,float localX, float localY, float slop) {
+
+    public boolean pointInView(View child, float localX, float localY, float slop) {
         return localX >= -slop && localY >= -slop && localX < ((child.getRight() - child.getLeft()) + slop) &&
                 localY < ((child.getBottom() - child.getTop()) + slop);
     }

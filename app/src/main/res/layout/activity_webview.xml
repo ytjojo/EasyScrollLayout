@@ -7,12 +7,17 @@
 
 
     <LinearLayout
+        app:parallaxMultiplier="0.5"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:gravity="center"
         android:orientation="vertical"
         app:easylayout_layoutGravity="innertop">
-
+        <ImageView
+            android:src="@drawable/example"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
         <TextView
             android:id="@+id/tvHeader"
             android:layout_width="wrap_content"

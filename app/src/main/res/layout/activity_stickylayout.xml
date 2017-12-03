@@ -21,9 +21,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:gravity="center"
+        app:parallaxMultiplier="0.5"
         app:easylayout_layoutGravity="innertop"
         android:orientation="vertical"
         android:layout_height="300dp">
+        <ImageView
+            android:src="@drawable/example"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
         <TextView
             android:id="@+id/tvHeader"
             android:text="header"

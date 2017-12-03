@@ -5,39 +5,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-
     <LinearLayout
         app:parallaxMultiplier="0.5"
-        android:background="@android:color/white"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        app:easylayout_layoutGravity="innertop"
-        android:orientation="vertical"
-        android:layout_height="300dp">
-        <ImageView
-            android:src="@drawable/example"
-            android:scaleType="centerCrop"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-        <TextView
-            android:id="@+id/tvHeader"
-            android:text="header"
-            android:padding="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-    <com.github.ytjojo.easyscrolllayout.ContentWraperView
-        android:background="#FF0000"
-        app:parallaxMultiplier="0.5"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v4.view.ViewPager>
-    </com.github.ytjojo.easyscrolllayout.ContentWraperView>
-    <LinearLayout
         android:layout_width="200dp"
         android:gravity="center"
         android:background="#003ef0"
@@ -51,6 +20,7 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
     <LinearLayout
+        app:parallaxMultiplier="0.5"
         android:layout_width="200dp"
         android:gravity="center"
         android:background="#00ee00"
@@ -63,4 +33,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
+    <FrameLayout
+        app:parallaxMultiplier="0.5"
+        app:easylayout_layoutGravity="innertop"
+        android:layout_width="match_parent"
+        android:layout_height="220dp">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/banner_viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+        <com.shizhefei.view.indicator.FixedIndicatorView
+            android:id="@+id/banner_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="right|bottom" />
+    </FrameLayout>
+    <com.github.ytjojo.easyscrolllayout.ContentWraperView
+        android:background="#FF0000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v4.view.ViewPager>
+    </com.github.ytjojo.easyscrolllayout.ContentWraperView>
+
+
 </com.github.ytjojo.easyscrolllayout.EasyScrollLayout>

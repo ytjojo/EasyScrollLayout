@@ -47,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+		findViewById(R.id.tv_topbanner).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,BannerActivity.class);
+				startActivity(intent);
+			}
+		});
         CoordinatorLayout c;
 
 

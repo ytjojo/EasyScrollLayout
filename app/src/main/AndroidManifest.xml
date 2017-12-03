@@ -82,6 +82,7 @@
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ViewPagerAcitivity"/>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.WebViewActivity"/>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ViewpagerHorizentalActivity"/>
+    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.BannerActivity"/>
   </application>
 
 </manifest>
