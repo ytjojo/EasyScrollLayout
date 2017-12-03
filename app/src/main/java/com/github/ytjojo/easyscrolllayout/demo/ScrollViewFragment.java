@@ -1,5 +1,6 @@
 package com.github.ytjojo.easyscrolllayout.demo;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,5 +17,11 @@ public class ScrollViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        return   LayoutInflater.from(getActivity()).inflate(R.layout.layout_scrollview,container,false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        view.setBackgroundColor(Color.WHITE);
     }
 }

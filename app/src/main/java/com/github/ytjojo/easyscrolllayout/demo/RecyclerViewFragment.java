@@ -1,5 +1,6 @@
 package com.github.ytjojo.easyscrolllayout.demo;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ public class RecyclerViewFragment extends Fragment {
         recyclerView = (RecyclerView) LayoutInflater.from(getActivity()).inflate(R.layout.layout_recyclerview,container,false);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setBackgroundColor(Color.WHITE);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

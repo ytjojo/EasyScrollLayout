@@ -59,7 +59,6 @@ public class ContentWraperView extends FrameLayout {
         layoutChildren(l, t, r, b, false);
     }
 
-    int mContentViewHeight;
     View mContentView;
     View mInnerBottomView;
     View mOutTopView;
@@ -102,9 +101,6 @@ public class ContentWraperView extends FrameLayout {
                     maxArea = childArea;
                 }
             }
-        }
-        if (mContentView != null && mVerticalScrollCheckHandlar.isAutomaticHunting()) {
-            mVerticalScrollCheckHandlar.huntingScrollChild(mContentView);
         }
     }
 
@@ -206,6 +202,7 @@ public class ContentWraperView extends FrameLayout {
                 lp.mMaxScrollY = scrollRange;
                 lp.mMinScrollY = childTop - (bottom - top);
                 mScrollRange = Math.max(childTop + height  - (bottom - top),mScrollRange);
+                mOutBottomView = child;
                 break;
             case GRAVITY_INNER_BOTTOM:
                 childLeft = 0;
@@ -457,16 +454,21 @@ public class ContentWraperView extends FrameLayout {
         return false;
     }
 
-    VerticalScrollCheckHandlar mVerticalScrollCheckHandlar = new VerticalScrollCheckHandlar();
-
+    View mScrollChild;
     public boolean reachChildTop() {
-        return mVerticalScrollCheckHandlar.reachChildTop();
+        if (mScrollChild == null) {
+            return true;
+        }
+        return !ViewCompat.canScrollVertically(mScrollChild, -1);
     }
 
     public boolean reachChildBottom() {
-        return mVerticalScrollCheckHandlar.reachChildBottom();
+        if (mScrollChild == null) {
+            return true;
+        }
+        return !ViewCompat.canScrollVertically(mScrollChild, 1);
     }
-    public void setScrollChildHandlar(@NonNull VerticalScrollCheckHandlar handlar){
-        this.mVerticalScrollCheckHandlar = handlar;
+    public void setScrollChild(View child){
+        this.mScrollChild = child;
     }
 }

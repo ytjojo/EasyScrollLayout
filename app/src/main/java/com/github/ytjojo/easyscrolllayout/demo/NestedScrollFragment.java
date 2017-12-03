@@ -1,5 +1,6 @@
 package com.github.ytjojo.easyscrolllayout.demo;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,5 +32,6 @@ public class NestedScrollFragment extends Fragment {
                 Logger.e(scrollY + "scrollY");
             }
         });
+        view.setBackgroundColor(Color.WHITE);
     }
 }

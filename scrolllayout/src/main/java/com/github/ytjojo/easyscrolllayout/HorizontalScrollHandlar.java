@@ -37,10 +37,10 @@ public class HorizontalScrollHandlar {
     int mMaxHorizontalStableScrollRange;
     int mScrollX;
 
-    public void setViews(ViewGroup contentWraperView, View outLeftView, View outRightView) {
+    public void setViews(ViewGroup contentView, View outLeftView, View outRightView) {
         this.mOutLeftView = outLeftView;
         this.mOutRightView = outRightView;
-        this.mContentView = contentWraperView;
+        this.mContentView = contentView;
         if (mOutLeftView != null) {
             mOutLeftView.setClickable(true);
             mMaxHorizontalStableScrollRange = mOutLeftView.getMeasuredWidth();
@@ -169,10 +169,14 @@ public class HorizontalScrollHandlar {
             }
         }
         if (mInnerTopView != null) {
-//            ViewCompat.offsetLeftAndRight(mInnerTopView, offsetDx);
-            int offset = (mScrollX - mInnerTopView.getLeft());
-            ViewCompat.offsetLeftAndRight(mInnerTopView, offset);
+            if (mContentParallaxMult != 0) {
+                int offset = (int) (mTargetScrollX * (1 - mContentParallaxMult));
+                ViewCompat.offsetLeftAndRight(mInnerTopView, offset - mInnerTopView.getLeft());
+            } else {
+                ViewCompat.offsetLeftAndRight(mInnerTopView, mTargetScrollX- mInnerTopView.getLeft());
+            }
         }
+
         if (mOutTopView != null) {
             int offset = (mScrollX - mOutTopView.getLeft());
             ViewCompat.offsetLeftAndRight(mOutTopView, offset);

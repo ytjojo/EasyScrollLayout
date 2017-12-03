@@ -81,7 +81,7 @@ public class EasyScrollLayout extends FrameLayout {
     private final int[] mScrollConsumed = new int[2];
     private int mNestedYOffset;
     private int mChildYOffset;
-    ContentWraperView mContentView;
+    ContentChildHolder mContentChildHolder;
     View mInnerTopView;
     View mOutTopView;
     View mOutLeftView;
@@ -131,15 +131,15 @@ public class EasyScrollLayout extends FrameLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         final int count = getChildCount();
         mOrientation = ORIENTATION_INVALID;
+        if (mContentChildHolder == null) {
+            mContentChildHolder = new ContentChildHolder();
+        }
+        mContentChildHolder.onMeasure(this);
         int maxArea = 0;
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                if (child instanceof ContentWraperView) {
-                    mContentView = (ContentWraperView) child;
-                    continue;
-                }
                 if (lp.mLayoutOutGravity != GRAVITY_OUT_INVALID) {
                     final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
                     maxArea = childArea > maxArea ? childArea : maxArea;
@@ -154,7 +154,7 @@ public class EasyScrollLayout extends FrameLayout {
                                 int widthSize = (int) (MeasureSpec.getSize(widthMeasureSpec) * lp.mWidthRatioOfParent);
                                 int childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
                                 int childHeightSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight(), MeasureSpec.EXACTLY);
-                                measureChild(mContentView, childWidthSpec, childHeightSpec);
+                                measureChild(child, childWidthSpec, childHeightSpec);
                             }
                             break;
                         case GRAVITY_OUT_RIGHT:
@@ -162,17 +162,17 @@ public class EasyScrollLayout extends FrameLayout {
                                 int widthSize = (int) (MeasureSpec.getSize(widthMeasureSpec) * lp.mWidthRatioOfParent);
                                 int childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
                                 int childHeightSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight(), MeasureSpec.EXACTLY);
-                                measureChild(mContentView, childWidthSpec, childHeightSpec);
+                                measureChild(child, childWidthSpec, childHeightSpec);
                             }
                             break;
                     }
                 }
             }
         }
-        if (mInnerTopView != null && mContentView != null) {
+        if (mInnerTopView != null && mContentChildHolder != null) {
             int heghtSize = MeasureSpec.getSize(heightMeasureSpec) - mInnerTopView.getMinimumHeight();
             int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
-            measureChild(mContentView, widthMeasureSpec, childHeightSpec);
+            measureChild(mContentChildHolder.mDirectChild, widthMeasureSpec, childHeightSpec);
         }
     }
 
@@ -192,11 +192,11 @@ public class EasyScrollLayout extends FrameLayout {
             }
         }
         if (mHorizontalScrollHandlar != null) {
-            mHorizontalScrollHandlar.setViews(mContentView, mOutLeftView, mOutRightView);
+            mHorizontalScrollHandlar.setViews((ViewGroup) mContentChildHolder.mDirectChild, mOutLeftView, mOutRightView);
             mHorizontalScrollHandlar.setTopViews(mInnerTopView, mOutTopView);
             mHorizontalScrollHandlar.onLayout();
         }
-        if (mContentView.mMinVerticalScrollRange < 0 || mContentView.mMaxVerticalScrollRange > 0) {
+        if (mContentChildHolder.canNestedScrollVetical()) {
             mOrientation |= ORIENTATION_VERTICAL;
         }
         if (getScrollY() != 0) {
@@ -274,10 +274,8 @@ public class EasyScrollLayout extends FrameLayout {
                         childTop = parentTop + lp.topMargin;
                         break;
                 }
-                if (child == mContentView) {
+                if (child == mContentChildHolder.mDirectChild) {
                     childTop += mInnerTopView.getMeasuredHeight();
-                } else {
-
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
             }
@@ -423,7 +421,7 @@ public class EasyScrollLayout extends FrameLayout {
                 mIsUnableToDrag = false;
                 final int rawX = (int) event.getRawX();
                 final int rawY = (int) event.getRawY();
-                mContentView.mVerticalScrollCheckHandlar.onDownInit(rawX, rawY);
+                mContentChildHolder.mVerticalScrollCheckHandlar.onDownInit(rawX, rawY);
                 if (mHorizontalScrollHandlar != null) {
                     mHorizontalScrollHandlar.onDownEvent(mFirstMotionX, mFirstMotionY, EasyScrollLayout.this);
                 }
@@ -542,13 +540,13 @@ public class EasyScrollLayout extends FrameLayout {
                 int velocityY = (int) VelocityTrackerCompat.getYVelocity(mVelocityTracker, mActivePointerId);
                 int velocityX = (int) VelocityTrackerCompat.getXVelocity(mVelocityTracker, mActivePointerId);
                 final boolean isDownSlide = (event.getY() - mFirstMotionY) > 0;
-                if (mDragging && isVerticalScroll && (canFling() || mContentView.canFling())) {
+                if (mDragging && isVerticalScroll && (canFling() || mContentChildHolder.canFling())) {
                     if (canFling()) {
                         dispatchFling(velocityY, isDownSlide);
 
-                    } else if (mContentView.canFling()) {
+                    } else if (mContentChildHolder.canFling()) {
                         sendCancelEvent();
-                        mContentView.dispatchFling(Math.abs(velocityY) > mMinimumVelocity ? velocityY : 0, isDownSlide);
+                        mContentChildHolder.dispatchFling(Math.abs(velocityY) > mMinimumVelocity ? velocityY : 0, isDownSlide);
                     }
                 } else if (mDragging && isHorizontalScroll && mHorizontalScrollHandlar.canFling()) {
                     mHorizontalScrollHandlar.dispatchFling(Math.abs(velocityX) > mMinimumVelocity ? velocityX : 0);
@@ -724,11 +722,6 @@ public class EasyScrollLayout extends FrameLayout {
         if (Math.abs(dy) < Math.abs(childConsumed) || dy * childConsumed < 0) {
             Logger.e("出错了 dy " + dy + " child " + childConsumed + "   preScrollConsumed" + preScrollConsumed);
         }
-//        if (unconsumedY != 0) {
-//            parentScroll(0, unconsumedY, mScrollConsumed);
-//            mChildYOffset += mScrollConsumed[1];
-//            Logger.e("parentScroll   " + mScrollConsumed[1] + "   " + getScrollY());
-//        }
         Logger.e(mNestedYOffset + "mChildYOffset  " + mChildYOffset + "totaldy  " + totaldy + " dy " + dy + " child " + childConsumed);
     }
 
@@ -748,17 +741,17 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     private void parentPreScroll(int dx, int dy, int[] consumed) {
+        consumed[1] = consumed[0] = 0;
         if (!canPreScroll(dy)) {
-            consumed[1] = consumed[0] = 0;
-            mContentView.preScrollConsumed(dy, consumed);
+            mContentChildHolder.preScrollConsumed(dy,consumed);
             return;
         }
         int lastScrolly = getScrollY();
         scrollBy(0, -dy);
         int consumedDy = consumed[1] = lastScrolly - getScrollY();
-//        Logger.e("parentPreScroll  " + consumed[1]);
         if (dy - consumedDy != 0) {
-            mContentView.preScrollConsumed(dy - consumedDy, consumed);
+            consumed[1] = 0;
+            mContentChildHolder.preScrollConsumed(dy - consumedDy, consumed);
             consumed[1] = consumedDy + consumed[1];
         }
 
@@ -779,33 +772,14 @@ public class EasyScrollLayout extends FrameLayout {
             float curY = event.getY(activePointerIndex);
             event.offsetLocation(mFirstMotionX - curX, 0);
             dispatchTouchEventSupper(event);
-            mContentView.mVerticalScrollCheckHandlar.childScrollConsumed(mScrollConsumed);
         }
 
-
-    }
-
-    private void parentScroll(int dx, int dy, int[] consumed) {
-        consumed[1] = consumed[0] = 0;
-        if (dy > 0) {
-            if (mContentView.reachChildTop()) {
-                int lastScrolly = getScrollY();
-                scrollBy(0, -dy);
-                consumed[1] = lastScrolly - getScrollY();
-            }
-        } else if (dy < 0) {
-            if (mContentView.reachChildBottom()) {
-                int lastScrolly = getScrollY();
-                scrollBy(0, -dy);
-                consumed[1] = lastScrolly - getScrollY();
-            }
-        }
 
     }
 
     private boolean canPreScroll(int dy) {
 
-        if (dy > 0 && mContentView.reachChildTop()) {
+        if (dy > 0 && mContentChildHolder.reachChildTop()) {
             return true;
         } else if (dy < 0) {
             return true;
@@ -903,10 +877,10 @@ public class EasyScrollLayout extends FrameLayout {
         if (getScrollY() <= 0) {
             return;
         }
-        if (mContentView.mInnerBottomView == null && velocityY < 0) {
+        if(velocityY < 0 && !mContentChildHolder.canNestedFlingToBottom()){
             return;
         }
-        if (mContentView.reachChildBottom() || mContentView.reachChildTop()) {
+        if (mContentChildHolder.reachChildBottom() || mContentChildHolder.reachChildTop()) {
             return;
         }
         isFlingToNestScroll = true;
@@ -968,19 +942,19 @@ public class EasyScrollLayout extends FrameLayout {
         if (mScroller.computeScrollOffset()) {
             int curY = mScroller.getCurrY();
             if (isFlingToNestScroll) {
-                if (mContentView.reachChildTop()) {
+                if (mContentChildHolder.reachChildTop()) {
                     isFlingToNestScroll = false;
                     final float velocityY = mScroller.getCurrVelocity();
                     if (Math.abs(velocityY) >= mMinimumVelocity) {
                         mScroller.abortAnimation();
                         fling((int) velocityY);
                     }
-                } else if (mContentView.reachChildBottom()) {
+                } else if (mContentChildHolder.reachChildBottom()) {
                     isFlingToNestScroll = false;
                     final float velocityY = mScroller.getCurrVelocity();
                     if (Math.abs(velocityY) >= mMinimumVelocity && velocityY > 0) {
                         mScroller.abortAnimation();
-                        mContentView.fling((int) -velocityY);
+                        mContentChildHolder.fling((int) -velocityY);
                     }
                 }
             } else {
