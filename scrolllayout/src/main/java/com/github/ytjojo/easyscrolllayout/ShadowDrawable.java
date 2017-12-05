@@ -41,14 +41,6 @@ public class ShadowDrawable extends Drawable {
      * 阴影半径
      */
     private float mShadowRadius;
-    /**
-     * 阴影x偏移
-     */
-    private float mShadowDx;
-    /**
-     * 阴影y偏移
-     */
-    private float mShadowDy;
 
 
     private int mShadowGravity = -1;
@@ -59,8 +51,6 @@ public class ShadowDrawable extends Drawable {
         mShadowOffset = 0;
         mShadowGravity = gravity;
         setShadowRadius(dip2px(30, context));
-        setShadowDx(dip2px(3, context));
-        setShadowDy(dip2px(3, context));
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         /**
@@ -216,6 +206,14 @@ public class ShadowDrawable extends Drawable {
         return PixelFormat.UNKNOWN;
     }
 
+    public int getNumStops() {
+        return mNumStops;
+    }
+
+    public void setNumStops(int numStops) {
+        this.mNumStops = numStops;
+    }
+
     public int getShadowOffset() {
         return mShadowOffset;
     }
@@ -241,21 +239,6 @@ public class ShadowDrawable extends Drawable {
         this.mShadowRadius = shadowRadius;
     }
 
-    public float getShadowDx() {
-        return mShadowDx;
-    }
-
-    public void setShadowDx(float shadowDx) {
-        this.mShadowDx = shadowDx;
-    }
-
-    public float getShadowDy() {
-        return mShadowDy;
-    }
-
-    public void setShadowDy(float shadowDy) {
-        this.mShadowDy = shadowDy;
-    }
 
     public int getShadowDirection() {
         return mShadowGravity;
