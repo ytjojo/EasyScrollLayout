@@ -3,7 +3,10 @@ package com.github.ytjojo.easyscrolllayout;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.IntDef;
@@ -113,6 +116,7 @@ public class EasyScrollLayout extends FrameLayout {
         isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
         mInnerTopParallaxMult = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0f);
         a.recycle();
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
 
 
     }
@@ -999,7 +1003,54 @@ public class EasyScrollLayout extends FrameLayout {
         }
 
     }
+    ShadowDrawable mShadowDrawable;
+    GradientDrawable mGradientDrawable;
+    @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
 
+        boolean result = super.drawChild(canvas, child, drawingTime);
+
+        if(child == mOutLeftView){
+            if(mGradientDrawable ==null){
+                mGradientDrawable = new GradientDrawable();
+                mGradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
+
+                mGradientDrawable.setColors(new int[]{0x34000000,0x11000000,0x00000000});
+
+            }
+//            if(mShadowDrawable ==null){
+//                mShadowDrawable = new ShadowDrawable(getContext(),ShadowDrawable.RIGHT);
+//            }
+//            mShadowDrawable.setShadowDirection(ShadowDrawable.RIGHT);
+            mGradientDrawable.setOrientation(GradientDrawable.Orientation.RIGHT_LEFT);
+            mGradientDrawable.setBounds(child.getRight()-60,child.getTop(),child.getRight(),child.getBottom());
+//            mGradientDrawable.setSize(100,child.getBottom() - child.getTop());
+            mGradientDrawable.draw(canvas);
+        }
+        if(child == mOutRightView){
+            if(mShadowDrawable ==null){
+                mShadowDrawable = new ShadowDrawable(getContext(),Gravity.LEFT);
+            }
+            mShadowDrawable.setmShadowGravity(Gravity.LEFT);
+            mShadowDrawable.setBounds(child.getLeft(),child.getTop(),child.getRight(),child.getBottom());
+            mShadowDrawable.draw(canvas);
+            Logger.e(child.getLeft() + "getLeft "+ child.getX());
+        }
+        return result;
+    }
+    @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
+
+        final boolean visible = visibility == VISIBLE;
+        if (mShadowDrawable != null && mShadowDrawable.isVisible() != visible) {
+            mShadowDrawable.setVisible(visible, false);
+        }
+    }
+    @Override
+    protected boolean verifyDrawable(Drawable who) {
+        return super.verifyDrawable(who) || who == mShadowDrawable || who == mShadowDrawable;
+    }
     @Override
     protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
         return p instanceof LayoutParams;
