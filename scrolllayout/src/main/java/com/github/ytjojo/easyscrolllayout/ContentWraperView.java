@@ -248,6 +248,7 @@ public class ContentWraperView extends FrameLayout {
             super(context, attrs);
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
             mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_contentwrper_layoutGravity, GRAVITY_OUT_INVALID);
+            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, 0.7f);
             a.recycle();
         }
 
@@ -287,6 +288,37 @@ public class ContentWraperView extends FrameLayout {
 
         int mLayoutOutGravity = GRAVITY_OUT_INVALID;
 
+        public float getOverScrollRatio() {
+            return mOverScrollRatio;
+        }
+
+        public void setOverScrollRatio(float overScrollRatio) {
+            this.mOverScrollRatio = overScrollRatio;
+        }
+
+        public int getMinScrollY() {
+            return mMinScrollY;
+        }
+
+        public void setmMinScrollY(int minScrollY) {
+            this.mMinScrollY = minScrollY;
+        }
+
+        public int getmMaxScrollY() {
+            return mMaxScrollY;
+        }
+
+        public void setMaxScrollY(int maxScrollY) {
+            this.mMaxScrollY = maxScrollY;
+        }
+
+        public int getLayoutOutGravity() {
+            return mLayoutOutGravity;
+        }
+
+        public void setLayoutOutGravity(int layoutOutGravity) {
+            this.mLayoutOutGravity = layoutOutGravity;
+        }
     }
 
     @Override

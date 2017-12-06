@@ -1096,6 +1096,7 @@ public class EasyScrollLayout extends FrameLayout {
             if (mLayoutOutGravity == GRAVITY_OUT_RIGHT) {
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outRightWidth_ratioOfParent, 0);
             }
+            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, 0.7f);
             a.recycle();
         }
 
@@ -1133,6 +1134,37 @@ public class EasyScrollLayout extends FrameLayout {
             super(source);
         }
 
+        public float getOverScrollRatio() {
+            return mOverScrollRatio;
+        }
+
+        public void setOverScrollRatio(float overScrollRatio) {
+            this.mOverScrollRatio = overScrollRatio;
+        }
+
+        public int getLayoutOutGravity() {
+            return mLayoutOutGravity;
+        }
+
+        public void setLayoutOutGravity(int layoutOutGravity) {
+            this.mLayoutOutGravity = layoutOutGravity;
+        }
+
+        public float getParallaxMultiplier() {
+            return mParallaxMultiplier;
+        }
+
+        public void setmParallaxMultiplier(float parallaxMultiplier) {
+            this.mParallaxMultiplier = parallaxMultiplier;
+        }
+
+        public float getWidthRatioOfParent() {
+            return mWidthRatioOfParent;
+        }
+
+        public void setWidthRatioOfParent(float widthRatioOfParent) {
+            this.mWidthRatioOfParent = widthRatioOfParent;
+        }
     }
 
     public OnScollListener mOnScollListener;

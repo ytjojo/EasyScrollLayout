@@ -25,6 +25,7 @@
             <flag name="innerbottom" value="0x3"/>
         </attr>
         <attr name="parallaxMultiplier" format="float"/>
+        <attr name="scrollmaster_overscrollratio" format="float"/>
         <attr name="outleftWidth_ratioOfParent" format="float"/>
         <attr name="outRightWidth_ratioOfParent" format="float"/>
     </declare-styleable>
