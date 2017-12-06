@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="200dp"
+        android:gravity="center"
+        android:background="#00ee00"
+        app:easylayout_layoutGravity="outleft"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+        <TextView
+            android:text="outLeftView"
+            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:background="#003ef0"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:easylayout_layoutGravity="outright"
+        app:parallaxMultiplier="0.5">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="outRightView" />
+    </LinearLayout>
+    <com.github.ytjojo.easyscrolllayout.ContentWraperView
+        android:layout_width="match_parent"
+        android:background="@android:color/white"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="#eeff00"
+            app:contentwrper_layoutGravity="outtop"
+            android:layout_height="100dp">
+            <TextView
+                android:text="bottomView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recylerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="#00ffee"
+            app:contentwrper_layoutGravity="innerbottom"
+            android:layout_height="300dp">
+            <TextView
+                android:text="bottomView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="#eeff00"
+            app:contentwrper_layoutGravity="outbottom"
+            android:layout_height="100dp">
+            <TextView
+                android:text="bottomView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </com.github.ytjojo.easyscrolllayout.ContentWraperView>
+
+</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
