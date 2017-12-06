@@ -94,7 +94,7 @@ public class ContentWraperView extends FrameLayout {
         if (!contentViews.isEmpty()) {
             int contentViewsCount = contentViews.size();
             for (int i = 0; i < contentViewsCount; i++) {
-                final View child = getChildAt(i);
+                final View child = contentViews.get(i);
                 final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
                 if (childArea >= maxArea) {
                     mContentView = child;

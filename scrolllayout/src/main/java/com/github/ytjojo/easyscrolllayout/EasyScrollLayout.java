@@ -278,7 +278,7 @@ public class EasyScrollLayout extends FrameLayout {
                         childTop = parentTop + lp.topMargin;
                         break;
                 }
-                if (child == mContentChildHolder.mDirectChild) {
+                if (child == mContentChildHolder.mDirectChild && mInnerTopView != null) {
                     childTop += mInnerTopView.getMeasuredHeight();
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
@@ -747,7 +747,7 @@ public class EasyScrollLayout extends FrameLayout {
     private void parentPreScroll(int dx, int dy, int[] consumed) {
         consumed[1] = consumed[0] = 0;
         if (!canPreScroll(dy)) {
-            mContentChildHolder.preScrollConsumed(dy,consumed);
+            mContentChildHolder.preScrollConsumed(dy, consumed);
             return;
         }
         int lastScrolly = getScrollY();
@@ -881,7 +881,7 @@ public class EasyScrollLayout extends FrameLayout {
         if (getScrollY() <= 0) {
             return;
         }
-        if(velocityY < 0 && !mContentChildHolder.canNestedFlingToBottom()){
+        if (velocityY < 0 && !mContentChildHolder.canNestedFlingToBottom()) {
             return;
         }
         if (mContentChildHolder.reachChildBottom() || mContentChildHolder.reachChildTop()) {
@@ -1003,19 +1003,21 @@ public class EasyScrollLayout extends FrameLayout {
         }
 
     }
+
     ShadowDrawable mShadowDrawable;
     GradientDrawable mGradientDrawable;
+
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
 
         boolean result = super.drawChild(canvas, child, drawingTime);
 
-        if(child == mOutLeftView){
-            if(mGradientDrawable ==null){
+        if (child == mOutLeftView) {
+            if (mGradientDrawable == null) {
                 mGradientDrawable = new GradientDrawable();
                 mGradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
 
-                mGradientDrawable.setColors(new int[]{0x34000000,0x11000000,0x00000000});
+                mGradientDrawable.setColors(new int[]{0x34000000, 0x11000000, 0x00000000});
 
             }
 //            if(mShadowDrawable ==null){
@@ -1023,21 +1025,22 @@ public class EasyScrollLayout extends FrameLayout {
 //            }
 //            mShadowDrawable.setShadowDirection(ShadowDrawable.RIGHT);
             mGradientDrawable.setOrientation(GradientDrawable.Orientation.RIGHT_LEFT);
-            mGradientDrawable.setBounds(child.getRight()-60,child.getTop(),child.getRight(),child.getBottom());
+            mGradientDrawable.setBounds(child.getRight() - 60, child.getTop(), child.getRight(), child.getBottom());
 //            mGradientDrawable.setSize(100,child.getBottom() - child.getTop());
             mGradientDrawable.draw(canvas);
         }
-        if(child == mOutRightView){
-            if(mShadowDrawable ==null){
-                mShadowDrawable = new ShadowDrawable(getContext(),Gravity.LEFT);
+        if (child == mOutRightView) {
+            if (mShadowDrawable == null) {
+                mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
             }
             mShadowDrawable.setmShadowGravity(Gravity.LEFT);
-            mShadowDrawable.setBounds(child.getLeft(),child.getTop(),child.getRight(),child.getBottom());
+            mShadowDrawable.setBounds(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
             mShadowDrawable.draw(canvas);
-            Logger.e(child.getLeft() + "getLeft "+ child.getX());
+            Logger.e(child.getLeft() + "getLeft " + child.getX());
         }
         return result;
     }
+
     @Override
     public void setVisibility(int visibility) {
         super.setVisibility(visibility);
@@ -1047,10 +1050,12 @@ public class EasyScrollLayout extends FrameLayout {
             mShadowDrawable.setVisible(visible, false);
         }
     }
+
     @Override
     protected boolean verifyDrawable(Drawable who) {
         return super.verifyDrawable(who) || who == mShadowDrawable || who == mShadowDrawable;
     }
+
     @Override
     protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
         return p instanceof LayoutParams;

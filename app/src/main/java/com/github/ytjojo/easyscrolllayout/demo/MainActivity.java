@@ -54,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+		findViewById(R.id.tv_recylerview_viewpagerheader).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,RecylerViewWithHeaderActivity.class);
+				startActivity(intent);
+			}
+		});
         CoordinatorLayout c;
 
 

@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AbsListView;
-import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 
 /**

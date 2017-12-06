@@ -16,16 +16,12 @@ import android.widget.ScrollView;
 
 import com.orhanobut.logger.Logger;
 
-import static android.R.attr.x;
-import static android.R.attr.y;
-
 /**
  * Created by Administrator on 2017/11/29 0029.
  */
 
 public class HorizontalScrollHandlar {
 
-    EasyScrollLayout mEasyScrollLayout;
     View mOutLeftView;
     View mOutRightView;
     View mInnerTopView;
@@ -122,7 +118,7 @@ public class HorizontalScrollHandlar {
             ViewCompat.offsetLeftAndRight(mContentView, contentLeft - mContentView.getLeft());
         } else {
 
-            ViewCompat.offsetLeftAndRight(mContentView, mTargetScrollX- mContentView.getLeft());
+            ViewCompat.offsetLeftAndRight(mContentView, mTargetScrollX - mContentView.getLeft());
         }
         mScrollX = mTargetScrollX;
         if (mOutLeftView != null) {
@@ -173,7 +169,7 @@ public class HorizontalScrollHandlar {
                 int offset = (int) (mTargetScrollX * (1 - mContentParallaxMult));
                 ViewCompat.offsetLeftAndRight(mInnerTopView, offset - mInnerTopView.getLeft());
             } else {
-                ViewCompat.offsetLeftAndRight(mInnerTopView, mTargetScrollX- mInnerTopView.getLeft());
+                ViewCompat.offsetLeftAndRight(mInnerTopView, mTargetScrollX - mInnerTopView.getLeft());
             }
         }
 
@@ -333,7 +329,23 @@ public class HorizontalScrollHandlar {
 
     public View isDirectChildCanScroll(Point point, ViewGroup parent, ViewGroup child) {
         offsetPoint(point, parent, child);
-        return findChildViewUnder(child, point.x, point.y);
+        View hitView = findChildViewUnder(child, point.x, point.y);
+        if(hitView == null){
+            return null;
+        }
+        if (isHorizontalScrollView(child)) {
+            mScrollChild = hitView;
+            return mScrollChild;
+        } else {
+            offsetPoint(point, child, hitView);
+            hitView = findChildViewUnder(child, point.x, point.y);
+            if (isHorizontalScrollView(hitView)) {
+                mScrollChild = hitView;
+                return mScrollChild;
+            }
+        }
+        return null;
+
     }
 
     public View findScrollChildInVerticalView(Point point, ViewGroup verticalScrollView) {
@@ -344,7 +356,7 @@ public class HorizontalScrollHandlar {
                 offsetPoint(point, verticalScrollView, child);
             }
         }
-        View hitView = findChildViewUnder((ViewGroup) child, x, y);
+        View hitView = findChildViewUnder((ViewGroup) child, point.x, point.y);
         if (hitView == null) {
             return null;
         }
