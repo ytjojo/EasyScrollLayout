@@ -1,4 +1,4 @@
 <resources>
   <string name="action_settings">Settings</string>
-  <string name="app_name">StickyLayout</string>
+  <string name="app_name">ScrollMasterView</string>
 </resources>

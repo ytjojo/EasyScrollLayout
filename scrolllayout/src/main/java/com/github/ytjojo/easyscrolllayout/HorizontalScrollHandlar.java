@@ -89,6 +89,9 @@ public class HorizontalScrollHandlar {
         if (!canPreScroll(dx)) {
             return;
         }
+        if (mScroller != null && !mScroller.isFinished()) {
+            mScroller.abortAnimation();
+        }
         int startX = mScrollX;
         offsetLeftAndRight(dx);
         consumed[0] = mScrollX - startX;
@@ -146,7 +149,7 @@ public class HorizontalScrollHandlar {
                     int totalOffset = (int) (mMinHorizontalStableScrollRange * mRightParallaxMult);
                     float horizontalOffset = mMinHorizontalStableScrollRange - totalOffset + totalOffset * offsetRatio;
 
-                    Logger.e(" mOutRightView " + (mOutRightView.getLeft() - mContentView.getMeasuredWidth()));
+//                    Logger.e(" mOutRightView " + (mOutRightView.getLeft() - mContentView.getMeasuredWidth()));
                     int offset = (int) (horizontalOffset - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
                     ViewCompat.offsetLeftAndRight(mOutRightView, offset);
                 } else if (mScrollX < 0) {
@@ -330,7 +333,7 @@ public class HorizontalScrollHandlar {
     public View isDirectChildCanScroll(Point point, ViewGroup parent, ViewGroup child) {
         offsetPoint(point, parent, child);
         View hitView = findChildViewUnder(child, point.x, point.y);
-        if(hitView == null){
+        if (hitView == null) {
             return null;
         }
         if (isHorizontalScrollView(child)) {
@@ -522,24 +525,47 @@ public class HorizontalScrollHandlar {
             mFlingRunnable = null;
         }
 
-        if (velocityX != 0 && mScrollX < mMaxHorizontalStableScrollRange && mScrollX > mMinHorizontalStableScrollRange) {
-            fiing(velocityX);
-        } else {
-            if (mScrollX < 0) {
-                int targetX = (mMinHorizontalStableScrollRange) / 2 < mScrollX ? 0 : mMinHorizontalStableScrollRange;
-                if (mScroller.springBack(mScrollX, 0, targetX, targetX, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
-                }
-            } else {
-                int targetX = (mMaxHorizontalStableScrollRange) / 2 < mScrollX ? mMaxHorizontalStableScrollRange : 0;
-                if (mScroller.springBack(mScrollX, 0, targetX, targetX, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+        if (mScrollX < 0) {
+
+            int targetX = (mMinHorizontalStableScrollRange) / 2 < mScrollX ? 0 : mMinHorizontalStableScrollRange;
+            EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutRightView.getLayoutParams();
+            if (velocityX != 0 && mScrollX > mMinHorizontalStableScrollRange && mScrollX < lp.mTrigeerExpandRatio * mMinHorizontalStableScrollRange) {
+                fiing(velocityX);
+                return;
+            }
+            if (lp.mTrigeerExpandRatio >= 0 && lp.mTrigeerExpandRatio <= 1f + lp.mOverScrollRatio) {
+                if (mScrollX <= lp.mTrigeerExpandRatio * mMinHorizontalStableScrollRange) {
+                    targetX = mMinHorizontalStableScrollRange;
+                } else {
+                    targetX = 0;
                 }
             }
-
+            if (mScroller.springBack(mScrollX, 0, targetX, targetX, 0, 0)) {
+                mFlingRunnable = new FlingRunnable(mContentView);
+                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            }
+        } else {
+            int targetX = (mMaxHorizontalStableScrollRange) / 2 < mScrollX ? mMaxHorizontalStableScrollRange : 0;
+            EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutLeftView.getLayoutParams();
+            if (velocityX != 0 && mScrollX < mMaxHorizontalStableScrollRange && mScrollX > lp.mTrigeerExpandRatio * mMaxHorizontalStableScrollRange) {
+                fiing(velocityX);
+                return;
+            }
+            if (lp.mTrigeerExpandRatio >= 0 && lp.mTrigeerExpandRatio <= 1f + lp.mOverScrollRatio) {
+                if (mScrollX >= lp.mTrigeerExpandRatio * mMaxHorizontalStableScrollRange) {
+                    targetX = mMaxHorizontalStableScrollRange;
+                } else {
+                    targetX = 0;
+                }
+            }
+            if (mScroller.springBack(mScrollX, 0, targetX, targetX, 0, 0)) {
+                mFlingRunnable = new FlingRunnable(mContentView);
+                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            }
         }
+//        if (velocityX != 0 && mScrollX < mMaxHorizontalStableScrollRange && mScrollX > mMinHorizontalStableScrollRange) {
+//            fiing(velocityX);
+//        }
     }
 
     Runnable mFlingRunnable;
@@ -547,7 +573,6 @@ public class HorizontalScrollHandlar {
     private void fiing(int velocityX) {
         if (mScrollX > 0) {
             if (velocityX > 0) {
-
                 mScroller.fling(mScrollX, 0, velocityX, 0, mMaxHorizontalStableScrollRange, mMaxHorizontalStableScrollRange, 0, 0);
             } else {
                 mScroller.fling(mScrollX, 0, velocityX, 0, 0, 0, 0, 0);
