@@ -117,7 +117,17 @@ public class EasyScrollLayout extends FrameLayout {
         mInnerTopParallaxMult = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0f);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
+        setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
+            @Override
+            public void onChildViewAdded(View parent, View child) {
 
+            }
+
+            @Override
+            public void onChildViewRemoved(View parent, View child) {
+
+            }
+        });
 
     }
 
@@ -182,6 +192,7 @@ public class EasyScrollLayout extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        mOrientation = ORIENTATION_INVALID;
         layoutChildren(l, t, r, b, false);
         if (mState == INITSTATE) {
             mState = OnScollListener.STATE_EXPAND;
@@ -298,10 +309,15 @@ public class EasyScrollLayout extends FrameLayout {
                 childLeft = 0;
                 childTop = -height;
                 mOutTopView = child;
-                mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
-                lp.mMinScrollY = mMinVerticalScrollRange;
-                lp.mMaxScrollY = 0;
-                mOrientation |= ORIENTATION_VERTICAL;
+                if (lp.mEnable) {
+                    mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
+                    lp.mMinScrollY = mMinVerticalScrollRange;
+                    lp.mMaxScrollY = 0;
+                    mOrientation |= ORIENTATION_VERTICAL;
+                } else {
+                    mMinVerticalScrollRange = 0;
+                }
+
                 break;
             case GRAVITY_OUT_LEFT:
                 childLeft = -width;
@@ -338,6 +354,40 @@ public class EasyScrollLayout extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
+    public void setOutTopViewEnable(boolean enable) {
+        if (mOutTopView != null) {
+            LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
+            lp.mEnable = enable;
+            if (lp.mEnable) {
+                if (ViewCompat.isLaidOut(mOutTopView)){
+                    mMinVerticalScrollRange = (int) (-mOutTopView.getMeasuredHeight() * (1f + lp.mOverScrollRatio));
+                    lp.mMinScrollY = mMinVerticalScrollRange;
+                    lp.mMaxScrollY = 0;
+                    mOrientation |= ORIENTATION_VERTICAL;
+                }
+
+            } else {
+                mMinVerticalScrollRange = 0;
+                if(mInnerTopView==null){
+                    if(mOrientation == ORIENTATION_BOTH){
+                        mOrientation = ORIENTATION_VERTICAL;
+                    }else if(mOrientation == ORIENTATION_VERTICAL){
+                        mOrientation = ORIENTATION_INVALID;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+        super.addView(child, index, params);
+    }
+
+    @Override
+    protected boolean addViewInLayout(View child, int index, ViewGroup.LayoutParams params, boolean preventRequestLayout) {
+        return super.addViewInLayout(child, index, params, preventRequestLayout);
+    }
 
     private void sendCancelEvent() {
         // The ScrollChecker will update position and lead to send cancel event when mLastMoveEvent is null.
@@ -434,7 +484,7 @@ public class EasyScrollLayout extends FrameLayout {
                 mLastEventPoint.set(mFirstMotionX, mFirstMotionY);
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(mLastMoveEvent !=null){
+                if (mLastMoveEvent != null) {
                     mLastMoveEvent.recycle();
                 }
                 mLastMoveEvent = MotionEvent.obtain(event);
@@ -547,7 +597,7 @@ public class EasyScrollLayout extends FrameLayout {
                     } else if (mContentChildHolder.canFling()) {
                         sendCancelEvent();
                         mContentChildHolder.dispatchFling(Math.abs(velocityY) > mMinimumVelocity ? velocityY : 0, isDownSlide);
-                    }else {
+                    } else {
                         isHandlar = dispatchTouchEventSupper(event);
                     }
                 } else if (mDragging && isHorizontalScroll && mHorizontalScrollHandlar.canFling()) {
@@ -750,7 +800,7 @@ public class EasyScrollLayout extends FrameLayout {
         int lastScrolly = getScrollY();
         scrollBy(0, -dy);
         int consumedDy = consumed[1] = lastScrolly - getScrollY();
-        Logger.e(dy+"parentPreScroll " + consumedDy);
+        Logger.e(dy + "parentPreScroll " + consumedDy);
         if (dy - consumedDy != 0) {
             consumed[1] = 0;
             mContentChildHolder.preScrollConsumed(dy - consumedDy, consumed);
@@ -795,10 +845,10 @@ public class EasyScrollLayout extends FrameLayout {
         mActivePointerId = INVALID_ID;
         mDragging = false;
         mIgnoreTouchEvent = false;
-//        if(mLastMoveEvent !=null){
-//            mLastMoveEvent.recycle();
-//            mLastMoveEvent = null;
-//        }
+        if (mLastMoveEvent != null) {
+            mLastMoveEvent.recycle();
+            mLastMoveEvent = null;
+        }
         mScrollConsumed[0] = mScrollConsumed[1] = 0;
     }
 
@@ -912,7 +962,7 @@ public class EasyScrollLayout extends FrameLayout {
             for (int i = 0; i < childCount; i++) {
                 final View child = getChildAt(i);
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                if(lp.mIgnoreScroll){
+                if (lp.mIgnoreScroll) {
                     final int top = child.getTop() - lp.mTopWhenLayout;
                     ViewCompat.offsetTopAndBottom(child, scrollY - top);
                 }
@@ -1079,8 +1129,9 @@ public class EasyScrollLayout extends FrameLayout {
         float mParallaxMultiplier;
         float mWidthRatioOfParent;
         boolean mIgnoreScroll;
-        float mTrigeerExpandRatio =1f;
+        float mTrigeerExpandRatio = 1f;
         int mTopWhenLayout;
+        boolean mEnable;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
@@ -1164,6 +1215,14 @@ public class EasyScrollLayout extends FrameLayout {
 
         public void setWidthRatioOfParent(float widthRatioOfParent) {
             this.mWidthRatioOfParent = widthRatioOfParent;
+        }
+
+        public boolean ismEnable() {
+            return mEnable;
+        }
+
+        public void setmEnable(boolean mEnable) {
+            this.mEnable = mEnable;
         }
     }
 
