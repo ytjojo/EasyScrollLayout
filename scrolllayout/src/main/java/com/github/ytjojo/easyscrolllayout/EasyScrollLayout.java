@@ -434,6 +434,9 @@ public class EasyScrollLayout extends FrameLayout {
                 mLastEventPoint.set(mFirstMotionX, mFirstMotionY);
                 break;
             case MotionEvent.ACTION_MOVE:
+                if(mLastMoveEvent !=null){
+                    mLastMoveEvent.recycle();
+                }
                 mLastMoveEvent = MotionEvent.obtain(event);
                 int activePointerIndex = event.findPointerIndex(mActivePointerId);
                 if (activePointerIndex == -1) {
@@ -747,6 +750,7 @@ public class EasyScrollLayout extends FrameLayout {
         int lastScrolly = getScrollY();
         scrollBy(0, -dy);
         int consumedDy = consumed[1] = lastScrolly - getScrollY();
+        Logger.e(dy+"parentPreScroll " + consumedDy);
         if (dy - consumedDy != 0) {
             consumed[1] = 0;
             mContentChildHolder.preScrollConsumed(dy - consumedDy, consumed);
@@ -791,10 +795,10 @@ public class EasyScrollLayout extends FrameLayout {
         mActivePointerId = INVALID_ID;
         mDragging = false;
         mIgnoreTouchEvent = false;
-        if(mLastMoveEvent !=null){
-            mLastMoveEvent.recycle();
-            mLastMoveEvent = null;
-        }
+//        if(mLastMoveEvent !=null){
+//            mLastMoveEvent.recycle();
+//            mLastMoveEvent = null;
+//        }
         mScrollConsumed[0] = mScrollConsumed[1] = 0;
     }
 
@@ -908,8 +912,10 @@ public class EasyScrollLayout extends FrameLayout {
             for (int i = 0; i < childCount; i++) {
                 final View child = getChildAt(i);
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                final int top = lp.mTopWhenLayout;
-                ViewCompat.offsetTopAndBottom(child, scrollY - top);
+                if(lp.mIgnoreScroll){
+                    final int top = child.getTop() - lp.mTopWhenLayout;
+                    ViewCompat.offsetTopAndBottom(child, scrollY - top);
+                }
             }
             if (getScrollY() >= 0 && mInnerTopView != null) {
                 float offsetRatio = ((float) getScrollY()) / mMaxVerticalScrollRange;
