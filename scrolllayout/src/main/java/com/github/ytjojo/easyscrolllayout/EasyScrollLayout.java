@@ -357,26 +357,58 @@ public class EasyScrollLayout extends FrameLayout {
     public void setOutTopViewEnable(boolean enable) {
         if (mOutTopView != null) {
             LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
+            if (lp.mEnable == enable) {
+                return;
+            }
             lp.mEnable = enable;
-            if (lp.mEnable) {
-                if (ViewCompat.isLaidOut(mOutTopView)){
+            if (mOutTopView.isLayoutRequested()) {
+                return;
+            }
+            if (ViewCompat.isLaidOut(mOutTopView)) {
+                if (lp.mEnable) {
                     mMinVerticalScrollRange = (int) (-mOutTopView.getMeasuredHeight() * (1f + lp.mOverScrollRatio));
                     lp.mMinScrollY = mMinVerticalScrollRange;
                     lp.mMaxScrollY = 0;
                     mOrientation |= ORIENTATION_VERTICAL;
-                }
-
-            } else {
-                mMinVerticalScrollRange = 0;
-                if(mInnerTopView==null){
-                    if(mOrientation == ORIENTATION_BOTH){
-                        mOrientation = ORIENTATION_VERTICAL;
-                    }else if(mOrientation == ORIENTATION_VERTICAL){
-                        mOrientation = ORIENTATION_INVALID;
+                } else {
+                    if (getScrollY() >= 0) {
+                        mMinVerticalScrollRange = 0;
+                        if (mInnerTopView == null) {
+                            if (mOrientation == ORIENTATION_BOTH) {
+                                mOrientation = ORIENTATION_VERTICAL;
+                            } else if (mOrientation == ORIENTATION_VERTICAL) {
+                                mOrientation = ORIENTATION_INVALID;
+                            }
+                        }
                     }
+
                 }
             }
+
         }
+    }
+
+    private void disableOutTopViewActual(int lastScrollY, int targetScrollY) {
+        if (mMinVerticalScrollRange == 0) {
+            return;
+        }
+        if(lastScrollY < 0 && targetScrollY >= 0){
+            if (mOutTopView != null) {
+                LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
+                if (!lp.mEnable) {
+                    mMinVerticalScrollRange = 0;
+                    if (mInnerTopView == null) {
+                        if (mOrientation == ORIENTATION_BOTH) {
+                            mOrientation = ORIENTATION_VERTICAL;
+                        } else if (mOrientation == ORIENTATION_VERTICAL) {
+                            mOrientation = ORIENTATION_INVALID;
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 
     @Override
