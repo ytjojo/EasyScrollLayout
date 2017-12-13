@@ -397,7 +397,6 @@ public class ContentWraperView extends FrameLayout {
 
         } else {
             if (mInnerBottomView != null) {
-                // 手指离开之后，根据加速度进行滑动
                 if(getScrollY() < mInnerBottomView.getMeasuredHeight()){
                     if(velocityY != 0 ){
                         fling(velocityY);
@@ -407,14 +406,13 @@ public class ContentWraperView extends FrameLayout {
                             int currentY = getScrollY();
                             // 下拉
                             if (isDownSlide) {
-                                if (currentY < mMaxVerticalScrollRange) {
-                                    mScroller.startScroll(0, currentY, 0, -currentY);
+                                if (currentY <mInnerBottomView.getMeasuredHeight()) {
+                                    mScroller.startScroll(0, currentY, 0, mInnerBottomView.getMeasuredHeight());
                                     ViewCompat.postInvalidateOnAnimation(this);
                                 }
                             } else {
                                 if (currentY > 0) {
-                                    mScroller.startScroll(0, currentY, 0, 0
-                                            - currentY);
+                                    mScroller.startScroll(0, currentY, 0, 0);
                                     ViewCompat.postInvalidateOnAnimation(this);
                                 }
                             }
@@ -450,7 +448,7 @@ public class ContentWraperView extends FrameLayout {
 
     }
 
-    boolean isSnap;
+    boolean isSnap ;
 
     public void fling(int velocityY) {
         if(mInnerBottomView==null){

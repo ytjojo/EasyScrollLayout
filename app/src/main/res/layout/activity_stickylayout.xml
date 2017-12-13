@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/StickyNavLayout"
     android:orientation="vertical" android:layout_width="match_parent"
+    app:isSnap="true"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -40,6 +41,7 @@
     <com.github.ytjojo.easyscrolllayout.ContentWraperView
         android:layout_width="match_parent"
         android:background="#000000"
+        app:isSnap="true"
         android:layout_height="match_parent">
         <ListView
             android:id="@+id/listview"
