@@ -121,6 +121,24 @@ public class EasyScrollLayout extends FrameLayout {
             @Override
             public void onChildViewAdded(View parent, View child) {
                 Logger.e(".........." + child.getClass().getName());
+                LayoutParams lp = (LayoutParams) child.getLayoutParams();
+
+                switch (lp.mLayoutOutGravity) {
+                    case GRAVITY_OUT_TOP:
+                        mOutTopView = child;
+                        break;
+                    case GRAVITY_OUT_LEFT:
+                        mOutLeftView = child;
+                        break;
+                    case GRAVITY_OUT_RIGHT:
+                        mOutRightView = child;
+                        break;
+
+                    case GRAVITY_INNER_TOP:
+                        mInnerTopView = child;
+                        break;
+
+                }
             }
 
             @Override
@@ -129,6 +147,9 @@ public class EasyScrollLayout extends FrameLayout {
             }
         });
         mRefreshHeaderIndicator = new RefreshHeaderIndicator();
+        if (mContentChildHolder == null) {
+            mContentChildHolder = new ContentChildHolder();
+        }
     }
 
     HorizontalScrollHandlar mHorizontalScrollHandlar;
@@ -145,9 +166,7 @@ public class EasyScrollLayout extends FrameLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         final int count = getChildCount();
         mOrientation = ORIENTATION_INVALID;
-        if (mContentChildHolder == null) {
-            mContentChildHolder = new ContentChildHolder();
-        }
+
         mContentChildHolder.onMeasure(this);
         int maxArea = 0;
         for (int i = 0; i < count; i++) {
@@ -198,7 +217,7 @@ public class EasyScrollLayout extends FrameLayout {
             mState = OnScollListener.STATE_EXPAND;
             if (mOnScollListener != null) {
                 mOnScollListener.onStateChanged(mState);
-                mOnScollListener.onScroll(0, getScrollY(), getScrollY() > 0 || mMinVerticalScrollRange == 0 ? mMaxVerticalScrollRange : mMinVerticalScrollRange);
+                mOnScollListener.onScroll(0f, getScrollY(), mMaxVerticalScrollRange);
             }
         }
         if (mOutLeftView != null || mOutRightView != null) {
@@ -687,6 +706,9 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     public void toggle() {
+        if(this.isLayoutRequested()||mInnerTopView ==null||!ViewCompat.isLaidOut(mInnerTopView)||mInnerTopView.isLayoutRequested()){
+            return;
+        }
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
@@ -701,6 +723,9 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     public void close() {
+        if(this.isLayoutRequested()||mInnerTopView ==null||!ViewCompat.isLaidOut(mInnerTopView)||mInnerTopView.isLayoutRequested()){
+            return;
+        }
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
@@ -727,7 +752,9 @@ public class EasyScrollLayout extends FrameLayout {
      * 默认是打开状态，也就是getScrollY为0
      */
     public void expand() {
-
+        if(this.isLayoutRequested()||mInnerTopView ==null||!ViewCompat.isLaidOut(mInnerTopView)||mInnerTopView.isLayoutRequested()){
+            return;
+        }
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
@@ -1008,8 +1035,9 @@ public class EasyScrollLayout extends FrameLayout {
                         float verticalOffset = totalOffset * offsetRatio;
                         ViewCompat.setTranslationY(mInnerTopView, (int) verticalOffset);
                     }
-                }else if(lastScrolly > 0 && y <0){
+                }else if(lastScrolly > 0 && y <= 0){
                     if (mOnScollListener != null) {
+                        mOnScollListener.onScroll(0f, 0, max);
                         mState = OnScollListener.STATE_EXPAND;
                         mOnScollListener.onStateChanged(OnScollListener.STATE_EXPAND);
                     }
