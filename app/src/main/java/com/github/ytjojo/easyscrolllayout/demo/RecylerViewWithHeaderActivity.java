@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.ytjojo.easyscrolllayout.ContentWraperView;
 import com.shizhefei.view.indicator.BannerComponent;
 import com.shizhefei.view.indicator.Indicator;
 import com.shizhefei.view.indicator.slidebar.ColorBar;
@@ -69,6 +70,15 @@ public class RecylerViewWithHeaderActivity extends AppCompatActivity {
                 return 1;
             }
         });
+        final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
+        contentWraperView.setCanRefresh(false);
+        contentWraperView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                contentWraperView.setComplete(0);
+            }
+        },6000);
+
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 

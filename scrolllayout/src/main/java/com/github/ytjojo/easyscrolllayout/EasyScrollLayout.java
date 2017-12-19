@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.OverScroller;
+import android.widget.Scroller;
 
 import com.orhanobut.logger.Logger;
 
@@ -166,14 +167,11 @@ public class EasyScrollLayout extends FrameLayout {
         mOrientation = ORIENTATION_INVALID;
 
         mContentChildHolder.onMeasure(this);
-        int maxArea = 0;
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (lp.mLayoutOutGravity != GRAVITY_OUT_INVALID) {
-                    final int childArea = child.getMeasuredHeight() * child.getMeasuredWidth();
-                    maxArea = childArea > maxArea ? childArea : maxArea;
                     switch (lp.mLayoutOutGravity) {
                         case GRAVITY_INNER_TOP:
                             mInnerTopView = child;
@@ -307,7 +305,7 @@ public class EasyScrollLayout extends FrameLayout {
                         childTop = parentTop + lp.topMargin;
                         break;
                 }
-                if (child == mContentChildHolder.mDirectChild && mInnerTopView != null&& mInnerTopView.getVisibility() == VISIBLE) {
+                if (child == mContentChildHolder.mDirectChild && mInnerTopView != null && mInnerTopView.getVisibility() == VISIBLE) {
                     childTop += mInnerTopView.getMeasuredHeight();
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
@@ -329,6 +327,7 @@ public class EasyScrollLayout extends FrameLayout {
                 mOutTopView = child;
                 mRefreshHeaderIndicator.setOutTopView(mOutTopView);
                 mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
+                lp.mStableScrollValue = -height;
                 lp.mMinScrollY = mMinVerticalScrollRange;
                 lp.mMaxScrollY = 0;
                 mOrientation |= ORIENTATION_VERTICAL;
@@ -338,14 +337,14 @@ public class EasyScrollLayout extends FrameLayout {
                 childLeft = -width;
                 childTop = 0;
                 mOutLeftView = child;
-
+                lp.mStableScrollValue = -width;
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
             case GRAVITY_OUT_RIGHT:
                 childLeft = right;
                 childTop = 0;
                 mOutRightView = child;
-
+                lp.mStableScrollValue = width;
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
 
@@ -362,9 +361,10 @@ public class EasyScrollLayout extends FrameLayout {
         child.layout(childLeft, childTop, childLeft + width, childTop + height);
         lp.mTopWhenLayout = child.getTop();
     }
-    private void resetValue(){
+
+    private void resetValue() {
         mOrientation = ORIENTATION_INVALID;
-        mMinVerticalScrollRange= 0;
+        mMinVerticalScrollRange = 0;
         mMaxVerticalScrollRange = 0;
     }
 
@@ -375,7 +375,7 @@ public class EasyScrollLayout extends FrameLayout {
 
     RefreshHeaderIndicator mRefreshHeaderIndicator;
 
-    public void setOutTopViewEnable(boolean enable) {
+    public void setCanRefresh(boolean enable) {
         if (mOutTopView != null) {
             LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
             if (lp.mEnable == enable) {
@@ -643,18 +643,18 @@ public class EasyScrollLayout extends FrameLayout {
                 } else {
                     mRefreshHeaderIndicator.onStopScroll(getScrollY());
                 }
-            }else if(mRefreshHeaderIndicator.isLoading()){
+            } else if (mRefreshHeaderIndicator.isLoading()) {
 //                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
 //                    ViewCompat.postInvalidateOnAnimation(this);
 //                }
-                if (getScrollY() <= -mOutTopView.getMeasuredHeight()) {
-                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
+                if (getScrollY() <= lp.mStableScrollValue) {
+                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
                         ViewCompat.postInvalidateOnAnimation(this);
                     }
-                }else{
+                } else {
                     if (velocityY != 0) {
                         if (velocityY > 0) {
-                            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, -mOutTopView.getMeasuredHeight(), getScrollY());
+                            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, lp.mStableScrollValue, getScrollY());
                         } else {
                             mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, getScrollY(), 0);
                         }
@@ -663,7 +663,7 @@ public class EasyScrollLayout extends FrameLayout {
                 }
             } else if (mRefreshHeaderIndicator.isPrepare()) {
                 if (getScrollY() <= -mOutTopView.getMeasuredHeight() * lp.mTrigeerExpandRatio) {
-                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
+                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0,lp.mStableScrollValue, lp.mStableScrollValue)) {
                         ViewCompat.postInvalidateOnAnimation(this);
                         mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
                     } else {
@@ -709,7 +709,7 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     public void toggle() {
-        if(this.isLayoutRequested()||mInnerTopView ==null||!ViewCompat.isLaidOut(mInnerTopView)||mInnerTopView.isLayoutRequested()){
+        if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
         if (!mScroller.isFinished()) {
@@ -726,7 +726,7 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     public void close() {
-        if(this.isLayoutRequested()||mInnerTopView ==null||!ViewCompat.isLaidOut(mInnerTopView)||mInnerTopView.isLayoutRequested()){
+        if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
         if (!mScroller.isFinished()) {
@@ -755,7 +755,7 @@ public class EasyScrollLayout extends FrameLayout {
      * 默认是打开状态，也就是getScrollY为0
      */
     public void expand() {
-        if(this.isLayoutRequested()||mInnerTopView ==null||!ViewCompat.isLaidOut(mInnerTopView)||mInnerTopView.isLayoutRequested()){
+        if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
         if (!mScroller.isFinished()) {
@@ -955,6 +955,26 @@ public class EasyScrollLayout extends FrameLayout {
 
     }
 
+    public void setComplete(long delay) {
+
+        if (mOutTopView == null || !ViewCompat.isLaidOut(mOutTopView)) {
+            return;
+        }
+        if (mRefreshHeaderIndicator.isLoading()) {
+            mRefreshHeaderIndicator.setComplete();
+            final int scrollY = getScrollY();
+            if (scrollY < 0) {
+                if (!mScroller.isFinished()) {
+                    mScroller.abortAnimation();
+                }
+                mScroller.startScroll(getScrollX(),scrollY,0,-scrollY,250);
+                ViewCompat.postInvalidateOnAnimation(this);
+            } else {
+                mRefreshHeaderIndicator.onStopScroll(scrollY);
+            }
+        }
+    }
+
     public void flingNoSnap(int velocityY) {
         isFlingToNestScroll = false;
         if (velocityY > 0) {
@@ -1008,7 +1028,7 @@ public class EasyScrollLayout extends FrameLayout {
         }
         if (y != getScrollY()) {
             super.scrollTo(x, y);
-            mRefreshHeaderIndicator.onScrollChanged(lastScrolly,y);
+            mRefreshHeaderIndicator.onScrollChanged(lastScrolly, y);
             final int scrollY = getScrollY();
             final int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
@@ -1019,8 +1039,8 @@ public class EasyScrollLayout extends FrameLayout {
                     ViewCompat.offsetTopAndBottom(child, scrollY - top);
                 }
             }
-            if ( mInnerTopView != null) {
-                if(getScrollY() >= 0){
+            if (mInnerTopView != null) {
+                if (getScrollY() >= 0) {
                     float offsetRatio = ((float) scrollY) / mMaxVerticalScrollRange;
                     if (mOnScollListener != null) {
                         if (offsetRatio == 0) {
@@ -1038,7 +1058,7 @@ public class EasyScrollLayout extends FrameLayout {
                         float verticalOffset = totalOffset * offsetRatio;
                         ViewCompat.setTranslationY(mInnerTopView, (int) verticalOffset);
                     }
-                }else if(lastScrolly > 0 && y <= 0){
+                } else if (lastScrolly > 0 && y <= 0) {
                     if (mOnScollListener != null) {
                         mOnScollListener.onScroll(0f, 0, max);
                         mState = OnScollListener.STATE_EXPAND;
@@ -1199,6 +1219,7 @@ public class EasyScrollLayout extends FrameLayout {
         float mTrigeerExpandRatio = 1f;
         int mTopWhenLayout;
         boolean mEnable;
+        int mStableScrollValue;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);

@@ -74,11 +74,12 @@ public class RefreshHeaderIndicator {
         } else if (mStatus == PTR_STATUS_PREPARE && scrollY >= 0) {
             mStatus = PTR_STATUS_INIT;
             dispatchReset();
-        } else if (mStatus == PTR_STATUS_COMPLETE && scrollY >= 0) {
-            mStatus = PTR_STATUS_INIT;
-            dispatchReset();
         }
-
+    }
+    public void setComplete(){
+        if(mStatus ==PTR_STATUS_LOADING){
+            mStatus = PTR_STATUS_COMPLETE;
+        }
     }
 
     public void dispatchReset() {

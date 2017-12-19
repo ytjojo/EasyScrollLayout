@@ -207,7 +207,7 @@ public class VerticalScrollCheckHandlar {
                 View child = mViewPager.getChildAt(i);
                 int childX = (int) child.getX() - mViewPager.getScrollX();
                 int childY = (int) child.getY() - mViewPager.getScrollY();
-                if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMinimumHeight()) {
+                if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMeasuredHeight()) {
                     mScrollChild = child;
                     break;
                 }
@@ -304,7 +304,7 @@ public class VerticalScrollCheckHandlar {
                         View child = mViewPager.getChildAt(i);
                         int childX = (int) child.getX() - mViewPager.getScrollX();
                         int childY = (int) child.getY() - mViewPager.getScrollY();
-                        if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMinimumHeight()) {
+                        if (childX >= 0 && childX <= mViewPager.getMeasuredWidth() & childY >= 0 && childX <= mViewPager.getMeasuredHeight()) {
                             findScrollView(child, 0);
                             break;
                         }

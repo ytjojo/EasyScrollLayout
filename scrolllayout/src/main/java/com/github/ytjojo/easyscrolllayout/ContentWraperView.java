@@ -270,7 +270,6 @@ public class ContentWraperView extends FrameLayout {
         int mMinScrollY;
         int mMaxScrollY;
         int mStableScrollY;
-
         boolean mIgnoreScroll;
         float mTrigeerExpandRatio = 1f;
         int mTopWhenLayout;
@@ -463,14 +462,14 @@ public class ContentWraperView extends FrameLayout {
 //                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
 //                    ViewCompat.postInvalidateOnAnimation(this);
 //                }
-            if (getScrollY() <= -mOutTopView.getMeasuredHeight()) {
-                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
+            if (getScrollY() <= lp.mStableScrollY) {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY, lp.mStableScrollY)) {
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
             }else{
                 if (velocityY != 0) {
                     if (velocityY > 0) {
-                        mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, -mOutTopView.getMeasuredHeight(), getScrollY());
+                        mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, lp.mStableScrollY, getScrollY());
                     } else {
                         mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, getScrollY(), 0);
                     }
@@ -480,7 +479,7 @@ public class ContentWraperView extends FrameLayout {
 
         } else if (mRefreshHeaderIndicator.isPrepare()) {
             if (getScrollY() <= -mOutTopView.getMeasuredHeight() * lp.mTrigeerExpandRatio) {
-                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY, lp.mStableScrollY)) {
                     ViewCompat.postInvalidateOnAnimation(this);
                     mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
                 } else {
@@ -635,5 +634,45 @@ public class ContentWraperView extends FrameLayout {
 
     public void setScrollChild(View child) {
         this.mScrollChild = child;
+    }
+
+
+    public void setCanRefresh(boolean canRefresh){
+        mRefreshHeaderIndicator.setCanLoad(canRefresh);
+    }
+    public void setCanLoadMore(boolean canLoadMore){
+        mRefreshFooterIndicator.setCanLoad(canLoadMore);
+    }
+    public void setComplete(long delay) {
+
+        if (mOutTopView != null &&  ViewCompat.isLaidOut(mOutTopView) && mRefreshHeaderIndicator.isLoading()) {
+            mRefreshHeaderIndicator.setComplete();
+            final int scrollY = getScrollY();
+            if (scrollY < 0) {
+                if (!mScroller.isFinished()) {
+                    mScroller.abortAnimation();
+                }
+                mScroller.startScroll(getScrollX(),scrollY,0,-scrollY,250);
+                ViewCompat.postInvalidateOnAnimation(this);
+            } else {
+                mRefreshHeaderIndicator.onStopScroll(scrollY);
+            }
+            return;
+        }
+        if (mOutBottomView != null &&  ViewCompat.isLaidOut(mOutBottomView) && mRefreshFooterIndicator.isLoading()) {
+            mRefreshFooterIndicator.setComplete();
+            final int scrollY = getScrollY();
+            if (scrollY > mRefreshFooterIndicator.getLimitScrollY()) {
+                if (!mScroller.isFinished()) {
+                    mScroller.abortAnimation();
+                }
+                mScroller.startScroll(getScrollX(),scrollY,0,mRefreshFooterIndicator.getLimitScrollY()-scrollY,250);
+                ViewCompat.postInvalidateOnAnimation(this);
+            } else {
+                mRefreshFooterIndicator.onStopScroll(scrollY);
+            }
+            return;
+        }
+
     }
 }

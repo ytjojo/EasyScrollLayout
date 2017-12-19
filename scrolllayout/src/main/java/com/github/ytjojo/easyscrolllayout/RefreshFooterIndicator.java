@@ -61,7 +61,7 @@ public class RefreshFooterIndicator {
     }
 
     public void dispatchScrollChanged(byte status, int scrollY) {
-
+        Logger.e(status + "footer ::: ------> status  " + scrollY);
     }
 
     public void onStopScroll(int scrollY) {
@@ -75,8 +75,16 @@ public class RefreshFooterIndicator {
         } else if (mStatus == PTR_STATUS_COMPLETE && scrollY <= lp.mMinScrollY) {
             mStatus = PTR_STATUS_INIT;
             dispatchReset();
+        }else if (mStatus == PTR_STATUS_PREPARE && scrollY <= lp.mMinScrollY) {
+            mStatus = PTR_STATUS_INIT;
+            dispatchReset();
         }
 
+    }
+    public void setComplete(){
+        if(mStatus ==PTR_STATUS_LOADING){
+            mStatus = PTR_STATUS_COMPLETE;
+        }
     }
 
     public void dispatchReset() {
