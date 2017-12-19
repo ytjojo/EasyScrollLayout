@@ -58,6 +58,17 @@ public class ContentWraperView extends FrameLayout {
         a.recycle();
         mRefreshHeaderIndicator = new RefreshHeaderIndicator();
         mRefreshFooterIndicator = new RefreshFooterIndicator();
+        setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
+            @Override
+            public void onChildViewAdded(View parent, View child) {
+                Logger.e(".........." + child.getClass().getName());
+            }
+
+            @Override
+            public void onChildViewRemoved(View parent, View child) {
+
+            }
+        });
     }
 
     @Override
@@ -224,6 +235,7 @@ public class ContentWraperView extends FrameLayout {
                 lp.mMinScrollY = 0;
                 lp.mMaxScrollY = height;
                 mInnerBottomView = child;
+                mRefreshFooterIndicator.setLimitScrollY(height);
                 break;
             default:
                 break;
@@ -383,8 +395,8 @@ public class ContentWraperView extends FrameLayout {
         }
         if (x != lastScrollx || y != lastScrolly) {
             super.scrollTo(x, y);
-            mRefreshHeaderIndicator.onScrollChanged(y);
-            mRefreshFooterIndicator.onScrollChanged(y);
+            mRefreshHeaderIndicator.onScrollChanged(lastScrolly,y);
+            mRefreshFooterIndicator.onScrollChanged(lastScrolly,y);
         }
     }
 
