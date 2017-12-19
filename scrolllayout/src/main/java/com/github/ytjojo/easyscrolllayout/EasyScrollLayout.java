@@ -120,9 +120,7 @@ public class EasyScrollLayout extends FrameLayout {
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
             @Override
             public void onChildViewAdded(View parent, View child) {
-                Logger.e(".........." + child.getClass().getName());
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
-
                 switch (lp.mLayoutOutGravity) {
                     case GRAVITY_OUT_TOP:
                         mOutTopView = child;
@@ -211,7 +209,8 @@ public class EasyScrollLayout extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        mOrientation = ORIENTATION_INVALID;
+
+        resetValue();
         layoutChildren(l, t, r, b, false);
         if (mState == INITSTATE) {
             mState = OnScollListener.STATE_EXPAND;
@@ -308,7 +307,7 @@ public class EasyScrollLayout extends FrameLayout {
                         childTop = parentTop + lp.topMargin;
                         break;
                 }
-                if (child == mContentChildHolder.mDirectChild && mInnerTopView != null) {
+                if (child == mContentChildHolder.mDirectChild && mInnerTopView != null&& mInnerTopView.getVisibility() == VISIBLE) {
                     childTop += mInnerTopView.getMeasuredHeight();
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
@@ -355,7 +354,7 @@ public class EasyScrollLayout extends FrameLayout {
                 childTop = 0;
                 lp.mMinScrollY = 0;
                 lp.mMaxScrollY = height - child.getMinimumHeight();
-                mMaxVerticalScrollRange = Math.max(mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight(), mMaxVerticalScrollRange);
+                mMaxVerticalScrollRange = lp.mMaxScrollY;
                 mOrientation |= ORIENTATION_VERTICAL;
                 break;
 
@@ -363,7 +362,11 @@ public class EasyScrollLayout extends FrameLayout {
         child.layout(childLeft, childTop, childLeft + width, childTop + height);
         lp.mTopWhenLayout = child.getTop();
     }
-
+    private void resetValue(){
+        mOrientation = ORIENTATION_INVALID;
+        mMinVerticalScrollRange= 0;
+        mMaxVerticalScrollRange = 0;
+    }
 
     @Override
     protected void onDetachedFromWindow() {
@@ -587,7 +590,7 @@ public class EasyScrollLayout extends FrameLayout {
                 mDragging = false;
                 cancelWithAnim();
                 isHandlar = dispatchTouchEventSupper(event);
-                reset();
+                resetTouch();
                 break;
             case MotionEvent.ACTION_UP:
                 isHandlar = true;
@@ -619,7 +622,7 @@ public class EasyScrollLayout extends FrameLayout {
                         isHandlar = dispatchTouchEventSupper(event);
                     }
                 }
-                reset();
+                resetTouch();
                 break;
         }
         mVelocityTracker.addMovement(event);
@@ -881,7 +884,7 @@ public class EasyScrollLayout extends FrameLayout {
 
     }
 
-    private void reset() {
+    private void resetTouch() {
         mVelocityTracker.clear();
         mActivePointerId = INVALID_ID;
         mDragging = false;
@@ -1018,7 +1021,7 @@ public class EasyScrollLayout extends FrameLayout {
             }
             if ( mInnerTopView != null) {
                 if(getScrollY() >= 0){
-                    float offsetRatio = ((float) getScrollY()) / mMaxVerticalScrollRange;
+                    float offsetRatio = ((float) scrollY) / mMaxVerticalScrollRange;
                     if (mOnScollListener != null) {
                         if (offsetRatio == 0) {
                             mState = OnScollListener.STATE_EXPAND;
@@ -1028,7 +1031,7 @@ public class EasyScrollLayout extends FrameLayout {
                             mState = OnScollListener.STATE_COLLAPSED;
                             mOnScollListener.onStateChanged(OnScollListener.STATE_COLLAPSED);
                         }
-                        mOnScollListener.onScroll(offsetRatio, getScrollY(), max);
+                        mOnScollListener.onScroll(offsetRatio, scrollY, max);
                     }
                     if (mInnerTopParallaxMult != 0) {
                         int totalOffset = (int) ((mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight()) * mInnerTopParallaxMult);
@@ -1269,7 +1272,7 @@ public class EasyScrollLayout extends FrameLayout {
             return mParallaxMultiplier;
         }
 
-        public void setmParallaxMultiplier(float parallaxMultiplier) {
+        public void setParallaxMultiplier(float parallaxMultiplier) {
             this.mParallaxMultiplier = parallaxMultiplier;
         }
 

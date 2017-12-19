@@ -61,7 +61,22 @@ public class ContentWraperView extends FrameLayout {
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
             @Override
             public void onChildViewAdded(View parent, View child) {
-                Logger.e(".........." + child.getClass().getName());
+                LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                switch (lp.mLayoutOutGravity) {
+                    case GRAVITY_OUT_TOP:
+                        mOutTopView = child;
+                        mRefreshHeaderIndicator.setOutTopView(mOutTopView);
+                        break;
+                    case GRAVITY_OUT_BOTTOM:
+                        mOutBottomView = child;
+                        mRefreshFooterIndicator.setOutBottomView(mOutBottomView);
+                        break;
+                    case GRAVITY_INNER_BOTTOM:
+                        mInnerBottomView = child;
+                        break;
+                    default:
+                        break;
+                }
             }
 
             @Override
@@ -93,17 +108,7 @@ public class ContentWraperView extends FrameLayout {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                if (lp.mLayoutOutGravity != GRAVITY_OUT_INVALID) {
-                    switch (lp.mLayoutOutGravity) {
-                        case GRAVITY_INNER_BOTTOM:
-                            mInnerBottomView = child;
-                            break;
-
-                        default:
-
-                            break;
-                    }
-                } else {
+                if (lp.mLayoutOutGravity == GRAVITY_OUT_INVALID) {
                     contentViews.add(child);
                 }
             }
@@ -123,8 +128,7 @@ public class ContentWraperView extends FrameLayout {
 
     int mMinVerticalScrollRange;
     int mMaxVerticalScrollRange;
-    int mMinHorizontalScrollRange;
-    int mMaxHorizontalScrollRange;
+
 //    int mScrollRange;
 
 
@@ -138,6 +142,7 @@ public class ContentWraperView extends FrameLayout {
         final int parentBottom = bottom - top - getPaddingBottom();
         mMaxVerticalScrollRange = 0;
         mMinVerticalScrollRange = 0;
+        mRefreshFooterIndicator.setLimitScrollY(0);
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
@@ -191,6 +196,7 @@ public class ContentWraperView extends FrameLayout {
                         childTop = parentTop + lp.topMargin;
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
+                lp.mTopWhenLayout = child.getTop();
             }
         }
     }
@@ -226,12 +232,6 @@ public class ContentWraperView extends FrameLayout {
             case GRAVITY_INNER_BOTTOM:
                 childLeft = 0;
                 childTop = bottom - top;
-                scrollRange = height;
-                if (mOutBottomView != null) {
-                    LayoutParams outBottomViewlp = (LayoutParams) mOutBottomView.getLayoutParams();
-                    scrollRange += mOutBottomView.getMeasuredHeight() * outBottomViewlp.mOverScrollRatio;
-                }
-                mMaxVerticalScrollRange = Math.max(scrollRange, mMaxVerticalScrollRange);
                 lp.mMinScrollY = 0;
                 lp.mMaxScrollY = height;
                 mInnerBottomView = child;
@@ -241,6 +241,7 @@ public class ContentWraperView extends FrameLayout {
                 break;
         }
         child.layout(childLeft, childTop, childLeft + width, childTop + height);
+        lp.mTopWhenLayout = child.getTop();
     }
 
 
@@ -273,7 +274,6 @@ public class ContentWraperView extends FrameLayout {
         boolean mIgnoreScroll;
         float mTrigeerExpandRatio = 1f;
         int mTopWhenLayout;
-        boolean mEnable;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
@@ -360,12 +360,7 @@ public class ContentWraperView extends FrameLayout {
         if (y < mMinVerticalScrollRange) {
             y = mMinVerticalScrollRange;
         }
-        if (x < mMinHorizontalScrollRange) {
-            x = mMinHorizontalScrollRange;
-        }
-        if (x > mMaxHorizontalScrollRange) {
-            x = mMaxHorizontalScrollRange;
-        }
+
         if (mRefreshHeaderIndicator.isLoading()) {
             final int limitScrollY = mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight();
             if (y > limitScrollY) {
@@ -395,6 +390,17 @@ public class ContentWraperView extends FrameLayout {
         }
         if (x != lastScrollx || y != lastScrolly) {
             super.scrollTo(x, y);
+
+            final int scrollY = getScrollY();
+            final int childCount = getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                final View child = getChildAt(i);
+                LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.mIgnoreScroll) {
+                    final int top = child.getTop() - lp.mTopWhenLayout;
+                    ViewCompat.offsetTopAndBottom(child, scrollY - top);
+                }
+            }
             mRefreshHeaderIndicator.onScrollChanged(lastScrolly,y);
             mRefreshFooterIndicator.onScrollChanged(lastScrolly,y);
         }
