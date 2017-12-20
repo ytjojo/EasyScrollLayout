@@ -109,54 +109,91 @@ public class HorizontalScrollHandlar {
     float mContentParallaxMult = 0.5f;
 
     public void offsetLeftAndRight(int dx) {
-        int mTargetScrollX = mScrollX;
+        int targetScrollX = mScrollX;
         final int mLastScrollX = mScrollX;
-        mTargetScrollX += dx;
-        if (mTargetScrollX > mMaxHorizontalScrollRange) {
-            mTargetScrollX = mMaxHorizontalScrollRange;
+        targetScrollX += dx;
+        if (targetScrollX > mMaxHorizontalScrollRange) {
+            targetScrollX = mMaxHorizontalScrollRange;
         }
-        if (mTargetScrollX < mMinHorizontalScrollRange) {
-            mTargetScrollX = mMinHorizontalScrollRange;
+        if (targetScrollX < mMinHorizontalScrollRange) {
+            targetScrollX = mMinHorizontalScrollRange;
         }
-        if (mScrollX < 0 && dx > 0 && mTargetScrollX > 0) {
-            mTargetScrollX = 0;
-        } else if (mScrollX > 0 && dx < 0 && mTargetScrollX < 0) {
-            mTargetScrollX = 0;
+        if (mScrollX < 0 && dx > 0 && targetScrollX > 0) {
+            targetScrollX = 0;
+        } else if (mScrollX > 0 && dx < 0 && targetScrollX < 0) {
+            targetScrollX = 0;
         }
         if(!isDrawLayoutStyle){
+            if(mLeftRefreshInidicator.isLoading()){
+                if(targetScrollX <0){
+                    targetScrollX = 0;
+                }
+            }
+            if(mRightRefreshIndicator.isLoading()){
+                if(targetScrollX > 0){
+                    targetScrollX = 0;
+                }
+            }
             if (!mRightRefreshIndicator.getCanLoad()) {
-                if (mLastScrollX >= 0 && mTargetScrollX < 0) {
-                    mTargetScrollX = 0;
+                if (mLastScrollX >= 0 && targetScrollX < 0) {
+                    targetScrollX = 0;
                 }
             }
             if (!mLeftRefreshInidicator.getCanLoad()) {
-                if (mLastScrollX <= 0 && mTargetScrollX > 0) {
-                    mTargetScrollX = 0;
+                if (mLastScrollX <= 0 && targetScrollX > 0) {
+                    targetScrollX = 0;
                 }
             }
         }else {
             if (!mIsRightEnable) {
-                if (mLastScrollX >= 0 && mTargetScrollX < 0) {
-                    mTargetScrollX = 0;
+                if (mLastScrollX >= 0 && targetScrollX < 0) {
+                    targetScrollX = 0;
                 }
             }
             if (!mIsLeftEnable) {
-                if (mLastScrollX <= 0 && mTargetScrollX > 0) {
-                    mTargetScrollX = 0;
+                if (mLastScrollX <= 0 && targetScrollX > 0) {
+                    targetScrollX = 0;
                 }
             }
         }
 
-        int offsetDx = mTargetScrollX - mScrollX;
+        int offsetDx = targetScrollX - mScrollX;
 
+
+        mScrollX = targetScrollX;
+
+        offsetContenViews();
+        offsetLeftView();
+        offsetRightView();
+        if(!isDrawLayoutStyle){
+            mLeftRefreshInidicator.onScrollChanged(mLastScrollX,mScrollX);
+            mRightRefreshIndicator.onScrollChanged(mLastScrollX,mScrollX);
+        }
+
+    }
+    private void offsetContenViews(){
         if (mContentParallaxMult != 0) {
-            int contentLeft = (int) (mTargetScrollX * (1 - mContentParallaxMult));
+            int contentLeft = (int) (mScrollX * (1 - mContentParallaxMult));
             ViewCompat.offsetLeftAndRight(mContentView, contentLeft - mContentView.getLeft());
         } else {
 
-            ViewCompat.offsetLeftAndRight(mContentView, mTargetScrollX - mContentView.getLeft());
+            ViewCompat.offsetLeftAndRight(mContentView, mScrollX - mContentView.getLeft());
         }
-        mScrollX = mTargetScrollX;
+        if (mInnerTopView != null) {
+            if (mContentParallaxMult != 0) {
+                int offset = (int) (mScrollX * (1 - mContentParallaxMult));
+                ViewCompat.offsetLeftAndRight(mInnerTopView, offset - mInnerTopView.getLeft());
+            } else {
+                ViewCompat.offsetLeftAndRight(mInnerTopView, mScrollX - mInnerTopView.getLeft());
+            }
+        }
+
+        if (mOutTopView != null) {
+            int offset = (mScrollX - mOutTopView.getLeft());
+            ViewCompat.offsetLeftAndRight(mOutTopView, offset);
+        }
+    }
+    private void offsetLeftView(){
         if (mOutLeftView != null) {
             if (mLeftParallaxMult != 0) {
                 if (mScrollX >= 0 && mScrollX < mMaxHorizontalStableScrollRange) {
@@ -175,6 +212,8 @@ public class HorizontalScrollHandlar {
             }
 
         }
+    }
+    private void offsetRightView(){
         if (mOutRightView != null) {
             if (mRightParallaxMult != 0) {
                 if (mScrollX <= 0 && mScrollX > mMinHorizontalStableScrollRange) {
@@ -200,24 +239,6 @@ public class HorizontalScrollHandlar {
                 ViewCompat.offsetLeftAndRight(mOutRightView, offset);
             }
         }
-        if (mInnerTopView != null) {
-            if (mContentParallaxMult != 0) {
-                int offset = (int) (mTargetScrollX * (1 - mContentParallaxMult));
-                ViewCompat.offsetLeftAndRight(mInnerTopView, offset - mInnerTopView.getLeft());
-            } else {
-                ViewCompat.offsetLeftAndRight(mInnerTopView, mTargetScrollX - mInnerTopView.getLeft());
-            }
-        }
-
-        if (mOutTopView != null) {
-            int offset = (mScrollX - mOutTopView.getLeft());
-            ViewCompat.offsetLeftAndRight(mOutTopView, offset);
-        }
-        if(!isDrawLayoutStyle){
-            mLeftRefreshInidicator.onScrollChanged(mLastScrollX,mScrollX);
-            mRightRefreshIndicator.onScrollChanged(mLastScrollX,mScrollX);
-        }
-
     }
     private boolean mIsLeftEnable;
     private boolean mIsRightEnable;
@@ -754,5 +775,59 @@ public class HorizontalScrollHandlar {
             mRightRefreshIndicator.onStopScroll(mScrollX);
         }
 
+    }
+    private void setLeftComplete(){
+        if (mLeftRefreshInidicator.isLoading()) {
+            if (mFlingRunnable != null) {
+                mContentView.removeCallbacks(mFlingRunnable);
+                mFlingRunnable = null;
+            }
+
+            mLeftRefreshInidicator.setComplete();
+            if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
+                mFlingRunnable = new FlingRunnable(mContentView);
+                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            }else {
+                mLeftRefreshInidicator.onStopScroll(mScrollX);
+            }
+        }
+    }
+    private void setRightComplete(){
+        if (mRightRefreshIndicator.isLoading()) {
+            if (mFlingRunnable != null) {
+                mContentView.removeCallbacks(mFlingRunnable);
+                mFlingRunnable = null;
+            }
+
+            mRightRefreshIndicator.setComplete();
+            if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
+                mFlingRunnable = new FlingRunnable(mContentView);
+                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            }else {
+                mRightRefreshIndicator.onStopScroll(mScrollX);
+            }
+        }
+    }
+    private void closeLeft(){
+        if(mScrollX >0 ){
+            if (mFlingRunnable != null) {
+                mContentView.removeCallbacks(mFlingRunnable);
+                mFlingRunnable = null;
+            }
+            mScroller.startScroll(mScrollX,0,-mScrollX,0,250);
+            mFlingRunnable = new FlingRunnable(mContentView);
+            ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+        }
+    }
+    private void closeRight(){
+        if(mScrollX < 0 ){
+            if (mFlingRunnable != null) {
+                mContentView.removeCallbacks(mFlingRunnable);
+                mFlingRunnable = null;
+            }
+            mScroller.startScroll(mScrollX,0,-mScrollX,0,250);
+            mFlingRunnable = new FlingRunnable(mContentView);
+            ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+        }
     }
 }

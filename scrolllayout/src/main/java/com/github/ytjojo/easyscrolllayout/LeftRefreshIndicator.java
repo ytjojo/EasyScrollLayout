@@ -47,9 +47,9 @@ public class LeftRefreshIndicator {
         if (mStatus == PTR_STATUS_INIT && curScrollX > 0) {
             mStatus = PTR_STATUS_PREPARE;
             dispatchRefreshPrepare();
-            dispatchScrollChanged(mStatus, -curScrollX);
+            dispatchScrollChanged(mStatus, curScrollX);
         } else if ((mStatus == PTR_STATUS_PREPARE || mStatus == PTR_STATUS_LOADING) && curScrollX < 0) {
-            dispatchScrollChanged(mStatus, -curScrollX);
+            dispatchScrollChanged(mStatus, curScrollX);
         } else if (lastScrollX < 0 && curScrollX <= 0) {
             if (mStatus == PTR_STATUS_PREPARE || mStatus == PTR_STATUS_LOADING) {
                 dispatchScrollChanged(mStatus, 0);
@@ -66,7 +66,7 @@ public class LeftRefreshIndicator {
         if (mStatus == PTR_STATUS_INIT || mChild == null) {
             return;
         }
-        if (scrollX == -mChild.getMeasuredWidth() && mStatus == PTR_STATUS_PREPARE) {
+        if (scrollX == mChild.getMeasuredWidth() && mStatus == PTR_STATUS_PREPARE) {
             mStatus = PTR_STATUS_LOADING;
             dispatchStartRefresh();
         } else if (mStatus == PTR_STATUS_COMPLETE && scrollX <= 0) {
