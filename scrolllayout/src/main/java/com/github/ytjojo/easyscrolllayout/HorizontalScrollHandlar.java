@@ -213,7 +213,7 @@ public class HorizontalScrollHandlar {
             int offset = (mScrollX - mOutTopView.getLeft());
             ViewCompat.offsetLeftAndRight(mOutTopView, offset);
         }
-        if(!isDrawLayoutStyle && mLastScrollX != mScrollX){
+        if(!isDrawLayoutStyle){
             mLeftRefreshInidicator.onScrollChanged(mLastScrollX,mScrollX);
             mRightRefreshIndicator.onScrollChanged(mLastScrollX,mScrollX);
         }
