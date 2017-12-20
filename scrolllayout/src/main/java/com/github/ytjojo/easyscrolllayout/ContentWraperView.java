@@ -449,7 +449,7 @@ public class ContentWraperView extends FrameLayout {
     public boolean canFling() {
         return getScrollY() >= mMinVerticalScrollRange && getScrollY() <= mMaxVerticalScrollRange && getScrollY() != 0;
     }
-    private void header(int velocityY){
+    private void headerFling(int velocityY){
         LayoutParams lp = (ContentWraperView.LayoutParams) mOutTopView.getLayoutParams();
         if (mRefreshHeaderIndicator.isComplete()) {
             if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
@@ -498,7 +498,7 @@ public class ContentWraperView extends FrameLayout {
     }
     public void dispatchFling(int velocityY, boolean isDownSlide) {
         if (getScrollY() < 0) {
-            header(velocityY);
+            headerFling(velocityY);
             mRefreshFooterIndicator.onStopScroll(getScrollY());
         } else {
             mRefreshHeaderIndicator.onStopScroll(getScrollY());
@@ -525,11 +525,11 @@ public class ContentWraperView extends FrameLayout {
                     }
                 }
             } else {
-               footer(velocityY);
+               footerFling(velocityY);
             }
         }
     }
-    private void footer(int velocityY){
+    private void footerFling(int velocityY){
         LayoutParams lp = (ContentWraperView.LayoutParams) mOutBottomView.getLayoutParams();
         if (getScrollY() >= (lp.mMinScrollY + mOutBottomView.getMeasuredHeight() * lp.mTrigeerExpandRatio)) {
             if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY, lp.mStableScrollY)) {

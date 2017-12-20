@@ -712,6 +712,9 @@ public class EasyScrollLayout extends FrameLayout {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
+        if(getScrollY() < 0){
+            return;
+        }
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
@@ -727,6 +730,9 @@ public class EasyScrollLayout extends FrameLayout {
 
     public void close() {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
+            return;
+        }
+        if(getScrollY() < 0){
             return;
         }
         if (!mScroller.isFinished()) {
@@ -756,6 +762,9 @@ public class EasyScrollLayout extends FrameLayout {
      */
     public void expand() {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
+            return;
+        }
+        if(getScrollY() < 0){
             return;
         }
         if (!mScroller.isFinished()) {
