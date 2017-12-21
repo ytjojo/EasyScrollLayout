@@ -128,9 +128,15 @@ public class EasyScrollLayout extends FrameLayout {
                         break;
                     case GRAVITY_OUT_LEFT:
                         mOutLeftView = child;
+                        if (mHorizontalScrollHandlar == null) {
+                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this);
+                        }
                         break;
                     case GRAVITY_OUT_RIGHT:
                         mOutRightView = child;
+                        if (mHorizontalScrollHandlar == null) {
+                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this);
+                        }
                         break;
 
                     case GRAVITY_INNER_TOP:
@@ -146,9 +152,7 @@ public class EasyScrollLayout extends FrameLayout {
             }
         });
         mRefreshHeaderIndicator = new RefreshHeaderIndicator();
-        if (mContentChildHolder == null) {
-            mContentChildHolder = new ContentChildHolder();
-        }
+        mContentChildHolder = new ContentChildHolder();
     }
 
     HorizontalScrollHandlar mHorizontalScrollHandlar;
@@ -217,13 +221,9 @@ public class EasyScrollLayout extends FrameLayout {
                 mOnScollListener.onScroll(0f, getScrollY(), mMaxVerticalScrollRange);
             }
         }
-        if (mOutLeftView != null || mOutRightView != null) {
-            if (mHorizontalScrollHandlar == null) {
-                mHorizontalScrollHandlar = new HorizontalScrollHandlar();
-            }
-        }
+
         if (mHorizontalScrollHandlar != null) {
-            mHorizontalScrollHandlar.setViews((ViewGroup) mContentChildHolder.mDirectChild, mOutLeftView, mOutRightView);
+            mHorizontalScrollHandlar.setViews(mContentChildHolder.mDirectChild, mOutLeftView, mOutRightView);
             mHorizontalScrollHandlar.setTopViews(mInnerTopView, mOutTopView);
             mHorizontalScrollHandlar.onLayout();
         }
@@ -663,7 +663,7 @@ public class EasyScrollLayout extends FrameLayout {
                 }
             } else if (mRefreshHeaderIndicator.isPrepare()) {
                 if (getScrollY() <= -mOutTopView.getMeasuredHeight() * lp.mTrigeerExpandRatio) {
-                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0,lp.mStableScrollValue, lp.mStableScrollValue)) {
+                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
                         ViewCompat.postInvalidateOnAnimation(this);
                         mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
                     } else {
@@ -712,7 +712,7 @@ public class EasyScrollLayout extends FrameLayout {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
-        if(getScrollY() < 0){
+        if (getScrollY() < 0) {
             return;
         }
         if (!mScroller.isFinished()) {
@@ -732,7 +732,7 @@ public class EasyScrollLayout extends FrameLayout {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
-        if(getScrollY() < 0){
+        if (getScrollY() < 0) {
             return;
         }
         if (!mScroller.isFinished()) {
@@ -764,7 +764,7 @@ public class EasyScrollLayout extends FrameLayout {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
             return;
         }
-        if(getScrollY() < 0){
+        if (getScrollY() < 0) {
             return;
         }
         if (!mScroller.isFinished()) {
@@ -976,7 +976,7 @@ public class EasyScrollLayout extends FrameLayout {
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                mScroller.startScroll(getScrollX(),scrollY,0,-scrollY,250);
+                mScroller.startScroll(getScrollX(), scrollY, 0, -scrollY, 250);
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
                 mRefreshHeaderIndicator.onStopScroll(scrollY);
@@ -1158,28 +1158,57 @@ public class EasyScrollLayout extends FrameLayout {
 
         boolean result = super.drawChild(canvas, child, drawingTime);
 
-        if (child == mOutLeftView) {
-            if (mGradientDrawable == null) {
-                mGradientDrawable = new GradientDrawable();
-                mGradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
-
-                mGradientDrawable.setColors(new int[]{0x34000000, 0x11000000, 0x00000000});
-
-            }
-            mGradientDrawable.setOrientation(GradientDrawable.Orientation.RIGHT_LEFT);
-            mGradientDrawable.setBounds(child.getRight() - 60, child.getTop(), child.getRight(), child.getBottom());
-            mGradientDrawable.draw(canvas);
-        }
-        if (child == mOutRightView) {
-            if (mShadowDrawable == null) {
-                mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
-            }
-            mShadowDrawable.setmShadowGravity(Gravity.LEFT);
-            mShadowDrawable.setBounds(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
-            mShadowDrawable.draw(canvas);
-//            Logger.e(child.getLeft() + "getLeft " + child.getX());
-        }
         return result;
+    }
+
+    private void drawGradientDrawable(View child,Canvas canvas) {
+        if (mGradientDrawable == null) {
+            mGradientDrawable = new GradientDrawable();
+            mGradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
+            mGradientDrawable.setColors(new int[]{0x34000000, 0x11000000, 0x00000000});
+        }
+        mGradientDrawable.setOrientation(GradientDrawable.Orientation.RIGHT_LEFT);
+        mGradientDrawable.setBounds(child.getRight() - 60, child.getTop(), child.getRight(), child.getBottom());
+        mGradientDrawable.draw(canvas);
+    }
+
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+        if (!mHorizontalScrollHandlar.isDrawLayoutStyle) {
+            return;
+        }
+        if (mHorizontalScrollHandlar.getScrollX() < 0) {
+            if (mContentChildHolder.mDirectChild != null) {
+                if (mShadowDrawable == null) {
+                    mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
+                }
+                if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
+                    mShadowDrawable.setmShadowGravity(Gravity.LEFT);
+                    mShadowDrawable.setBounds(mOutLeftView.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
+                } else {
+                    mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
+                    mShadowDrawable.setBounds(mOutLeftView.getLeft(), mOutLeftView.getTop(), mContentChildHolder.mDirectChild.getLeft(), mOutLeftView.getBottom());
+
+                }
+                mShadowDrawable.draw(canvas);
+            }
+        } else if (mHorizontalScrollHandlar.getScrollX() > 0) {
+            if (mContentChildHolder.mDirectChild != null) {
+                if (mShadowDrawable == null) {
+                    mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
+                }
+                if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
+                    mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
+                    mShadowDrawable.setBounds(0, mOutRightView.getTop(), mOutRightView.getLeft(), mOutRightView.getBottom());
+                } else {
+                    mShadowDrawable.setmShadowGravity(Gravity.LEFT);
+                    mShadowDrawable.setBounds(mContentChildHolder.mDirectChild.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
+
+                }
+                mShadowDrawable.draw(canvas);
+            }
+        }
     }
 
     @Override

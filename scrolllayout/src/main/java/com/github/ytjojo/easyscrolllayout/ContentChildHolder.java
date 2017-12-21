@@ -9,9 +9,10 @@ import android.view.View;
 public class ContentChildHolder {
 
     View mDirectChild;
-    VerticalScrollCheckHandlar mVerticalScrollCheckHandlar = new VerticalScrollCheckHandlar();
+    VerticalScrollCheckHandlar mVerticalScrollCheckHandlar;
 
     public ContentChildHolder() {
+        mVerticalScrollCheckHandlar = new VerticalScrollCheckHandlar();
     }
 
     public void onMeasure(EasyScrollLayout parent) {

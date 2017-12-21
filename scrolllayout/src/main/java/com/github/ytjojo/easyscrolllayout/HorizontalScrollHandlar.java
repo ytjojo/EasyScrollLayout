@@ -24,24 +24,26 @@ public class HorizontalScrollHandlar {
     View mOutRightView;
     View mInnerTopView;
     View mOutTopView;
-    ViewGroup mContentView;
+    View mDirectContentView;
     int mMaxHorizontalScrollRange;
     int mMinHorizontalScrollRange;
     int mMinHorizontalStableScrollRange;
     int mMaxHorizontalStableScrollRange;
     int mScrollX;
     LeftRefreshIndicator mLeftRefreshInidicator;
-    public HorizontalScrollHandlar(){
+    EasyScrollLayout mParentView;
+    public HorizontalScrollHandlar(EasyScrollLayout parent){
         mLeftRefreshInidicator = new LeftRefreshIndicator();
         mRightRefreshIndicator = new RightRefreshIndicator();
+        this.mParentView = parent;
     }
 
     boolean isDrawLayoutStyle;
 
-    public void setViews(ViewGroup contentView, View outLeftView, View outRightView) {
+    public void setViews(View contentView, View outLeftView, View outRightView) {
         this.mOutLeftView = outLeftView;
         this.mOutRightView = outRightView;
-        this.mContentView = contentView;
+        this.mDirectContentView = contentView;
         if (mOutLeftView != null) {
             mOutLeftView.setClickable(true);
             mMaxHorizontalStableScrollRange = mOutLeftView.getMeasuredWidth();
@@ -70,16 +72,27 @@ public class HorizontalScrollHandlar {
         } else {
             mMinHorizontalScrollRange = mMinHorizontalStableScrollRange = 0;
         }
-        if (mContentView != null) {
-            EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mContentView.getLayoutParams();
+        if (mDirectContentView != null) {
+            EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mDirectContentView.getLayoutParams();
             mContentParallaxMult = lp.mParallaxMultiplier;
         }
         mLeftRefreshInidicator.setView(mOutLeftView);
         mRightRefreshIndicator.setView(mOutRightView);
     }
 
+    boolean isOutLeftViewTopOfContent;
+    boolean isOutRightViewTopOfContent;
+
     public void onLayout() {
         offsetLeftAndRight(0);
+        isOutLeftViewTopOfContent = false;
+        isOutRightViewTopOfContent = false;
+        if(mOutLeftView != null && mDirectContentView !=null){
+            isOutLeftViewTopOfContent = mParentView.indexOfChild(mOutLeftView)> mParentView.indexOfChild(mDirectContentView);
+        }
+        if(mOutRightView != null && mDirectContentView !=null){
+            isOutRightViewTopOfContent = mParentView.indexOfChild(mOutRightView)> mParentView.indexOfChild(mDirectContentView);
+        }
     }
 
     public void setTopViews(View innerTopView, View outTopView) {
@@ -174,10 +187,10 @@ public class HorizontalScrollHandlar {
     private void offsetContenViews(){
         if (mContentParallaxMult != 0) {
             int contentLeft = (int) (mScrollX * (1 - mContentParallaxMult));
-            ViewCompat.offsetLeftAndRight(mContentView, contentLeft - mContentView.getLeft());
+            ViewCompat.offsetLeftAndRight(mDirectContentView, contentLeft - mDirectContentView.getLeft());
         } else {
 
-            ViewCompat.offsetLeftAndRight(mContentView, mScrollX - mContentView.getLeft());
+            ViewCompat.offsetLeftAndRight(mDirectContentView, mScrollX - mDirectContentView.getLeft());
         }
         if (mInnerTopView != null) {
             if (mContentParallaxMult != 0) {
@@ -222,20 +235,20 @@ public class HorizontalScrollHandlar {
                     float horizontalOffset = mMinHorizontalStableScrollRange - totalOffset + totalOffset * offsetRatio;
 
 //                    Logger.e(" mOutRightView " + (mOutRightView.getLeft() - mContentView.getMeasuredWidth()));
-                    int offset = (int) (horizontalOffset - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
+                    int offset = (int) (horizontalOffset - mOutRightView.getLeft() + mDirectContentView.getMeasuredWidth());
                     ViewCompat.offsetLeftAndRight(mOutRightView, offset);
                 } else if (mScrollX < 0) {
-                    int offset = (mScrollX - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
+                    int offset = (mScrollX - mOutRightView.getLeft() + mDirectContentView.getMeasuredWidth());
                     ViewCompat.offsetLeftAndRight(mOutRightView, offset);
                 } else {
                     int totalOffset = (int) (mMinHorizontalStableScrollRange * mRightParallaxMult);
                     totalOffset += mScrollX;
-                    final int offset = totalOffset - mOutRightView.getLeft() + mContentView.getMeasuredWidth();
+                    final int offset = totalOffset - mOutRightView.getLeft() + mDirectContentView.getMeasuredWidth();
                     ViewCompat.offsetLeftAndRight(mOutRightView, offset);
 
                 }
             } else {
-                int offset = (mScrollX - mOutRightView.getLeft() + mContentView.getMeasuredWidth());
+                int offset = (mScrollX - mOutRightView.getLeft() + mDirectContentView.getMeasuredWidth());
                 ViewCompat.offsetLeftAndRight(mOutRightView, offset);
             }
         }
@@ -440,11 +453,9 @@ public class HorizontalScrollHandlar {
     public boolean onDownEvent(int x, int y, EasyScrollLayout parent) {
         mIsDownInOuterViews = false;
         mScrollChild = null;
-        if (mContentView != null && (mOutRightView != null || mOutLeftView != null)) {
-            int contentIndex = parent.indexOfChild(mContentView);
+        if (mDirectContentView != null && (mOutRightView != null || mOutLeftView != null)) {
             if (mOutLeftView != null) {
-                int outLeftIndex = parent.indexOfChild(mOutLeftView);
-                if (outLeftIndex > contentIndex) {
+                if (isOutLeftViewTopOfContent) {
                     mPoint.set(x, y);
                     offsetPoint(mPoint, parent, mOutLeftView);
                     mIsDownInOuterViews |= pointInView(mOutLeftView, mPoint.x, mPoint.y, 0);
@@ -455,8 +466,7 @@ public class HorizontalScrollHandlar {
                 }
             }
             if (mOutRightView != null) {
-                int outLeftIndex = parent.indexOfChild(mOutRightView);
-                if (outLeftIndex > contentIndex) {
+                if (isOutRightViewTopOfContent) {
                     mPoint.set(x, y);
                     offsetPoint(mPoint, parent, mOutRightView);
                     mIsDownInOuterViews |= pointInView(mOutRightView, mPoint.x, mPoint.y, 0);
@@ -468,19 +478,19 @@ public class HorizontalScrollHandlar {
             }
         }
 
-        if (mContentView != null) {
+        if (mDirectContentView != null) {
             mPoint.set(x, y);
-            offsetPoint(mPoint, parent, mContentView);
-            boolean isPointInView = pointInView(mContentView, mPoint.x, mPoint.y, 0);
-            if (mContentView instanceof ViewPager) {
+            offsetPoint(mPoint, parent, mDirectContentView);
+            boolean isPointInView = pointInView(mDirectContentView, mPoint.x, mPoint.y, 0);
+            if (mDirectContentView instanceof ViewPager) {
                 if (isPointInView) {
-                    mScrollChild = mContentView;
+                    mScrollChild = mDirectContentView;
                     return mIsDownInOuterViews;
                 }
             }
-            if (isPointInView && mContentView instanceof ContentWraperView) {
-                final ContentWraperView contentWraperView = (ContentWraperView) mContentView;
-                offsetPoint(mPoint, mContentView, ((ContentWraperView) mContentView).mContentView);
+            if (isPointInView && mDirectContentView instanceof ContentWraperView) {
+                final ContentWraperView contentWraperView = (ContentWraperView) mDirectContentView;
+                offsetPoint(mPoint, (ViewGroup) mDirectContentView, ((ContentWraperView) mDirectContentView).mContentView);
                 if (!pointInView(contentWraperView.mContentView, mPoint.x, mPoint.y, 0)) {
                     return mIsDownInOuterViews;
                 }
@@ -578,10 +588,10 @@ public class HorizontalScrollHandlar {
 
     public void dispatchFling(int velocityX) {
         if (mScroller == null) {
-            mScroller = new OverScroller(mContentView.getContext());
+            mScroller = new OverScroller(mParentView.getContext());
         }
         if (mFlingRunnable != null) {
-            mContentView.removeCallbacks(mFlingRunnable);
+            mParentView.removeCallbacks(mFlingRunnable);
             mFlingRunnable = null;
         }
 
@@ -612,8 +622,8 @@ public class HorizontalScrollHandlar {
                 }
             }
             if (mScroller.springBack(mScrollX, 0, targetX, targetX, 0, 0)) {
-                mFlingRunnable = new FlingRunnable(mContentView);
-                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                mFlingRunnable = new FlingRunnable(mParentView);
+                ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
             }
         } else {
             int targetX = (mMaxHorizontalStableScrollRange) / 2 < mScrollX ? mMaxHorizontalStableScrollRange : 0;
@@ -630,8 +640,8 @@ public class HorizontalScrollHandlar {
                 }
             }
             if (mScroller.springBack(mScrollX, 0, targetX, targetX, 0, 0)) {
-                mFlingRunnable = new FlingRunnable(mContentView);
-                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                mFlingRunnable = new FlingRunnable(mParentView);
+                ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
             }
         }
     }
@@ -640,8 +650,8 @@ public class HorizontalScrollHandlar {
         EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutRightView.getLayoutParams();
         if (mRightRefreshIndicator.isComplete()) {
             if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
-                mFlingRunnable = new FlingRunnable(mContentView);
-                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                mFlingRunnable = new FlingRunnable(mParentView);
+                ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
 
             } else {
                 mRightRefreshIndicator.onStopScroll(mScrollX);
@@ -649,8 +659,8 @@ public class HorizontalScrollHandlar {
         }else if(mRightRefreshIndicator.isLoading()){
             if (mScrollX < mMinHorizontalStableScrollRange) {
                 if (mScroller.springBack(mScrollX, 0, mMinHorizontalStableScrollRange,mMinHorizontalStableScrollRange, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                    mFlingRunnable = new FlingRunnable(mParentView);
+                    ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
                 }
             }else{
                 if (velocityX != 0) {
@@ -661,8 +671,8 @@ public class HorizontalScrollHandlar {
         } else if (mRightRefreshIndicator.isPrepare()) {
             if (mScrollX <= -mOutRightView.getMeasuredWidth() * lp.mTrigeerExpandRatio) {
                 if (mScroller.springBack(mScrollX,0, mMinHorizontalStableScrollRange,mMinHorizontalStableScrollRange, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                    mFlingRunnable = new FlingRunnable(mParentView);
+                    ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
                     mRightRefreshIndicator.dispatchReleaseBeforeRefresh();
                 } else {
                     mRightRefreshIndicator.dispatchReleaseBeforeRefresh();
@@ -670,8 +680,8 @@ public class HorizontalScrollHandlar {
                 }
             } else {
                 if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                    mFlingRunnable = new FlingRunnable(mParentView);
+                    ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
                 } else {
                     mRightRefreshIndicator.onStopScroll(mScrollX);
                 }
@@ -683,8 +693,8 @@ public class HorizontalScrollHandlar {
         EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutLeftView.getLayoutParams();
         if (mLeftRefreshInidicator.isComplete()) {
             if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
-                mFlingRunnable = new FlingRunnable(mContentView);
-                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                mFlingRunnable = new FlingRunnable(mParentView);
+                ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
 
             } else {
                 mLeftRefreshInidicator.onStopScroll(mScrollX);
@@ -692,8 +702,8 @@ public class HorizontalScrollHandlar {
         }else if(mLeftRefreshInidicator.isLoading()){
             if (mScrollX > mMaxHorizontalStableScrollRange) {
                 if (mScroller.springBack(mScrollX, 0, mMaxHorizontalStableScrollRange,mMaxHorizontalStableScrollRange, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                    mFlingRunnable = new FlingRunnable(mParentView);
+                    ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
                 }
             }else{
                 if (velocityX != 0) {
@@ -704,8 +714,8 @@ public class HorizontalScrollHandlar {
         } else if (mLeftRefreshInidicator.isPrepare()) {
             if (mScrollX >= mOutRightView.getMeasuredWidth() * lp.mTrigeerExpandRatio) {
                 if (mScroller.springBack(mScrollX,0, mMaxHorizontalStableScrollRange,mMaxHorizontalStableScrollRange, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                    mFlingRunnable = new FlingRunnable(mParentView);
+                    ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
                     mLeftRefreshInidicator.dispatchReleaseBeforeRefresh();
                 } else {
                     mLeftRefreshInidicator.dispatchReleaseBeforeRefresh();
@@ -713,8 +723,8 @@ public class HorizontalScrollHandlar {
                 }
             } else {
                 if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
-                    mFlingRunnable = new FlingRunnable(mContentView);
-                    ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                    mFlingRunnable = new FlingRunnable(mParentView);
+                    ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
                 } else {
                     mLeftRefreshInidicator.onStopScroll(mScrollX);
                 }
@@ -740,8 +750,8 @@ public class HorizontalScrollHandlar {
         }
 
         if (mScroller.computeScrollOffset()) {
-            mFlingRunnable = new FlingRunnable(mContentView);
-            ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            mFlingRunnable = new FlingRunnable(mParentView);
+            ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
         } else {
             onFlingFinished();
         }
@@ -779,14 +789,14 @@ public class HorizontalScrollHandlar {
     private void setLeftComplete(){
         if (mLeftRefreshInidicator.isLoading()) {
             if (mFlingRunnable != null) {
-                mContentView.removeCallbacks(mFlingRunnable);
+                mParentView.removeCallbacks(mFlingRunnable);
                 mFlingRunnable = null;
             }
 
             mLeftRefreshInidicator.setComplete();
             if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
-                mFlingRunnable = new FlingRunnable(mContentView);
-                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                mFlingRunnable = new FlingRunnable(mParentView);
+                ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
             }else {
                 mLeftRefreshInidicator.onStopScroll(mScrollX);
             }
@@ -795,14 +805,14 @@ public class HorizontalScrollHandlar {
     private void setRightComplete(){
         if (mRightRefreshIndicator.isLoading()) {
             if (mFlingRunnable != null) {
-                mContentView.removeCallbacks(mFlingRunnable);
+                mParentView.removeCallbacks(mFlingRunnable);
                 mFlingRunnable = null;
             }
 
             mRightRefreshIndicator.setComplete();
             if (mScroller.springBack(mScrollX, 0, 0, 0, 0, 0)) {
-                mFlingRunnable = new FlingRunnable(mContentView);
-                ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+                mFlingRunnable = new FlingRunnable(mParentView);
+                ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
             }else {
                 mRightRefreshIndicator.onStopScroll(mScrollX);
             }
@@ -811,23 +821,35 @@ public class HorizontalScrollHandlar {
     private void closeLeft(){
         if(mScrollX >0 ){
             if (mFlingRunnable != null) {
-                mContentView.removeCallbacks(mFlingRunnable);
+                mParentView.removeCallbacks(mFlingRunnable);
                 mFlingRunnable = null;
             }
             mScroller.startScroll(mScrollX,0,-mScrollX,0,250);
-            mFlingRunnable = new FlingRunnable(mContentView);
-            ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            mFlingRunnable = new FlingRunnable(mParentView);
+            ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
         }
     }
     private void closeRight(){
         if(mScrollX < 0 ){
             if (mFlingRunnable != null) {
-                mContentView.removeCallbacks(mFlingRunnable);
+                mParentView.removeCallbacks(mFlingRunnable);
                 mFlingRunnable = null;
             }
             mScroller.startScroll(mScrollX,0,-mScrollX,0,250);
-            mFlingRunnable = new FlingRunnable(mContentView);
-            ViewCompat.postOnAnimation(mContentView, mFlingRunnable);
+            mFlingRunnable = new FlingRunnable(mParentView);
+            ViewCompat.postOnAnimation(mParentView, mFlingRunnable);
         }
+    }
+
+    public int getScrollX() {
+        return mScrollX;
+    }
+
+    public boolean isOutLeftViewTopOfContent() {
+        return isOutLeftViewTopOfContent;
+    }
+
+    public boolean isOutRightViewTopOfContent() {
+        return isOutRightViewTopOfContent;
     }
 }
