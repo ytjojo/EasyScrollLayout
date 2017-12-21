@@ -487,7 +487,7 @@ public class EasyScrollLayout extends FrameLayout {
                 final int rawX = (int) event.getRawX();
                 final int rawY = (int) event.getRawY();
                 mContentChildHolder.mVerticalScrollCheckHandlar.onDownInit(rawX, rawY);
-                if (mHorizontalScrollHandlar != null) {
+                if (mHorizontalScrollHandlar != null&& mOrientation & ORIENTATION_HORIZONTAL ===ORIENTATION_HORIZONTAL) {
                     mHorizontalScrollHandlar.onDownEvent(mFirstMotionX, mFirstMotionY, EasyScrollLayout.this);
                 }
                 mLastEventPoint.set(mFirstMotionX, mFirstMotionY);
@@ -1175,7 +1175,7 @@ public class EasyScrollLayout extends FrameLayout {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        if (!mHorizontalScrollHandlar.isDrawLayoutStyle) {
+        if (mHorizontalScrollHandlar ==null|| !mHorizontalScrollHandlar.isDrawLayoutStyle) {
             return;
         }
         if (mHorizontalScrollHandlar.getScrollX() < 0) {

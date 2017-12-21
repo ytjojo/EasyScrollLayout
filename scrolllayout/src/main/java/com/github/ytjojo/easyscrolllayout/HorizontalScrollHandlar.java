@@ -577,7 +577,7 @@ public class HorizontalScrollHandlar {
         }
         int[] location = new int[2];
         Rect rect = new Rect();
-        return screenPointInView(view, rawY, rawY, rect, location);
+        return screenPointInView(view, rawX, rawY, rect, location);
     }
 
     public boolean canFling() {
