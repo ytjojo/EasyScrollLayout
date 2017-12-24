@@ -79,6 +79,12 @@ public class ContentChildHolder {
             mVerticalScrollCheckHandlar.mCurContentView.preScrollConsumed(dy, consumed);
         }
     }
+    public void preScrollUp(int dy, int[] consumed) {
+        consumed[0] = consumed[1] = 0;
+        if (mVerticalScrollCheckHandlar.mCurContentView != null) {
+            mVerticalScrollCheckHandlar.mCurContentView.preScrollUp(dy, consumed);
+        }
+    }
     public boolean canNestedFlingToBottom(){
         if(mVerticalScrollCheckHandlar.mCurContentView !=null && mVerticalScrollCheckHandlar.mCurContentView.mInnerBottomView !=null){
             return true;

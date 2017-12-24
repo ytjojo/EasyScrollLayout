@@ -487,7 +487,7 @@ public class EasyScrollLayout extends FrameLayout {
                 final int rawX = (int) event.getRawX();
                 final int rawY = (int) event.getRawY();
                 mContentChildHolder.mVerticalScrollCheckHandlar.onDownInit(rawX, rawY);
-                if (mHorizontalScrollHandlar != null&& mOrientation & ORIENTATION_HORIZONTAL ===ORIENTATION_HORIZONTAL) {
+                if (mHorizontalScrollHandlar != null&&( mOrientation & ORIENTATION_HORIZONTAL) ==ORIENTATION_HORIZONTAL) {
                     mHorizontalScrollHandlar.onDownEvent(mFirstMotionX, mFirstMotionY, EasyScrollLayout.this);
                 }
                 mLastEventPoint.set(mFirstMotionX, mFirstMotionY);
@@ -808,7 +808,7 @@ public class EasyScrollLayout extends FrameLayout {
 //        Logger.e("parentScrollY    " + getScrollY());
         int activePointerIndex = event.findPointerIndex(mActivePointerId);
         float curY = event.getY(activePointerIndex);
-        parentPreScroll(0, dy, mScrollConsumed);
+        parentPreScroll( dy, mScrollConsumed);
         int preScrollConsumed = mScrollConsumed[1];
         if (preScrollConsumed != 0) {
             if (!mScroller.isFinished()) {
@@ -844,12 +844,20 @@ public class EasyScrollLayout extends FrameLayout {
         }
     }
 
-    private void parentPreScroll(int dx, int dy, int[] consumed) {
+    private void parentPreScroll(int dy, int[] consumed) {
         consumed[1] = consumed[0] = 0;
         if (!canPreScroll(dy)) {
             mContentChildHolder.preScrollConsumed(dy, consumed);
             return;
         }
+        if(dy<0){
+            mContentChildHolder.preScrollUp(dy, consumed);
+        }
+        dy  -= consumed[1];
+        if(dy ==0){
+            return;
+        }
+        consumed[1] = consumed[0] = 0;
         int lastScrolly = getScrollY();
         scrollBy(0, -dy);
         int consumedDy = consumed[1] = lastScrolly - getScrollY();
@@ -1184,11 +1192,11 @@ public class EasyScrollLayout extends FrameLayout {
                     mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
                 }
                 if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
-                    mShadowDrawable.setmShadowGravity(Gravity.LEFT);
-                    mShadowDrawable.setBounds(mOutLeftView.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
-                } else {
                     mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
-                    mShadowDrawable.setBounds(mOutLeftView.getLeft(), mOutLeftView.getTop(), mContentChildHolder.mDirectChild.getLeft(), mOutLeftView.getBottom());
+                    mShadowDrawable.setBounds(0, mOutRightView.getTop(),mOutRightView.getLeft(), mOutRightView.getBottom());
+                } else {
+                    mShadowDrawable.setmShadowGravity(Gravity.LEFT);
+                    mShadowDrawable.setBounds(mContentChildHolder.mDirectChild.getRight(), mOutRightView.getTop(), getMeasuredWidth(), mOutRightView.getBottom());
 
                 }
                 mShadowDrawable.draw(canvas);
@@ -1199,11 +1207,11 @@ public class EasyScrollLayout extends FrameLayout {
                     mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
                 }
                 if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
-                    mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
-                    mShadowDrawable.setBounds(0, mOutRightView.getTop(), mOutRightView.getLeft(), mOutRightView.getBottom());
-                } else {
                     mShadowDrawable.setmShadowGravity(Gravity.LEFT);
-                    mShadowDrawable.setBounds(mContentChildHolder.mDirectChild.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
+                    mShadowDrawable.setBounds(mOutLeftView.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
+                } else {
+                    mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
+                    mShadowDrawable.setBounds(0, mOutLeftView.getTop(),mContentChildHolder.mDirectChild.getLeft(), mOutLeftView.getBottom());
 
                 }
                 mShadowDrawable.draw(canvas);

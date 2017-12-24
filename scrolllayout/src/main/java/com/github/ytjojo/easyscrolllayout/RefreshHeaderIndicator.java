@@ -56,7 +56,19 @@ public class RefreshHeaderIndicator {
         }
 
     }
+    int mStableValue;
+    int mMaxValue;
+    int mTriggerValue;
+    public int getStableValue(){
 
+        return mStableValue;
+    }
+    public int getMaxValue(){
+        return mMaxValue;
+    }
+    public int getTriggerValue(){
+        return mTriggerValue;
+    }
     public void dispatchScrollChanged(byte status, int scrollY) {
 
     }

@@ -38,7 +38,7 @@ public class HorizontalScrollHandlar {
         this.mParentView = parent;
     }
 
-    boolean isDrawLayoutStyle;
+    boolean isDrawLayoutStyle = true;
 
     public void setViews(View contentView, View outLeftView, View outRightView) {
         this.mOutLeftView = outLeftView;
@@ -253,8 +253,8 @@ public class HorizontalScrollHandlar {
             }
         }
     }
-    private boolean mIsLeftEnable;
-    private boolean mIsRightEnable;
+    private boolean mIsLeftEnable = true;
+    private boolean mIsRightEnable = true;
     public void setLeftEnable(boolean enable){
         mIsLeftEnable = enable;
     }
@@ -276,7 +276,6 @@ public class HorizontalScrollHandlar {
 
     View mScrollChild;
     boolean isAutomaticHunting = true;
-    Rect mRect = new Rect();
 
     boolean mIsDownInOuterViews;
 
@@ -394,7 +393,7 @@ public class HorizontalScrollHandlar {
                     return null;
                 }
                 if (isHorizontalScrollView(hitView)) {
-                    mScrollChild = parent;
+                    mScrollChild = hitView;
                     return mScrollChild;
                 } else if (isVerticalScrollView(hitView)) {
                     offsetPoint(mPoint, viewGroup, hitView);

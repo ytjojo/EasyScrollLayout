@@ -445,6 +445,12 @@ public class ContentWraperView extends FrameLayout {
         }
         Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
     }
+    public void preScrollUp(int dy, int[] consumed){
+        final int lastScrolly = getScrollY();
+        if(dy <0 && lastScrolly < 0 ){
+            preScrollConsumed(dy,consumed);
+        }
+    }
 
     public boolean canFling() {
         return getScrollY() >= mMinVerticalScrollRange && getScrollY() <= mMaxVerticalScrollRange && getScrollY() != 0;
