@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public abstract class BaseRefreshIndicator {
     public static final byte PTR_STATUS_INIT = 1;
-    private byte mStatus = PTR_STATUS_INIT;
+    protected byte mStatus = PTR_STATUS_INIT;
     public static final byte PTR_STATUS_PREPARE = 2;
     public static final byte PTR_STATUS_LOADING = 3;
     public static final byte PTR_STATUS_COMPLETE = 4;
@@ -83,6 +83,18 @@ public abstract class BaseRefreshIndicator {
         return mTriggerValue;
     }
 
+    public void setStableValue(int stableValue) {
+        this.mStableValue = stableValue;
+    }
+
+    public void setOverScrollValue(int overScrollValue) {
+        this.mOverScrollValue = overScrollValue;
+    }
+
+    public void setTriggerValue(int triggerValue) {
+        this.mTriggerValue = triggerValue;
+    }
+
     public void dispatchScrollChanged(byte status, int scrollValue) {
         for (UIHandler uiHandler : mUiHandlers) {
             uiHandler.onUIScrollChanged(this, scrollValue, mStatus);
@@ -114,6 +126,9 @@ public abstract class BaseRefreshIndicator {
         Logger.e("header ::: ------> dispatchStartRefresh");
         for (UIHandler uiHandler : mUiHandlers) {
             uiHandler.onUIRefreshBegin(this);
+        }
+        if(mOnStartLoadCallback !=null){
+            mOnStartLoadCallback.onStartLoad();
         }
     }
 
@@ -148,5 +163,14 @@ public abstract class BaseRefreshIndicator {
     }
     public void removeUIHandler(UIHandler uiHandler){
         mUiHandlers.remove(uiHandler);
+    }
+
+    private OnStartLoadCallback mOnStartLoadCallback;
+
+    public void setOnStartLoadCallback(OnStartLoadCallback callback){
+        this.mOnStartLoadCallback = callback;
+    }
+    public interface OnStartLoadCallback{
+        void onStartLoad();
     }
 }

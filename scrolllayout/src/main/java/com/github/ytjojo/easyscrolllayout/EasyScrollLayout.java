@@ -28,7 +28,6 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.OverScroller;
-import android.widget.Scroller;
 
 import com.orhanobut.logger.Logger;
 
@@ -93,6 +92,7 @@ public class EasyScrollLayout extends FrameLayout {
     int mMinVerticalScrollRange;
     int mMaxVerticalScrollRange;
     private int mOrientation = ORIENTATION_INVALID;
+    private boolean isDrawerLayoutStyle;
 
     public EasyScrollLayout(Context context) {
         this(context, null);
@@ -115,6 +115,7 @@ public class EasyScrollLayout extends FrameLayout {
 
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
         isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
+        isDrawerLayoutStyle = a.getBoolean(R.styleable.EasyScrollLayout_isDrawerLayoutStyle, false);
         mInnerTopParallaxMult = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0f);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
@@ -129,13 +130,13 @@ public class EasyScrollLayout extends FrameLayout {
                     case GRAVITY_OUT_LEFT:
                         mOutLeftView = child;
                         if (mHorizontalScrollHandlar == null) {
-                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this);
+                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this,isDrawerLayoutStyle);
                         }
                         break;
                     case GRAVITY_OUT_RIGHT:
                         mOutRightView = child;
                         if (mHorizontalScrollHandlar == null) {
-                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this);
+                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this,isDrawerLayoutStyle);
                         }
                         break;
 
@@ -162,6 +163,17 @@ public class EasyScrollLayout extends FrameLayout {
             mOrientation = orientation;
 
         }
+    }
+
+    public HorizontalScrollHandlar getHorizontalScrollHandlar() {
+        return mHorizontalScrollHandlar;
+    }
+    public LeftRefreshIndicator getLeftRefreshInidicator() {
+        return mHorizontalScrollHandlar.getLeftRefreshInidicator();
+    }
+
+    public RightRefreshIndicator getRightRefreshIndicator() {
+        return mHorizontalScrollHandlar.getRightRefreshIndicator();
     }
 
     @Override
@@ -325,26 +337,29 @@ public class EasyScrollLayout extends FrameLayout {
                 childLeft = 0;
                 childTop = -height;
                 mOutTopView = child;
-                mRefreshHeaderIndicator.setOutTopView(mOutTopView);
+                mRefreshHeaderIndicator.setTargetView(mOutTopView);
                 mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
                 lp.mStableScrollValue = -height;
                 lp.mMinScrollY = mMinVerticalScrollRange;
                 lp.mMaxScrollY = 0;
                 mOrientation |= ORIENTATION_VERTICAL;
-
+                mRefreshHeaderIndicator.setOverScrollValue(mMinVerticalScrollRange);
+                mRefreshHeaderIndicator.setLimitValue(0);
+                mRefreshHeaderIndicator.setTriggerValue((int) (-height*lp.mTrigeerExpandRatio));
+                mRefreshHeaderIndicator.setStableValue(-height);
                 break;
             case GRAVITY_OUT_LEFT:
                 childLeft = -width;
                 childTop = 0;
                 mOutLeftView = child;
-                lp.mStableScrollValue = -width;
+                lp.mStableScrollValue = width;
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
             case GRAVITY_OUT_RIGHT:
                 childLeft = right;
                 childTop = 0;
                 mOutRightView = child;
-                lp.mStableScrollValue = width;
+                lp.mStableScrollValue = -width;
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
 
@@ -1038,7 +1053,7 @@ public class EasyScrollLayout extends FrameLayout {
         }
         final int lastScrolly = getScrollY();
         if (!mRefreshHeaderIndicator.getCanLoad()) {
-            final int limitScrollY = mRefreshHeaderIndicator.getLimitScrollY();
+            final int limitScrollY = mRefreshHeaderIndicator.getLimitValue();
             if (lastScrolly >= limitScrollY && y < limitScrollY) {
                 y = limitScrollY;
             }
@@ -1183,7 +1198,7 @@ public class EasyScrollLayout extends FrameLayout {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        if (mHorizontalScrollHandlar ==null|| !mHorizontalScrollHandlar.isDrawLayoutStyle) {
+        if (mHorizontalScrollHandlar ==null|| !mHorizontalScrollHandlar.isDrawerLayoutStyle) {
             return;
         }
         if (mHorizontalScrollHandlar.getScrollX() < 0) {
@@ -1253,6 +1268,8 @@ public class EasyScrollLayout extends FrameLayout {
     protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
         return new LayoutParams(p.width, p.height);
     }
+
+
 
     public static class LayoutParams extends FrameLayout.LayoutParams {
         float mOverScrollRatio = 0.7f;

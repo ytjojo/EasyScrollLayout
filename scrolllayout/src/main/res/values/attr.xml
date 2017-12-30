@@ -12,6 +12,7 @@
             <enum name="allHeaderHeigth" value="-1"/>
         </attr>
         <attr name="isSnap" format="boolean"/>
+        <attr name="isDrawerLayoutStyle" format="boolean"/>
 
         <attr name="easylayout_layoutGravity">
             <flag name="outleft" value="0x0"/>
