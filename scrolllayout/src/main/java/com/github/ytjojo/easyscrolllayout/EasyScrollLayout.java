@@ -152,7 +152,7 @@ public class EasyScrollLayout extends FrameLayout {
 
             }
         });
-        mRefreshHeaderIndicator = new RefreshHeaderIndicator();
+        mTopHeaderIndicator = new TopHeaderIndicator();
         mContentChildHolder = new ContentChildHolder();
     }
 
@@ -168,12 +168,39 @@ public class EasyScrollLayout extends FrameLayout {
     public HorizontalScrollHandlar getHorizontalScrollHandlar() {
         return mHorizontalScrollHandlar;
     }
-    public LeftRefreshIndicator getLeftRefreshInidicator() {
-        return mHorizontalScrollHandlar.getLeftRefreshInidicator();
+    public void setLeftComplete(){
+        mHorizontalScrollHandlar.setLeftComplete();
     }
+    public void setRightComplete(){
+        mHorizontalScrollHandlar.setRightComplete();
+    }
+    public void setLeftOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+        mHorizontalScrollHandlar.getLeftRefreshInidicator().setOnStartLoadCallback(callback);
+    }
+    public void setRightOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+        mHorizontalScrollHandlar.getRightRefreshIndicator().setOnStartLoadCallback(callback);
+    }
+    public void setTopHeaderOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+        mTopHeaderIndicator.setOnStartLoadCallback(callback);
+    }
+    public void setTopHeaderLoadComplete() {
 
-    public RightRefreshIndicator getRightRefreshIndicator() {
-        return mHorizontalScrollHandlar.getRightRefreshIndicator();
+        if (mOutTopView == null || !ViewCompat.isLaidOut(mOutTopView)) {
+            return;
+        }
+        if (mTopHeaderIndicator.isLoading()) {
+            mTopHeaderIndicator.setComplete();
+            final int scrollY = getScrollY();
+            if (scrollY < 0) {
+                if (!mScroller.isFinished()) {
+                    mScroller.abortAnimation();
+                }
+                mScroller.startScroll(getScrollX(), scrollY, 0, -scrollY, 250);
+                ViewCompat.postInvalidateOnAnimation(this);
+            } else {
+                mTopHeaderIndicator.onStopScroll(scrollY);
+            }
+        }
     }
 
     @Override
@@ -337,16 +364,16 @@ public class EasyScrollLayout extends FrameLayout {
                 childLeft = 0;
                 childTop = -height;
                 mOutTopView = child;
-                mRefreshHeaderIndicator.setTargetView(mOutTopView);
+                mTopHeaderIndicator.setTargetView(mOutTopView);
                 mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
                 lp.mStableScrollValue = -height;
                 lp.mMinScrollY = mMinVerticalScrollRange;
                 lp.mMaxScrollY = 0;
                 mOrientation |= ORIENTATION_VERTICAL;
-                mRefreshHeaderIndicator.setOverScrollValue(mMinVerticalScrollRange);
-                mRefreshHeaderIndicator.setLimitValue(0);
-                mRefreshHeaderIndicator.setTriggerValue((int) (-height*lp.mTrigeerExpandRatio));
-                mRefreshHeaderIndicator.setStableValue(-height);
+                mTopHeaderIndicator.setOverScrollValue(mMinVerticalScrollRange);
+                mTopHeaderIndicator.setLimitValue(0);
+                mTopHeaderIndicator.setTriggerValue((int) (-height*lp.mTrigeerExpandRatio));
+                mTopHeaderIndicator.setStableValue(-height);
                 break;
             case GRAVITY_OUT_LEFT:
                 childLeft = -width;
@@ -388,7 +415,7 @@ public class EasyScrollLayout extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
-    RefreshHeaderIndicator mRefreshHeaderIndicator;
+    TopHeaderIndicator mTopHeaderIndicator;
 
     public void setCanRefresh(boolean enable) {
         if (mOutTopView != null) {
@@ -397,7 +424,7 @@ public class EasyScrollLayout extends FrameLayout {
                 return;
             }
             lp.mEnable = enable;
-            mRefreshHeaderIndicator.setCanLoad(lp.mEnable);
+            mTopHeaderIndicator.setCanLoad(lp.mEnable);
 
         }
     }
@@ -652,13 +679,13 @@ public class EasyScrollLayout extends FrameLayout {
         isFlingToNestScroll = false;
         if (getScrollY() < 0) {
             LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
-            if (mRefreshHeaderIndicator.isComplete()) {
+            if (mTopHeaderIndicator.isComplete()) {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
                     ViewCompat.postInvalidateOnAnimation(this);
                 } else {
-                    mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                    mTopHeaderIndicator.onStopScroll(getScrollY());
                 }
-            } else if (mRefreshHeaderIndicator.isLoading()) {
+            } else if (mTopHeaderIndicator.isLoading()) {
 //                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
 //                    ViewCompat.postInvalidateOnAnimation(this);
 //                }
@@ -676,26 +703,26 @@ public class EasyScrollLayout extends FrameLayout {
                         ViewCompat.postInvalidateOnAnimation(this);
                     }
                 }
-            } else if (mRefreshHeaderIndicator.isPrepare()) {
+            } else if (mTopHeaderIndicator.isPrepare()) {
                 if (getScrollY() <= -mOutTopView.getMeasuredHeight() * lp.mTrigeerExpandRatio) {
                     if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
                         ViewCompat.postInvalidateOnAnimation(this);
-                        mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
+                        mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
                     } else {
-                        mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
-                        mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                        mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
+                        mTopHeaderIndicator.onStopScroll(getScrollY());
                     }
                 } else {
                     if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
                         ViewCompat.postInvalidateOnAnimation(this);
                     } else {
-                        mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                        mTopHeaderIndicator.onStopScroll(getScrollY());
                     }
                 }
             }
 
         } else {
-            mRefreshHeaderIndicator.onStopScroll(getScrollY());
+            mTopHeaderIndicator.onStopScroll(getScrollY());
             // 手指离开之后，根据加速度进行滑动
             if (Math.abs(velocityY) > mMinimumVelocity) {
                 fling(velocityY);
@@ -987,25 +1014,6 @@ public class EasyScrollLayout extends FrameLayout {
 
     }
 
-    public void setComplete(long delay) {
-
-        if (mOutTopView == null || !ViewCompat.isLaidOut(mOutTopView)) {
-            return;
-        }
-        if (mRefreshHeaderIndicator.isLoading()) {
-            mRefreshHeaderIndicator.setComplete();
-            final int scrollY = getScrollY();
-            if (scrollY < 0) {
-                if (!mScroller.isFinished()) {
-                    mScroller.abortAnimation();
-                }
-                mScroller.startScroll(getScrollX(), scrollY, 0, -scrollY, 250);
-                ViewCompat.postInvalidateOnAnimation(this);
-            } else {
-                mRefreshHeaderIndicator.onStopScroll(scrollY);
-            }
-        }
-    }
 
     public void flingNoSnap(int velocityY) {
         isFlingToNestScroll = false;
@@ -1052,15 +1060,15 @@ public class EasyScrollLayout extends FrameLayout {
             y = max;
         }
         final int lastScrolly = getScrollY();
-        if (!mRefreshHeaderIndicator.getCanLoad()) {
-            final int limitScrollY = mRefreshHeaderIndicator.getLimitValue();
+        if (!mTopHeaderIndicator.getCanLoad()) {
+            final int limitScrollY = mTopHeaderIndicator.getLimitValue();
             if (lastScrolly >= limitScrollY && y < limitScrollY) {
                 y = limitScrollY;
             }
         }
         if (y != getScrollY()) {
             super.scrollTo(x, y);
-            mRefreshHeaderIndicator.onScrollChanged(lastScrolly, y);
+            mTopHeaderIndicator.onScrollChanged(lastScrolly, y);
             final int scrollY = getScrollY();
             final int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
@@ -1130,7 +1138,7 @@ public class EasyScrollLayout extends FrameLayout {
             } else {
                 scrollTo(0, curY);
                 if (mScroller.isFinished()) {
-                    mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                    mTopHeaderIndicator.onStopScroll(getScrollY());
                 }
             }
             ViewCompat.postInvalidateOnAnimation(this);

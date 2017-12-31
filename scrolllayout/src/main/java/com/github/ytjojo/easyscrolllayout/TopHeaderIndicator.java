@@ -8,7 +8,7 @@ import com.orhanobut.logger.Logger;
  * Created by Administrator on 2017/12/16 0016.
  */
 
-public class RefreshHeaderIndicator extends BaseRefreshIndicator{
+public class TopHeaderIndicator extends BaseRefreshIndicator{
 
     @Override
     public void onScrollChanged(int lastScrollY, int curScrollY) {

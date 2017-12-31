@@ -809,7 +809,7 @@ public class HorizontalScrollHandlar {
 
     }
 
-    private void setLeftComplete() {
+    public void setLeftComplete() {
         if (mLeftRefreshInidicator.isLoading()) {
             if (mFlingRunnable != null) {
                 mParentView.removeCallbacks(mFlingRunnable);
@@ -826,7 +826,7 @@ public class HorizontalScrollHandlar {
         }
     }
 
-    private void setRightComplete() {
+    public void setRightComplete() {
         if (mRightRefreshIndicator.isLoading()) {
             if (mFlingRunnable != null) {
                 mParentView.removeCallbacks(mFlingRunnable);

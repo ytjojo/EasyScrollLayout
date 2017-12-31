@@ -34,8 +34,8 @@ public class ContentWraperView extends FrameLayout {
     public final static int GRAVITY_INNER_BOTTOM = 3;
 
 
-    RefreshHeaderIndicator mRefreshHeaderIndicator;
-    RefreshFooterIndicator mRefreshFooterIndicator;
+    TopHeaderIndicator mTopHeaderIndicator;
+    BottomFooterIndicator mBottomFooterIndicator;
     OverScroller mScroller;
     private int mMinimumVelocity;
 
@@ -56,8 +56,8 @@ public class ContentWraperView extends FrameLayout {
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
         isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
         a.recycle();
-        mRefreshHeaderIndicator = new RefreshHeaderIndicator();
-        mRefreshFooterIndicator = new RefreshFooterIndicator();
+        mTopHeaderIndicator = new TopHeaderIndicator();
+        mBottomFooterIndicator = new BottomFooterIndicator();
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
             @Override
             public void onChildViewAdded(View parent, View child) {
@@ -65,11 +65,11 @@ public class ContentWraperView extends FrameLayout {
                 switch (lp.mLayoutOutGravity) {
                     case GRAVITY_OUT_TOP:
                         mOutTopView = child;
-                        mRefreshHeaderIndicator.setTargetView(mOutTopView);
+                        mTopHeaderIndicator.setTargetView(mOutTopView);
                         break;
                     case GRAVITY_OUT_BOTTOM:
                         mOutBottomView = child;
-                        mRefreshFooterIndicator.setTargetView(mOutBottomView);
+                        mBottomFooterIndicator.setTargetView(mOutBottomView);
                         break;
                     case GRAVITY_INNER_BOTTOM:
                         mInnerBottomView = child;
@@ -142,7 +142,7 @@ public class ContentWraperView extends FrameLayout {
         final int parentBottom = bottom - top - getPaddingBottom();
         mMaxVerticalScrollRange = 0;
         mMinVerticalScrollRange = 0;
-        mRefreshFooterIndicator.setLimitValue(0);
+        mBottomFooterIndicator.setLimitValue(0);
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
@@ -212,15 +212,15 @@ public class ContentWraperView extends FrameLayout {
                 childLeft = 0;
                 childTop = -height;
                 mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
-                mRefreshHeaderIndicator.setOverScrollValue(mMinVerticalScrollRange);
-                mRefreshHeaderIndicator.setLimitValue(0);
-                mRefreshHeaderIndicator.setTriggerValue((int) (-height*lp.mTrigeerExpandRatio));
-                mRefreshHeaderIndicator.setStableValue(-height);
+                mTopHeaderIndicator.setOverScrollValue(mMinVerticalScrollRange);
+                mTopHeaderIndicator.setLimitValue(0);
+                mTopHeaderIndicator.setTriggerValue((int) (-height*lp.mTrigeerExpandRatio));
+                mTopHeaderIndicator.setStableValue(-height);
                 lp.mMaxScrollY = 0;
                 lp.mMinScrollY = mMinVerticalScrollRange;
                 lp.mStableScrollY = -height;
                 mOutTopView = child;
-                mRefreshHeaderIndicator.setTargetView(mOutTopView);
+                mTopHeaderIndicator.setTargetView(mOutTopView);
                 break;
             case GRAVITY_OUT_BOTTOM:
                 childLeft = 0;
@@ -231,12 +231,12 @@ public class ContentWraperView extends FrameLayout {
                 lp.mMaxScrollY = scrollRange;
                 lp.mMinScrollY = childTop - (bottom - top);
                 mOutBottomView = child;
-                mRefreshFooterIndicator.setTargetView(mOutBottomView);
+                mBottomFooterIndicator.setTargetView(mOutBottomView);
 
-                mRefreshFooterIndicator.setOverScrollValue(mMaxVerticalScrollRange);
-                mRefreshFooterIndicator.setLimitValue(lp.mMinScrollY);
-                mRefreshFooterIndicator.setTriggerValue(lp.mMinScrollY + (int) (height*lp.mTrigeerExpandRatio));
-                mRefreshFooterIndicator.setStableValue( lp.mStableScrollY);
+                mBottomFooterIndicator.setOverScrollValue(mMaxVerticalScrollRange);
+                mBottomFooterIndicator.setLimitValue(lp.mMinScrollY);
+                mBottomFooterIndicator.setTriggerValue(lp.mMinScrollY + (int) (height*lp.mTrigeerExpandRatio));
+                mBottomFooterIndicator.setStableValue( lp.mStableScrollY);
                 break;
             case GRAVITY_INNER_BOTTOM:
                 childLeft = 0;
@@ -244,7 +244,7 @@ public class ContentWraperView extends FrameLayout {
                 lp.mMinScrollY = 0;
                 lp.mMaxScrollY = height;
                 mInnerBottomView = child;
-                mRefreshFooterIndicator.setLimitValue(height);
+                mBottomFooterIndicator.setLimitValue(height);
                 break;
             default:
                 break;
@@ -369,13 +369,13 @@ public class ContentWraperView extends FrameLayout {
             y = mMinVerticalScrollRange;
         }
 
-        if (mRefreshHeaderIndicator.isLoading()) {
+        if (mTopHeaderIndicator.isLoading()) {
             final int limitScrollY = mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight();
             if (y > limitScrollY) {
                 y = limitScrollY;
             }
         }
-        if (mRefreshFooterIndicator.isLoading()) {
+        if (mBottomFooterIndicator.isLoading()) {
             final int limitScrollY = 0;
             if (y < limitScrollY) {
                 y = limitScrollY;
@@ -384,14 +384,14 @@ public class ContentWraperView extends FrameLayout {
 
         int lastScrollx = getScrollX();
         int lastScrolly = getScrollY();
-        if (!mRefreshHeaderIndicator.getCanLoad()) {
-            final int limitScrollY = mRefreshHeaderIndicator.getLimitValue();
+        if (!mTopHeaderIndicator.getCanLoad()) {
+            final int limitScrollY = mTopHeaderIndicator.getLimitValue();
             if (lastScrolly >= limitScrollY && y < limitScrollY) {
                 y = limitScrollY;
             }
         }
-        if (!mRefreshFooterIndicator.getCanLoad()) {
-            final int limitScrollY = mRefreshFooterIndicator.getLimitValue();
+        if (!mBottomFooterIndicator.getCanLoad()) {
+            final int limitScrollY = mBottomFooterIndicator.getLimitValue();
             if (lastScrolly <= limitScrollY && y > limitScrollY) {
                 y = limitScrollY;
             }
@@ -409,8 +409,8 @@ public class ContentWraperView extends FrameLayout {
                     ViewCompat.offsetTopAndBottom(child, scrollY - top);
                 }
             }
-            mRefreshHeaderIndicator.onScrollChanged(lastScrolly,y);
-            mRefreshFooterIndicator.onScrollChanged(lastScrolly,y);
+            mTopHeaderIndicator.onScrollChanged(lastScrolly,y);
+            mBottomFooterIndicator.onScrollChanged(lastScrolly,y);
         }
     }
 
@@ -421,8 +421,8 @@ public class ContentWraperView extends FrameLayout {
             scrollTo(0, curY);
             ViewCompat.postInvalidateOnAnimation(this);
             if (mScroller.isFinished()) {
-                mRefreshHeaderIndicator.onStopScroll(getScrollY());
-                mRefreshFooterIndicator.onStopScroll(getScrollY());
+                mTopHeaderIndicator.onStopScroll(getScrollY());
+                mBottomFooterIndicator.onStopScroll(getScrollY());
             }
         }
     }
@@ -466,14 +466,14 @@ public class ContentWraperView extends FrameLayout {
     }
     private void headerFling(int velocityY){
         LayoutParams lp = (ContentWraperView.LayoutParams) mOutTopView.getLayoutParams();
-        if (mRefreshHeaderIndicator.isComplete()) {
+        if (mTopHeaderIndicator.isComplete()) {
             if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
                 ViewCompat.postInvalidateOnAnimation(this);
 
             } else {
-                mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                mTopHeaderIndicator.onStopScroll(getScrollY());
             }
-        }else if(mRefreshHeaderIndicator.isLoading()){
+        }else if(mTopHeaderIndicator.isLoading()){
 //                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
 //                    ViewCompat.postInvalidateOnAnimation(this);
 //                }
@@ -492,20 +492,20 @@ public class ContentWraperView extends FrameLayout {
                 }
             }
 
-        } else if (mRefreshHeaderIndicator.isPrepare()) {
-            if (getScrollY() <= mRefreshHeaderIndicator.getTriggerValue()) {
+        } else if (mTopHeaderIndicator.isPrepare()) {
+            if (getScrollY() <= mTopHeaderIndicator.getTriggerValue()) {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY, lp.mStableScrollY)) {
                     ViewCompat.postInvalidateOnAnimation(this);
-                    mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
+                    mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
                 } else {
-                    mRefreshHeaderIndicator.dispatchReleaseBeforeRefresh();
-                    mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                    mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
+                    mTopHeaderIndicator.onStopScroll(getScrollY());
                 }
             } else {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
                     ViewCompat.postInvalidateOnAnimation(this);
                 } else {
-                    mRefreshHeaderIndicator.onStopScroll(getScrollY());
+                    mTopHeaderIndicator.onStopScroll(getScrollY());
                 }
             }
         }
@@ -514,11 +514,11 @@ public class ContentWraperView extends FrameLayout {
     public void dispatchFling(int velocityY, boolean isDownSlide) {
         if (getScrollY() < 0) {
             headerFling(velocityY);
-            mRefreshFooterIndicator.onStopScroll(getScrollY());
+            mBottomFooterIndicator.onStopScroll(getScrollY());
         } else {
-            mRefreshHeaderIndicator.onStopScroll(getScrollY());
+            mTopHeaderIndicator.onStopScroll(getScrollY());
             if (mInnerBottomView != null && getScrollY() < mInnerBottomView.getMeasuredHeight()) {
-                mRefreshFooterIndicator.onStopScroll(getScrollY());
+                mBottomFooterIndicator.onStopScroll(getScrollY());
                 if (velocityY != 0) {
                     fling(velocityY);
                 } else {
@@ -546,7 +546,7 @@ public class ContentWraperView extends FrameLayout {
     }
     private void footerFling(int velocityY){
         LayoutParams lp = (ContentWraperView.LayoutParams) mOutBottomView.getLayoutParams();
-        if (getScrollY() >= mRefreshFooterIndicator.getTriggerValue()) {
+        if (getScrollY() >= mBottomFooterIndicator.getTriggerValue()) {
             if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY, lp.mStableScrollY)) {
                 ViewCompat.postInvalidateOnAnimation(this);
             }
@@ -555,13 +555,13 @@ public class ContentWraperView extends FrameLayout {
                 ViewCompat.postInvalidateOnAnimation(this);
             }
         }
-        if (mRefreshFooterIndicator.isComplete()) {
+        if (mBottomFooterIndicator.isComplete()) {
             if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mMinScrollY, lp.mMinScrollY)) {
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
-                mRefreshFooterIndicator.onStopScroll(getScrollY());
+                mBottomFooterIndicator.onStopScroll(getScrollY());
             }
-        }else if(mRefreshFooterIndicator.isLoading()){
+        }else if(mBottomFooterIndicator.isLoading()){
             if (getScrollY() >= lp.mStableScrollY) {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY, lp.mStableScrollY)) {
                     ViewCompat.postInvalidateOnAnimation(this);
@@ -577,20 +577,20 @@ public class ContentWraperView extends FrameLayout {
                 }
             }
 
-        } else if (mRefreshFooterIndicator.isPrepare()) {
-            if (getScrollY() >= mRefreshFooterIndicator.getTriggerValue()) {
+        } else if (mBottomFooterIndicator.isPrepare()) {
+            if (getScrollY() >= mBottomFooterIndicator.getTriggerValue()) {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollY,lp.mStableScrollY)) {
                     ViewCompat.postInvalidateOnAnimation(this);
-                    mRefreshFooterIndicator.dispatchReleaseBeforeRefresh();
+                    mBottomFooterIndicator.dispatchReleaseBeforeRefresh();
                 } else {
-                    mRefreshFooterIndicator.dispatchReleaseBeforeRefresh();
-                    mRefreshFooterIndicator.onStopScroll(getScrollY());
+                    mBottomFooterIndicator.dispatchReleaseBeforeRefresh();
+                    mBottomFooterIndicator.onStopScroll(getScrollY());
                 }
             } else {
                 if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mMinScrollY, lp.mMinScrollY)) {
                     ViewCompat.postInvalidateOnAnimation(this);
                 } else {
-                    mRefreshFooterIndicator.onStopScroll(getScrollY());
+                    mBottomFooterIndicator.onStopScroll(getScrollY());
                 }
             }
         }
@@ -653,15 +653,15 @@ public class ContentWraperView extends FrameLayout {
 
 
     public void setCanRefresh(boolean canRefresh){
-        mRefreshHeaderIndicator.setCanLoad(canRefresh);
+        mTopHeaderIndicator.setCanLoad(canRefresh);
     }
     public void setCanLoadMore(boolean canLoadMore){
-        mRefreshFooterIndicator.setCanLoad(canLoadMore);
+        mBottomFooterIndicator.setCanLoad(canLoadMore);
     }
     public void setComplete(long delay) {
 
-        if (mOutTopView != null &&  ViewCompat.isLaidOut(mOutTopView) && mRefreshHeaderIndicator.isLoading()) {
-            mRefreshHeaderIndicator.setComplete();
+        if (mOutTopView != null &&  ViewCompat.isLaidOut(mOutTopView) && mTopHeaderIndicator.isLoading()) {
+            mTopHeaderIndicator.setComplete();
             final int scrollY = getScrollY();
             if (scrollY < 0) {
                 if (!mScroller.isFinished()) {
@@ -670,32 +670,32 @@ public class ContentWraperView extends FrameLayout {
                 mScroller.startScroll(getScrollX(),scrollY,0,-scrollY,250);
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
-                mRefreshHeaderIndicator.onStopScroll(scrollY);
+                mTopHeaderIndicator.onStopScroll(scrollY);
             }
             return;
         }
-        if (mOutBottomView != null &&  ViewCompat.isLaidOut(mOutBottomView) && mRefreshFooterIndicator.isLoading()) {
-            mRefreshFooterIndicator.setComplete();
+        if (mOutBottomView != null &&  ViewCompat.isLaidOut(mOutBottomView) && mBottomFooterIndicator.isLoading()) {
+            mBottomFooterIndicator.setComplete();
             final int scrollY = getScrollY();
-            if (scrollY > mRefreshFooterIndicator.getLimitValue()) {
+            if (scrollY > mBottomFooterIndicator.getLimitValue()) {
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                mScroller.startScroll(getScrollX(),scrollY,0,mRefreshFooterIndicator.getLimitValue()-scrollY,250);
+                mScroller.startScroll(getScrollX(),scrollY,0, mBottomFooterIndicator.getLimitValue()-scrollY,250);
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
-                mRefreshFooterIndicator.onStopScroll(scrollY);
+                mBottomFooterIndicator.onStopScroll(scrollY);
             }
             return;
         }
 
     }
 
-    public RefreshHeaderIndicator getRefreshHeaderIndicator() {
-        return mRefreshHeaderIndicator;
+    public TopHeaderIndicator getTopHeaderIndicator() {
+        return mTopHeaderIndicator;
     }
 
-    public RefreshFooterIndicator getRefreshFooterIndicator() {
-        return mRefreshFooterIndicator;
+    public BottomFooterIndicator getBottomFooterIndicator() {
+        return mBottomFooterIndicator;
     }
 }
