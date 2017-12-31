@@ -10,6 +10,9 @@ import com.orhanobut.logger.Logger;
 
 public class RightRefreshIndicator extends BaseRefreshIndicator{
 
+    public RightRefreshIndicator(){
+        setType(TYPE_RIGHT);
+    }
     public void onScrollChanged(int lastScrollX, int curScrollX) {
         if (mStatus == PTR_STATUS_INIT && curScrollX < 0) {
             mStatus = PTR_STATUS_PREPARE;

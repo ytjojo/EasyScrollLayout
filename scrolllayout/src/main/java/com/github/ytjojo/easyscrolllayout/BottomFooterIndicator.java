@@ -6,6 +6,9 @@ package com.github.ytjojo.easyscrolllayout;
  */
 
 public class BottomFooterIndicator extends BaseRefreshIndicator {
+    public BottomFooterIndicator(){
+        setType(TYPE_BOTTOM);
+    }
     @Override
     public void onScrollChanged(int lastScrollY, int curScrollY) {
         if (getTargetView() == null) {

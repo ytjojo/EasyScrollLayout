@@ -7,6 +7,9 @@ package com.github.ytjojo.easyscrolllayout;
 
 public class LeftRefreshIndicator extends BaseRefreshIndicator{
 
+    public LeftRefreshIndicator(){
+        setType(TYPE_LEFT);
+    }
     @Override
     public void onScrollChanged(int lastScrollX, int curScrollX) {
         if (mStatus == PTR_STATUS_INIT && curScrollX > 0) {

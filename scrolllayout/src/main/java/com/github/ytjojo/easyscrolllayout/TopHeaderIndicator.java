@@ -1,15 +1,14 @@
 package com.github.ytjojo.easyscrolllayout;
 
-import android.view.View;
-
-import com.orhanobut.logger.Logger;
 
 /**
  * Created by Administrator on 2017/12/16 0016.
  */
 
 public class TopHeaderIndicator extends BaseRefreshIndicator{
-
+    public TopHeaderIndicator(){
+        setType(TYPE_TOP);
+    }
     @Override
     public void onScrollChanged(int lastScrollY, int curScrollY) {
         if (mStatus == PTR_STATUS_INIT && curScrollY < 0) {

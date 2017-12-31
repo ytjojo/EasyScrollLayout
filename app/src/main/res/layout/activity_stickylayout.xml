@@ -6,19 +6,17 @@
     app:isSnap="true"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:background="#00ee00"
+    <com.github.ytjojo.easyscrolllayout.LikeView
         app:easylayout_layoutGravity="outtop"
-        android:orientation="vertical"
-        android:layout_height="80dp">
-        <TextView
-            android:text="outTopView"
-            android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@mipmap/ic_launcher_round"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"/>
+        </com.github.ytjojo.easyscrolllayout.LikeView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:gravity="center"
@@ -32,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <TextView
+            android:gravity="center"
             android:id="@+id/tvHeader"
             android:text="header"
             android:padding="8dp"

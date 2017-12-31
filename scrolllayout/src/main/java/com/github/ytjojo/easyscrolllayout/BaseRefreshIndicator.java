@@ -16,6 +16,19 @@ public abstract class BaseRefreshIndicator {
     public static final byte PTR_STATUS_PREPARE = 2;
     public static final byte PTR_STATUS_LOADING = 3;
     public static final byte PTR_STATUS_COMPLETE = 4;
+    public static final byte TYPE_TOP = 0;
+    public static final byte TYPE_BOTTOM = 1;
+    public static final byte TYPE_LEFT = 2;
+    public static final byte TYPE_RIGHT = 3;
+    public  int mType;
+
+    public int getType() {
+        return mType;
+    }
+
+    public void setType(int type) {
+        mType = type;
+    }
 
     public View getTargetView() {
         return mTargetView;
