@@ -383,7 +383,7 @@ public class EasyScrollLayout extends FrameLayout {
                 mOrientation |= ORIENTATION_HORIZONTAL;
                 break;
             case GRAVITY_OUT_RIGHT:
-                childLeft = right;
+                childLeft = width;
                 childTop = 0;
                 mOutRightView = child;
                 lp.mStableScrollValue = -width;
