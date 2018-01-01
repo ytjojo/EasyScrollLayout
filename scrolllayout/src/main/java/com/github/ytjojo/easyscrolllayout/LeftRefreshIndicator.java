@@ -16,9 +16,9 @@ public class LeftRefreshIndicator extends BaseRefreshIndicator{
             mStatus = PTR_STATUS_PREPARE;
             dispatchRefreshPrepare();
             dispatchScrollChanged(mStatus, curScrollX);
-        } else if ((mStatus == PTR_STATUS_PREPARE || mStatus == PTR_STATUS_LOADING) && curScrollX < 0) {
+        } else if ((mStatus == PTR_STATUS_PREPARE || mStatus == PTR_STATUS_LOADING) && curScrollX > 0) {
             dispatchScrollChanged(mStatus, curScrollX);
-        } else if (lastScrollX < 0 && curScrollX <= 0) {
+        } else if (lastScrollX > 0 && curScrollX <= 0) {
             if (mStatus == PTR_STATUS_PREPARE || mStatus == PTR_STATUS_LOADING) {
                 dispatchScrollChanged(mStatus, 0);
             }

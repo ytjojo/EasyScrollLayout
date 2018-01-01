@@ -13,7 +13,7 @@ import java.util.HashMap;
  * Created by Administrator on 2017/11/30 0030.
  */
 
-public class ViewpagerHorizentalActivity extends AppCompatActivity {
+public class DrawerViewpagerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

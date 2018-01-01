@@ -22,13 +22,13 @@ import com.shizhefei.view.indicator.slidebar.ScrollBar;
  * Created by Administrator on 2017/12/5 0005.
  */
 
-public class RecylerViewWithHeaderActivity extends AppCompatActivity {
+public class DrawerRecylerViewWithHeaderActivity extends AppCompatActivity {
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_recylerview);
+        setContentView(R.layout.activity__drawer_recylerview);
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recylerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());

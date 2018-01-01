@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent"
+                                                     app:isDrawerLayoutStyle="true"
+                                                     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="200dp"
-        android:gravity="center"
+        android:layout_height="match_parent"
         android:background="#00ee00"
-        app:easylayout_layoutGravity="outleft"
+        android:gravity="center"
         android:orientation="vertical"
-        android:layout_height="match_parent">
+        app:easylayout_layoutGravity="outleft">
+
         <TextView
-            android:text="outLeftView"
-            android:padding="8dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="outLeftView"/>
     </LinearLayout>
 
     <LinearLayout
@@ -31,49 +34,57 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="outRightView" />
+            android:text="outRightView"/>
     </LinearLayout>
+
     <com.github.ytjojo.easyscrolllayout.ContentWraperView
-        android:layout_width="match_parent"
         android:id="@+id/contentWraperview"
-        android:background="@android:color/white"
-        android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:gravity="center"
+            android:layout_height="100dp"
             android:background="#eeff00"
-            app:contentwrper_layoutGravity="outtop"
-            android:layout_height="100dp">
+            android:gravity="center"
+            app:contentwrper_layoutGravity="outtop">
+
             <TextView
-                android:text="bottomView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="bottomView"/>
         </LinearLayout>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recylerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:gravity="center"
+            android:layout_height="300dp"
             android:background="#00ffee"
-            app:contentwrper_layoutGravity="innerbottom"
-            android:layout_height="300dp">
+            android:gravity="center"
+            app:contentwrper_layoutGravity="innerbottom">
+
             <TextView
-                android:text="bottomView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="bottomView"/>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:gravity="center"
+            android:layout_height="100dp"
             android:background="#eeff00"
-            app:contentwrper_layoutGravity="outbottom"
-            android:layout_height="100dp">
+            android:gravity="center"
+            app:contentwrper_layoutGravity="outbottom">
+
             <TextView
-                android:text="bottomView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="bottomView"/>
         </LinearLayout>
     </com.github.ytjojo.easyscrolllayout.ContentWraperView>
 

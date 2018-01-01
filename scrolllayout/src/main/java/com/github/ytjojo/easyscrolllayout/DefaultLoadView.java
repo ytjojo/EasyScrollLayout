@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.support.annotation.ColorInt;
@@ -28,12 +27,12 @@ import com.orhanobut.logger.Logger;
 
 /**
  * Created
- * by jaren on 2017/5/26.
+ * by ytjojo on 2018/1/1.
  */
 
-public class LikeView extends FrameLayout implements UIHandler {
+public class DefaultLoadView extends FrameLayout implements UIHandler {
     /**
-     * 圆最大半径（心形）
+     * 圆最大半径
      */
     private float mRadius;
     /**
@@ -57,19 +56,19 @@ public class LikeView extends FrameLayout implements UIHandler {
 
     ImageView mImageView;
 
-    public LikeView(Context context) {
+    public DefaultLoadView(Context context) {
         this(context, null);
     }
 
-    public LikeView(Context context, @Nullable AttributeSet attrs) {
+    public DefaultLoadView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public LikeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DefaultLoadView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
         mRadius = dp2px(30);
-        mCycleTime = 1600;
+        mCycleTime = 1200;
         mOffset = c * mRadius;
         mCenterX = mRadius;
         mCenterY = mRadius;
@@ -151,18 +150,19 @@ public class LikeView extends FrameLayout implements UIHandler {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMinimumHeight((int) (3 * mRadius));
-        setMinimumHeight((int) (3 * mRadius));
+        setMinimumWidth((int) (3 * mRadius));
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
     }
 
 
-    /**
-     * 展现View点击后的变化效果
-     */
+
     private void startViewMotion() {
         if (mRepeateAnimator != null && mRepeateAnimator.isRunning())
             return;
+        setCurrentProgress(0f);
+        setOuterCircleRadiusProgress(0f);
+        setInnerCircleRadiusProgress(0f);
         mRepeateAnimator = ValueAnimator.ofFloat(0f, 1f,2f);
         mRepeateAnimator.setDuration(mCycleTime);
         mRepeateAnimator.setRepeatCount(-1);
@@ -275,6 +275,7 @@ public class LikeView extends FrameLayout implements UIHandler {
         if (indicator.getStatus() == BaseRefreshIndicator.PTR_STATUS_PREPARE) {
             if (scrollValue <= Math.abs(indicator.getStableValue() - indicator.getLimitValue())) {
                 float percent = Math.abs(scrollValue * 1f / (indicator.getStableValue() - indicator.getLimitValue()));
+                Logger.e("percent" + percent);
                 float ppppp = 0.5f;
                 if (percent <= ppppp) {
                     float percent1 = percent / ppppp;

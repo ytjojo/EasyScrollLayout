@@ -1,60 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/StickyNavLayout"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     android:id="@+id/StickyNavLayout"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent"
+                                                     android:orientation="vertical"
+                                                     app:isDrawerLayoutStyle="true">
 
 
     <LinearLayout
-        app:parallaxMultiplier="0.5"
-        android:background="@android:color/white"
         android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@android:color/white"
         android:gravity="center"
-        app:easylayout_layoutGravity="innertop"
         android:orientation="vertical"
-        android:layout_height="300dp">
+        app:easylayout_layoutGravity="innertop"
+        app:parallaxMultiplier="0.5">
+
         <ImageView
-            android:src="@drawable/example"
-            android:scaleType="centerCrop"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/example"/>
+
         <TextView
             android:id="@+id/tvHeader"
-            android:text="header"
-            android:padding="8dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="header"/>
     </LinearLayout>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
-        app:parallaxMultiplier="0.5"        android:layout_width="match_parent"
-        android:layout_height="match_parent"></android.support.v4.view.ViewPager>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:parallaxMultiplier="0.5"></android.support.v4.view.ViewPager>
+
     <LinearLayout
         android:layout_width="200dp"
-        android:gravity="center"
+        android:layout_height="match_parent"
         android:background="#003ef0"
-        app:easylayout_layoutGravity="outright"
+        android:gravity="center"
         android:orientation="vertical"
-        android:layout_height="match_parent">
+        app:easylayout_layoutGravity="outright">
+
         <TextView
-            android:text="outRightView"
-            android:padding="8dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="outRightView"/>
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="200dp"
-        android:gravity="center"
+        android:layout_height="match_parent"
         android:background="#00ee00"
-        app:easylayout_layoutGravity="outleft"
+        android:gravity="center"
         android:orientation="vertical"
-        android:layout_height="match_parent">
+        app:easylayout_layoutGravity="outleft">
+
         <TextView
-            android:text="outLeftView"
-            android:padding="8dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="outLeftView"/>
     </LinearLayout>
 </com.github.ytjojo.easyscrolllayout.EasyScrollLayout>

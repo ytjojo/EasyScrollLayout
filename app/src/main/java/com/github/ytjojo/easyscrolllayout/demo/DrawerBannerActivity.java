@@ -13,14 +13,14 @@ import com.shizhefei.view.indicator.slidebar.ScrollBar;
 
 import java.util.ArrayList;
 
-public class BannerActivity extends AppCompatActivity {
+public class DrawerBannerActivity extends AppCompatActivity {
 
     private BannerComponent bannerComponent;
 
     @Override
     protected void onCreate(Bundle arg0) {
         super.onCreate(arg0);
-        setContentView(R.layout.activity_headerviewpager);
+        setContentView(R.layout.activity_drawer_headerviewpager);
         //ViewPager,Indicator
         ViewPager viewPager = (ViewPager) findViewById(R.id.banner_viewPager);
         Indicator indicator = (Indicator) findViewById(R.id.banner_indicator);

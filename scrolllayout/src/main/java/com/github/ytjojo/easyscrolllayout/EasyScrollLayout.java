@@ -80,7 +80,6 @@ public class EasyScrollLayout extends FrameLayout {
     private MotionEvent mLastMoveEvent;
     private float mInnerTopParallaxMult = 0.5f;
 
-    //    private final int[] mScrollOffset = new int[2];
     private final int[] mScrollConsumed = new int[2];
     private int mNestedYOffset;
     private int mChildYOffset;
@@ -988,7 +987,7 @@ public class EasyScrollLayout extends FrameLayout {
     @Override
     public boolean canScrollHorizontally(int direction) {
         if (mHorizontalScrollHandlar == null) {
-            return true;
+            return false;
         }
         return mHorizontalScrollHandlar.canScrollHorizontally(direction);
     }

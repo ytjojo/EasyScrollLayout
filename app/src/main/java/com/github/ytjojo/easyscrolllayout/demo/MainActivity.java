@@ -43,25 +43,31 @@ public class MainActivity extends AppCompatActivity {
 		findViewById(R.id.tv_viewpagerh).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,ViewpagerHorizentalActivity.class);
+				Intent intent = new Intent(MainActivity.this,DrawerViewpagerActivity.class);
 				startActivity(intent);
 			}
 		});
 		findViewById(R.id.tv_topbanner).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,BannerActivity.class);
+				Intent intent = new Intent(MainActivity.this,DrawerBannerActivity.class);
 				startActivity(intent);
 			}
 		});
 		findViewById(R.id.tv_recylerview_viewpagerheader).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,RecylerViewWithHeaderActivity.class);
+				Intent intent = new Intent(MainActivity.this,DrawerRecylerViewWithHeaderActivity.class);
 				startActivity(intent);
 			}
 		});
-        CoordinatorLayout c;
+		findViewById(R.id.tv_horizontal_refresh_loadmore).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,HorizentalLoadActivity .class);
+				startActivity(intent);
+			}
+		});
 
 
 	}
