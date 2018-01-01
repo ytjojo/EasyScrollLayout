@@ -33,8 +33,13 @@ public class HorizontalScrollHandlar {
     int mScrollX;
     LeftRefreshIndicator mLeftRefreshInidicator;
     EasyScrollLayout mParentView;
+    EasyScrollLayout.OnScollListener mOnScollListener;
 
-    public HorizontalScrollHandlar(EasyScrollLayout parent,boolean isDrawerLayoutStyle) {
+    public void setOnScollListener(EasyScrollLayout.OnScollListener l) {
+        this.mOnScollListener = l;
+    }
+
+    public HorizontalScrollHandlar(EasyScrollLayout parent, boolean isDrawerLayoutStyle) {
         mLeftRefreshInidicator = new LeftRefreshIndicator();
         mRightRefreshIndicator = new RightRefreshIndicator();
         this.isDrawerLayoutStyle = isDrawerLayoutStyle;
@@ -191,6 +196,11 @@ public class HorizontalScrollHandlar {
         if (!isDrawerLayoutStyle) {
             mLeftRefreshInidicator.onScrollChanged(mLastScrollX, mScrollX);
             mRightRefreshIndicator.onScrollChanged(mLastScrollX, mScrollX);
+        } else {
+            if (mOnScollListener != null&& mLastScrollX != mScrollX) {
+                int offsetRange = mLastScrollX < 0 || mScrollX < 0 ? mMinHorizontalScrollRange : mMaxHorizontalScrollRange;
+                mOnScollListener.onScroll(mScrollX / offsetRange, mScrollX, offsetRange);
+            }
         }
 
     }
@@ -233,7 +243,7 @@ public class HorizontalScrollHandlar {
                 }
             } else {
                 int offset = (mScrollX - mOutLeftView.getRight());
-                Logger.e("offset" +mScrollX);
+                Logger.e("offset" + mScrollX);
                 ViewCompat.offsetLeftAndRight(mOutLeftView, offset);
             }
 
@@ -634,7 +644,7 @@ public class HorizontalScrollHandlar {
             }
             if (lp.mTrigeerExpandRatio >= 0 && lp.mTrigeerExpandRatio <= 1f + lp.mOverScrollRatio) {
                 if (mScrollX <= mRightRefreshIndicator.getTriggerValue()) {
-                    targetX =  mRightRefreshIndicator.getStableValue();
+                    targetX = mRightRefreshIndicator.getStableValue();
                 } else {
                     targetX = 0;
                 }
@@ -765,7 +775,7 @@ public class HorizontalScrollHandlar {
             if (velocityX > 0) {
                 mScroller.fling(mScrollX, 0, velocityX, 0, isSnap ? 0 : mScrollX, 0, 0, 0);
             } else {
-                mScroller.fling(mScrollX, 0, velocityX, 0, mRightRefreshIndicator.getStableValue(), isSnap ?  mRightRefreshIndicator.getStableValue() : mScrollX, 0, 0);
+                mScroller.fling(mScrollX, 0, velocityX, 0, mRightRefreshIndicator.getStableValue(), isSnap ? mRightRefreshIndicator.getStableValue() : mScrollX, 0, 0);
             }
         }
 

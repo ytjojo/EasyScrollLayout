@@ -274,43 +274,37 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
     public void onUIScrollChanged(BaseRefreshIndicator indicator, int scrollValue, byte status) {
         if (indicator.getStatus() == BaseRefreshIndicator.PTR_STATUS_PREPARE) {
             if (scrollValue <= Math.abs(indicator.getStableValue() - indicator.getLimitValue())) {
-                float percent = Math.abs(scrollValue * 1f / (indicator.getStableValue() - indicator.getLimitValue()));
-                Logger.e("percent" + percent);
-                float ppppp = 0.5f;
-                if (percent <= ppppp) {
-                    float percent1 = percent / ppppp;
+                float ratio = Math.abs(scrollValue * 1f / (indicator.getStableValue() - indicator.getLimitValue()));
+                Logger.e("percent" + ratio);
+                final float stepRatio = 0.5f;
+                if (ratio <= stepRatio) {
+                    float percent1 = ratio / stepRatio;
                     setOuterCircleRadiusProgress(DECCELERATE_INTERPOLATOR.getInterpolation(percent1));
-                    if (percent >= 0.1f) {
-                        setCurrentProgress(ACCELERATE_DECELERATE_INTERPOLATOR.getInterpolation(percent - 0.1f));
+                    if (ratio >= 0.1f) {
+                        setCurrentProgress(ACCELERATE_DECELERATE_INTERPOLATOR.getInterpolation(ratio - 0.1f));
 
                     } else {
                         setInnerCircleRadiusProgress(0f);
                     }
-                    if (percent >= 0.4f) {
-                        setInnerCircleRadiusProgress(DECCELERATE_INTERPOLATOR.getInterpolation((percent - 0.4f) / percent));
+                    if (ratio >= 0.4f) {
+                        setInnerCircleRadiusProgress(DECCELERATE_INTERPOLATOR.getInterpolation((ratio - 0.4f) / ratio));
                     }
                     mImageView.setScaleX(0f);
                     mImageView.setScaleY(0f);
                 } else {
-                    if (percent <= 0.9f) {
-                        setInnerCircleRadiusProgress(DECCELERATE_INTERPOLATOR.getInterpolation((percent - 0.4f) / ppppp));
+                    if (ratio <= 0.9f) {
+                        setInnerCircleRadiusProgress(DECCELERATE_INTERPOLATOR.getInterpolation((ratio - 0.4f) / stepRatio));
                     }
-                    setCurrentProgress(ACCELERATE_DECELERATE_INTERPOLATOR.getInterpolation(percent - 0.1f));
-                    float scaleXY = (percent-ppppp)/ppppp;
+                    setCurrentProgress(ACCELERATE_DECELERATE_INTERPOLATOR.getInterpolation(ratio - 0.1f));
+                    float scaleXY = (ratio- stepRatio)/ stepRatio;
                     scaleXY = OVERSHOOT_INTERPOLATOR.getInterpolation(scaleXY )*0.8f+0.2f;
-                    Logger.e(scaleXY + "scaleXY" +percent);
+                    Logger.e(scaleXY + "scaleXY" +ratio);
                     mImageView.setScaleX(scaleXY);
                     mImageView.setScaleY(scaleXY);
                 }
 
-
             } else {
-                float percent = (0f + scrollValue - Math.abs(indicator.getStableValue() - indicator.getLimitValue())) / (indicator.getOverScrollValue() - indicator.getStableValue());
-                if (percent < 0f) {
-                    percent = -percent;
-                }
-                invalidate();
-                Logger.e("percent" + percent);
+//                float ratio = (0f + scrollValue - Math.abs(indicator.getStableValue() - indicator.getLimitValue())) / (indicator.getOverScrollValue() - indicator.getStableValue());
             }
 
         }

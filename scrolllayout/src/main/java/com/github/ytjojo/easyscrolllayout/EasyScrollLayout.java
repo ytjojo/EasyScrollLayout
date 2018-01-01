@@ -38,6 +38,8 @@ import java.util.ArrayList;
 
 public class EasyScrollLayout extends FrameLayout {
 
+    public static final int STATE_EXPAND = 1;
+    public static final int STATE_COLLAPSED = -1;
     private static String TAG = "TAG";
 
     /**
@@ -253,9 +255,8 @@ public class EasyScrollLayout extends FrameLayout {
         resetValue();
         layoutChildren(l, t, r, b, false);
         if (mState == INITSTATE) {
-            mState = OnScollListener.STATE_EXPAND;
+            mState = STATE_EXPAND;
             if (mOnScollListener != null) {
-                mOnScollListener.onStateChanged(mState);
                 mOnScollListener.onScroll(0f, getScrollY(), mMaxVerticalScrollRange);
             }
         }
@@ -1083,12 +1084,10 @@ public class EasyScrollLayout extends FrameLayout {
                     float offsetRatio = ((float) scrollY) / mMaxVerticalScrollRange;
                     if (mOnScollListener != null) {
                         if (offsetRatio == 0) {
-                            mState = OnScollListener.STATE_EXPAND;
-                            mOnScollListener.onStateChanged(OnScollListener.STATE_EXPAND);
+                            mState = STATE_EXPAND;
 
                         } else if (offsetRatio == 1) {
-                            mState = OnScollListener.STATE_COLLAPSED;
-                            mOnScollListener.onStateChanged(OnScollListener.STATE_COLLAPSED);
+                            mState = STATE_COLLAPSED;
                         }
                         mOnScollListener.onScroll(offsetRatio, scrollY, max);
                     }
@@ -1100,8 +1099,7 @@ public class EasyScrollLayout extends FrameLayout {
                 } else if (lastScrolly > 0 && y <= 0) {
                     if (mOnScollListener != null) {
                         mOnScollListener.onScroll(0f, 0, max);
-                        mState = OnScollListener.STATE_EXPAND;
-                        mOnScollListener.onStateChanged(OnScollListener.STATE_EXPAND);
+                        mState = STATE_EXPAND;
                     }
                     if (mInnerTopParallaxMult != 0) {
                         ViewCompat.setTranslationY(mInnerTopView, 0);
@@ -1391,13 +1389,8 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     public interface OnScollListener {
-        public final int STATE_EXPAND = 1;
-        public final int STATE_COLLAPSED = -1;
-        public final int STATE_DRAGING = 0;
+        void onScroll(float offsetRatio, int positionOffsetPixels, int offsetRange);
 
-        void onScroll(float positionOffset, int positionOffsetPixels, int offsetRange);
-
-        void onStateChanged(int state);
     }
 
     /**
