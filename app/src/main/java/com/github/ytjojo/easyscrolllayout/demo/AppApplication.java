@@ -15,6 +15,7 @@ import com.orhanobut.logger.PrettyFormatStrategy;
 
 public class AppApplication extends Application {
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -32,5 +33,8 @@ public class AppApplication extends Application {
                 .build();
 
         Logger.addLogAdapter(new AndroidLogAdapter(formatStrategy));
+
+
+
     }
 }
