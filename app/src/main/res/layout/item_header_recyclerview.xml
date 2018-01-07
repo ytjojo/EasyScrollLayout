@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.github.ytjojo.easyscrolllayout.EasyScrollLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/horizontal_ScrollMaster"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    app:easylayout_layoutGravity="innertop"
+    app:isDrawerLayoutStyle="false"
+    >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recylerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:easylayout_layoutGravity="outleft">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_launcher_round"/>
+    </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+
+    <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:easylayout_layoutGravity="outright">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_launcher_round"/>
+    </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>

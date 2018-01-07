@@ -15,10 +15,10 @@
 
     <TextView
         android:id="@+id/name"
-        android:text=" 水水水水"
+        android:text=" please pull left and right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="15sp"
         android:textColor="#222222"
         android:paddingLeft="10dp"/>
 </LinearLayout>

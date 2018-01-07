@@ -41,7 +41,7 @@ public class Pendulum {
         }
         mOffsetX = cosine* RADIUS;
         mOffsetY = (float) (( Math.sqrt(1 - cosine*cosine)* RADIUS - RADIUS));
-        System.out.println(mOffsetX  + " " + mOffsetY);
+//        System.out.println(mOffsetX  + " " + mOffsetY);
 
 
 

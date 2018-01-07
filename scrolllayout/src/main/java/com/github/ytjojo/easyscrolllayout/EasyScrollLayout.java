@@ -25,6 +25,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.OverScroller;
@@ -196,7 +197,7 @@ public class EasyScrollLayout extends FrameLayout {
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                mScroller.startScroll(getScrollX(), scrollY, 0, -scrollY, 250);
+                mScroller.startScroll(getScrollX(), scrollY, 0, -scrollY, 300);
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
                 mTopHeaderIndicator.onStopScroll(scrollY);
@@ -485,6 +486,7 @@ public class EasyScrollLayout extends FrameLayout {
         return true;
     }
 
+
     Point mLastEventPoint = new Point();
     boolean mIgnoreTouchEvent;
 
@@ -576,6 +578,10 @@ public class EasyScrollLayout extends FrameLayout {
                         dispatchVerticalScroll(vtev, dy);
                         mLastMotionY = y;
                         mLastMotionX = x;
+                        final ViewParent parent = getParent();
+                        if (parent != null) {
+                            parent.requestDisallowInterceptTouchEvent(true);
+                        }
                     } else {
                         if (yDiff > mTouchSlop) {
                             if (mHorizontalScrollHandlar != null && mHorizontalScrollHandlar.isHorizontallyScrolled()) {
@@ -1150,6 +1156,9 @@ public class EasyScrollLayout extends FrameLayout {
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         Logger.e(disallowIntercept + "disallowIntercept");
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
+        if(!isEnabled()){
+            return;
+        }
         if (mIsUnableToDrag) {
             return;
         }
@@ -1165,6 +1174,7 @@ public class EasyScrollLayout extends FrameLayout {
                     isVerticalScroll = true;
                     mDragging = true;
                 }
+
             } else {
                 if (dx - mTouchSlop > 0 && (mOrientation & ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL) {
                     isHorizontalScroll = true;
@@ -1172,6 +1182,14 @@ public class EasyScrollLayout extends FrameLayout {
                 } else if (dy - mTouchSlop > 0 && (mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL) {
                     isVerticalScroll = true;
                     mDragging = true;
+                }
+            }
+            /**
+             * 如果child已经requestDisallowInterceptTouchEvent 仍然不能拖拽，就忽略此次滑动
+             */
+            if(dy - mTouchSlop > 0 || dx - mTouchSlop > 0){
+                if(!mIsUnableToDrag && !mDragging){
+                    mIsUnableToDrag = true;
                 }
             }
         }

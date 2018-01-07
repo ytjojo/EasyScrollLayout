@@ -130,6 +130,7 @@ public class HorizontalScrollHandlar {
         int startX = mScrollX;
         offsetLeftAndRight(dx);
         consumed[0] = mScrollX - startX;
+        mParentView.getParent().requestDisallowInterceptTouchEvent(true);
     }
 
     float mLeftParallaxMult = 0.5f;
@@ -189,7 +190,7 @@ public class HorizontalScrollHandlar {
 
 
         mScrollX = targetScrollX;
-
+        Logger.e("offsetDx" + offsetDx + "mScrollX "+ mScrollX);
         offsetContenViews();
         offsetLeftView();
         offsetRightView();
@@ -522,6 +523,10 @@ public class HorizontalScrollHandlar {
                     return mIsDownInOuterViews;
                 }
                 huntingScrollChild(contentWraperView.mContentView, mPoint);
+                return mIsDownInOuterViews;
+            }
+            if (isPointInView ) {
+                huntingScrollChild(mDirectContentView, mPoint);
                 return mIsDownInOuterViews;
             }
         }

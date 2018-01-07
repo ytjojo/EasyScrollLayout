@@ -85,6 +85,7 @@
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.DrawerBannerActivity"/>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.DrawerRecylerViewWithHeaderActivity"/>
     <activity android:name="com.github.ytjojo.easyscrolllayout.demo.HorizentalLoadActivity"/>
+    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.HorizentalLoadItemActivity"/>
   </application>
 
 </manifest>
