@@ -16,6 +16,7 @@ import android.view.animation.LinearInterpolator;
 
 public class PendulumView extends View {
     private Paint mPaint;
+    private Paint mDotPaint;
     private float mRadius;
     private float mCenterX;
     private float mCenterY;
@@ -41,6 +42,11 @@ public class PendulumView extends View {
         mPaint.setColor(0xffdaa9fa);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
+        mDotPaint = new Paint();
+        mDotPaint.setColor(0xffdaa9fa);
+        mDotPaint.setAntiAlias(true);
+        mDotPaint.setStyle(Paint.Style.FILL);
+
         mPendulum = new Pendulum();
         mRadius = 20;
         this.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -51,6 +57,7 @@ public class PendulumView extends View {
                 return true;
             }
         });
+        mPendulum.initDotCollections();
 
     }
 
@@ -67,10 +74,12 @@ public class PendulumView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.save();
-        canvas.translate(mCenterX,mCenterY/2);
+        canvas.translate(mCenterX,3*mCenterY/4);
         canvas.drawCircle(mPendulum.getOffsetX() * 25,mPendulum.getOffsetY()* 25,mRadius,mPaint);
+        mPendulum.drawInnerDotsFrame(canvas,mDotPaint);
         canvas.restore();
     }
+
 
     private void startViewMotion() {
         if (mRepeateAnimator != null && mRepeateAnimator.isRunning())
@@ -84,6 +93,7 @@ public class PendulumView extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mPendulum.physicsUpdate();
+                mPendulum.updateDotCollections();
                 invalidate();
 
             }
@@ -101,4 +111,5 @@ public class PendulumView extends View {
         }
 
     }
+
 }

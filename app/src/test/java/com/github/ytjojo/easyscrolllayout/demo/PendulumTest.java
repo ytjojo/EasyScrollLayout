@@ -18,7 +18,7 @@ public class PendulumTest {
 
     }
     Pendulum pendulum =new Pendulum();
-    long maxTime = 30000;
+    long maxTime = 5000;
     long start;
     @Test
     public void updateTest() throws InterruptedException {
@@ -26,6 +26,17 @@ public class PendulumTest {
         System.out.println(pendulum.time()+"            ");
         while ( System.currentTimeMillis() - start < maxTime){
             pendulum.physicsUpdate();
+            Thread.sleep(pendulum.DELTA_TIME);
+        }
+    }
+    @Test
+    public void updateDotTest() throws InterruptedException {
+        start = System.currentTimeMillis();
+        pendulum.initDotCollections();
+
+        System.out.println(pendulum.time()+"            ");
+        while ( System.currentTimeMillis() - start < maxTime){
+            pendulum.updateDotCollections();
             Thread.sleep(pendulum.DELTA_TIME);
         }
     }

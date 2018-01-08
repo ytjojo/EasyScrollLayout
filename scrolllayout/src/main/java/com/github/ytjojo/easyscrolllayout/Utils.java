@@ -64,4 +64,11 @@ public class Utils {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
+
+    public static float spring(float input){
+        float tension = 8;//min 4 max 12;
+        float friction= 20;//min 1 max 30;
+
+        return (float) (1-Math.pow(Math.E,-tension * input)* Math.cos(friction * input));
+    }
 }
