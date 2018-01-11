@@ -14,7 +14,7 @@ import com.orhanobut.logger.Logger;
 public class Pendulum {
     private static final int DOTS_COUNT = 7;
     private static final int OUTER_DOTS_POSITION_ANGLE = 51;
-    public float GRAVITY = 250f;            //重力加速度
+    public float GRAVITY = 250f;            //重力加速度 值越大周期越小
     //角速度
     private float mAngularVelocity = 0;
     //半径
@@ -95,7 +95,7 @@ public class Pendulum {
         public float progress = -1f;
     }
 
-    int mMaxDotsRadius = 60;
+    int mMaxDotsRadius = 80;
     int mMaxDotSize = 8;
 
     public void updateDotCollections() {
@@ -115,11 +115,12 @@ public class Pendulum {
         int alpha = (int) Utils.mapValueFromRangeToRange(progress, 0.6f, 1f, 255, 0);
         mDotCollection.alpha = alpha;
         mDotCollection.color = 0xFFFF9800;
-        if(mDotCollection.progress<0.75f){
-
-            mDotCollection.curRadius = 30+  mDotCollection.progress* mMaxDotsRadius;
+        if(mDotCollection.progress<0.5f) {
+             mDotCollection.curRadius= (float) Utils.mapValueFromRangeToRange( mDotCollection.progress, 0.0f, 0.5f,mMaxDotsRadius * 0.5f, mMaxDotsRadius * 0.8f);
+        }else  if(mDotCollection.progress <0.8f){
+            mDotCollection.curRadius = 0.8f * mMaxDotsRadius;
         }else {
-            mDotCollection.curRadius = (float) Utils.mapValueFromRangeToRange(mDotCollection.progress, 0.75f, 1f, 0, mMaxDotsRadius);
+            mDotCollection.curRadius = (float) Utils.mapValueFromRangeToRange(mDotCollection.progress, 0.8f, 1f, 0, mMaxDotsRadius);
         }
         mDotCollection.dotSize = mMaxDotSize - mMaxDotSize *mDotCollection.progress ;
 
