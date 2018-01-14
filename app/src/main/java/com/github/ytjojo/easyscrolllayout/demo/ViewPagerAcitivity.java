@@ -7,6 +7,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.github.ytjojo.easyscrolllayout.BaseRefreshIndicator;
+import com.github.ytjojo.easyscrolllayout.EasyScrollLayout;
+
 import java.util.HashMap;
 
 /**
@@ -18,6 +21,18 @@ public class ViewPagerAcitivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewpage);
+        final EasyScrollLayout easyScrollLayout = (EasyScrollLayout) findViewById(R.id.easyScrolllayout);
+        easyScrollLayout.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
+            @Override
+            public void onStartLoad() {
+                easyScrollLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        easyScrollLayout.setTopHeaderLoadComplete();
+                    }
+                },4000);
+            }
+        });
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {

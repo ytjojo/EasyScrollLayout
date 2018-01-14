@@ -60,29 +60,7 @@ public class RecyclerViewFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        recyclerView.setAdapter(new RecyclerView.Adapter() {
-            @Override
-            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        recyclerView.setAdapter(new BaseRecyclerViewAdapter(R.layout.item_simple));
 
-                MyViewHolder viewHolder = new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple, parent,false)) ;
-                return viewHolder;
-            }
-
-            @Override
-            public void onBindViewHolder(ViewHolder holder, int position) {
-
-            }
-
-            @Override
-            public int getItemCount() {
-                return 50;
-            }
-        });
-    }
-    public static class MyViewHolder extends ViewHolder{
-
-        public MyViewHolder(View itemView) {
-            super(itemView);
-        }
     }
 }

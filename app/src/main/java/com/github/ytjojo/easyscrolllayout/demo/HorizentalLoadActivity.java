@@ -62,32 +62,10 @@ public class HorizentalLoadActivity extends AppCompatActivity {
                 Logger.e(dy + "dy   recyclerView" );
             }
         });
+        recyclerView.setAdapter(new BaseRecyclerViewAdapter(R.layout.item_horizontal,10));
 
-        recyclerView.setAdapter(new RecyclerView.Adapter() {
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-                RecyclerViewFragment.MyViewHolder viewHolder = new RecyclerViewFragment.MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_horizontal, parent,false)) ;
-                return viewHolder;
-            }
-
-            @Override
-            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-            }
-
-            @Override
-            public int getItemCount() {
-                return 50;
-            }
-        });
     }
     RecyclerView recyclerView;
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public MyViewHolder(View itemView) {
-            super(itemView);
-        }
-    }
 }

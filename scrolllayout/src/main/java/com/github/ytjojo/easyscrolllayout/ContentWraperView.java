@@ -227,7 +227,7 @@ public class ContentWraperView extends FrameLayout {
                 childTop = bottom - top + (mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight());
                 int scrollRange = (int) (height * (1f + lp.mOverScrollRatio)) + (mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight());
                 mMaxVerticalScrollRange = Math.max(scrollRange, mMaxVerticalScrollRange);
-                lp.mStableScrollY = (mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight() + height);
+                lp.mStableScrollY = (mInnerBottomView == null ? height : mInnerBottomView.getMeasuredHeight() + height);
                 lp.mMaxScrollY = scrollRange;
                 lp.mMinScrollY = childTop - (bottom - top);
                 mOutBottomView = child;
@@ -274,13 +274,15 @@ public class ContentWraperView extends FrameLayout {
         return new LayoutParams(p.width, p.height);
     }
 
+
+
     public static class LayoutParams extends FrameLayout.LayoutParams {
         float mOverScrollRatio = 0.7f;
         int mMinScrollY;
         int mMaxScrollY;
         int mStableScrollY;
         boolean mIgnoreScroll;
-        float mTrigeerExpandRatio = 1f;
+        float mTrigeerExpandRatio = 1.2f;
         int mTopWhenLayout;
 
         public LayoutParams(Context context, AttributeSet attrs) {
@@ -457,6 +459,9 @@ public class ContentWraperView extends FrameLayout {
     public void preScrollUp(int dy, int[] consumed){
         final int lastScrolly = getScrollY();
         if(dy <0 && lastScrolly < 0 ){
+            preScrollConsumed(dy,consumed);
+        }
+        if(dy > 0 && lastScrolly >0){
             preScrollConsumed(dy,consumed);
         }
     }
@@ -652,13 +657,13 @@ public class ContentWraperView extends FrameLayout {
     }
 
 
-    public void setCanRefresh(boolean canRefresh){
+    public void setCanTopHeaderLoad(boolean canRefresh){
         mTopHeaderIndicator.setCanLoad(canRefresh);
     }
-    public void setCanLoadMore(boolean canLoadMore){
+    public void setCanBottomFooterLoad(boolean canLoadMore){
         mBottomFooterIndicator.setCanLoad(canLoadMore);
     }
-    public void setComplete(long delay) {
+    public void setLoadComplete() {
 
         if (mOutTopView != null &&  ViewCompat.isLaidOut(mOutTopView) && mTopHeaderIndicator.isLoading()) {
             mTopHeaderIndicator.setComplete();
@@ -667,7 +672,7 @@ public class ContentWraperView extends FrameLayout {
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                mScroller.startScroll(getScrollX(),scrollY,0,-scrollY,250);
+                mScroller.startScroll(getScrollX(),scrollY,0,-scrollY,350);
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
                 mTopHeaderIndicator.onStopScroll(scrollY);
@@ -681,7 +686,7 @@ public class ContentWraperView extends FrameLayout {
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                mScroller.startScroll(getScrollX(),scrollY,0, mBottomFooterIndicator.getLimitValue()-scrollY,250);
+                mScroller.startScroll(getScrollX(),scrollY,0, mBottomFooterIndicator.getLimitValue()-scrollY,350);
                 ViewCompat.postInvalidateOnAnimation(this);
             } else {
                 mBottomFooterIndicator.onStopScroll(scrollY);
@@ -697,5 +702,17 @@ public class ContentWraperView extends FrameLayout {
 
     public BottomFooterIndicator getBottomFooterIndicator() {
         return mBottomFooterIndicator;
+    }
+    public void setTopHeaderOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+        mTopHeaderIndicator.setOnStartLoadCallback(callback);
+    }
+    public void setBottomFooterOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+        mBottomFooterIndicator.setOnStartLoadCallback(callback);
+    }
+    public void setTopHeaderLoadComplete() {
+        setLoadComplete();
+    }
+    public void setBottomFooterLoadComplete() {
+        setLoadComplete();
     }
 }

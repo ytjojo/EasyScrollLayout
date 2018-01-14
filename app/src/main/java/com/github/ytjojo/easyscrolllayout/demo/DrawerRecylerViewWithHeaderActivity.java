@@ -71,11 +71,11 @@ public class DrawerRecylerViewWithHeaderActivity extends AppCompatActivity {
             }
         });
         final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
-        contentWraperView.setCanRefresh(false);
+        contentWraperView.setCanTopHeaderLoad(false);
         contentWraperView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                contentWraperView.setComplete(0);
+                contentWraperView.setLoadComplete();
             }
         },6000);
 

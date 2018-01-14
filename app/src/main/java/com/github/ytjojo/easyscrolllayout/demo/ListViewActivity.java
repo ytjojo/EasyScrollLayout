@@ -11,6 +11,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.ytjojo.easyscrolllayout.BaseRefreshIndicator;
+import com.github.ytjojo.easyscrolllayout.ContentWraperView;
 import com.github.ytjojo.easyscrolllayout.EasyScrollLayout;
 import com.orhanobut.logger.Logger;
 
@@ -36,8 +38,6 @@ public class ListViewActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stickylayout);
-        EasyScrollLayout stickyNavLayout = (EasyScrollLayout) findViewById(R.id.StickyNavLayout);
-        stickyNavLayout.setEnabled(true);
         TextView tvHeader = (TextView) findViewById(R.id.tvHeader);
         tvHeader.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,6 +133,36 @@ public class ListViewActivity extends AppCompatActivity {
 //                return true;
 //            }
 //        });
+
+        final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
+        final EasyScrollLayout easyScrollLayout = (EasyScrollLayout) findViewById(R.id.easyScrolllayout);
+        easyScrollLayout.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
+            @Override
+            public void onStartLoad() {
+                contentWraperView.setCanBottomFooterLoad(false);
+                easyScrollLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        easyScrollLayout.setTopHeaderLoadComplete();
+                        contentWraperView.setCanBottomFooterLoad(true);
+                    }
+                },3000);
+
+            }
+        });
+        contentWraperView.setBottomFooterOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
+            @Override
+            public void onStartLoad() {
+                easyScrollLayout.setCanTopHeaderLoad(false);
+                contentWraperView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        contentWraperView.setLoadComplete();
+                        easyScrollLayout.setCanTopHeaderLoad(true);
+                    }
+                }, 3000);
+            }
+        });
 
     }
 }

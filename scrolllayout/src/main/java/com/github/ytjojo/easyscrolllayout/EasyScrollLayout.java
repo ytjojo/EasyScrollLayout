@@ -418,7 +418,7 @@ public class EasyScrollLayout extends FrameLayout {
 
     TopHeaderIndicator mTopHeaderIndicator;
 
-    public void setCanRefresh(boolean enable) {
+    public void setCanTopHeaderLoad(boolean enable) {
         if (mOutTopView != null) {
             LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
             if (lp.mEnable == enable) {
@@ -898,9 +898,7 @@ public class EasyScrollLayout extends FrameLayout {
             mContentChildHolder.preScrollConsumed(dy, consumed);
             return;
         }
-        if(dy<0){
-            mContentChildHolder.preScrollUp(dy, consumed);
-        }
+        mContentChildHolder.preScrollUp(dy, consumed);
         dy  -= consumed[1];
         if(dy ==0){
             return;
