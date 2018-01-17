@@ -75,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+		findViewById(R.id.tv_viewpager_refresh_loadmore).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,ViewPagerEachWithRefreshLoadMoreActivity .class);
+				startActivity(intent);
+			}
+		});
 
 
 	}

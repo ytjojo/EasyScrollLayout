@@ -7,18 +7,6 @@
                                                      android:orientation="vertical">
 
 
-    <com.github.ytjojo.easyscrolllayout.DefaultLoadView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:easylayout_layoutGravity="outtop">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@mipmap/ic_launcher_round"/>
-    </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="300dp"
@@ -37,9 +25,9 @@
             android:id="@+id/tvHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
+            android:padding="8dp"
             android:textColor="@android:color/white"
             android:text="header"/>
     </FrameLayout>

@@ -27,23 +27,12 @@ public class ViewpagerFragmentAdapter extends FragmentStatePagerAdapter {
 
             return  fragment;
         }
-        switch (position){
-            case 0:
-
-                fragment =   new RecyclerViewFragment();
-                break;
-            case 1:
-
-                fragment =   new ScrollViewFragment();
-                break;
-            case 2:
-
-                fragment =   new NestedScrollFragment();
-                break;
-            case 3:
-
-                fragment =   new WebViewFragment();
-                break;
+        try {
+            fragment =mFragments.get(position).newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         map.put(position,fragment);
         return fragment;
