@@ -73,6 +73,9 @@ public class ContentWraperView extends FrameLayout {
                         break;
                     case GRAVITY_INNER_BOTTOM:
                         mInnerBottomView = child;
+                        if(isSnap||lp.isSnap){
+                            isSnap = true;
+                        }
                         break;
                     default:
                         break;
@@ -282,14 +285,19 @@ public class ContentWraperView extends FrameLayout {
         int mMaxScrollY;
         int mStableScrollY;
         boolean mIgnoreScroll;
-        float mTrigeerExpandRatio = 1.2f;
+        float mTrigeerExpandRatio ;
         int mTopWhenLayout;
+        boolean isSnap;
+        boolean isHeaderDrawerLayoutStyle;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
             mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_contentwrper_layoutGravity, GRAVITY_OUT_INVALID);
             mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, 0.7f);
+            mTrigeerExpandRatio = a.getFloat(R.styleable.EasyScrollLayout_trigeerExpandRatio, 1.2f);
+            isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
+            isHeaderDrawerLayoutStyle = a.getBoolean(R.styleable.EasyScrollLayout_isDrawerLayoutStyle,false);
             a.recycle();
         }
 
@@ -359,6 +367,14 @@ public class ContentWraperView extends FrameLayout {
 
         public void setLayoutOutGravity(int layoutOutGravity) {
             this.mLayoutOutGravity = layoutOutGravity;
+        }
+
+        public boolean isHeaderDrawerLayoutStyle() {
+            return isHeaderDrawerLayoutStyle;
+        }
+
+        public void setHeaderDrawerLayoutStyle(boolean headerDrawerLayoutStyle) {
+            isHeaderDrawerLayoutStyle = headerDrawerLayoutStyle;
         }
     }
 
@@ -516,10 +532,43 @@ public class ContentWraperView extends FrameLayout {
         }
 
     }
+    private void headerDrawerFling(int velocityY){
+        LayoutParams lp = (ContentWraperView.LayoutParams) mOutTopView.getLayoutParams();
+        final int curScrollY = getScrollY();
+        int targeScrollY = mTopHeaderIndicator.getStableValue()/2<curScrollY?mTopHeaderIndicator.getStableValue():0;
+
+        //curScrollY 'value  is < 0
+        if(velocityY != 0 && curScrollY > mTopHeaderIndicator.getStableValue()){
+            if (velocityY > 0) {
+                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, mTopHeaderIndicator.getStableValue(),mTopHeaderIndicator.getStableValue());
+            } else {
+                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, 0, 0);
+            }
+            ViewCompat.postInvalidateOnAnimation(this);
+            return;
+        }
+        if (lp.mTrigeerExpandRatio >= 0.2f && lp.mTrigeerExpandRatio <= 0.8f) {
+            if (curScrollY <= mTopHeaderIndicator.getTriggerValue()) {
+                targeScrollY = mTopHeaderIndicator.getStableValue();
+            } else {
+                targeScrollY = 0;
+            }
+        }
+        if (mScroller.springBack(0, curScrollY,  0, 0,targeScrollY,targeScrollY)) {
+            ViewCompat.postInvalidateOnAnimation(this);
+        }
+
+    }
     public void dispatchFling(int velocityY, boolean isDownSlide) {
         if (getScrollY() < 0) {
-            headerFling(velocityY);
-            mBottomFooterIndicator.onStopScroll(getScrollY());
+            LayoutParams lp = (ContentWraperView.LayoutParams) mOutTopView.getLayoutParams();
+            if(lp.isHeaderDrawerLayoutStyle){
+                headerDrawerFling(velocityY);
+            }else {
+                headerFling(velocityY);
+                mBottomFooterIndicator.onStopScroll(getScrollY());
+            }
+
         } else {
             mTopHeaderIndicator.onStopScroll(getScrollY());
             if (mInnerBottomView != null && getScrollY() < mInnerBottomView.getMeasuredHeight()) {

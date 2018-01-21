@@ -223,7 +223,7 @@ public class EasyScrollLayout extends FrameLayout {
                             mInnerTopParallaxMult = lp.mParallaxMultiplier;
                             break;
                         case GRAVITY_OUT_LEFT:
-                            if (lp.mWidthRatioOfParent != 0f && lp.mWidthRatioOfParent <= 1f) {
+                            if (lp.mWidthRatioOfParent > 0f && lp.mWidthRatioOfParent <= 1f) {
 
                                 int widthSize = (int) (MeasureSpec.getSize(widthMeasureSpec) * lp.mWidthRatioOfParent);
                                 int childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
@@ -232,7 +232,7 @@ public class EasyScrollLayout extends FrameLayout {
                             }
                             break;
                         case GRAVITY_OUT_RIGHT:
-                            if (lp.mWidthRatioOfParent != 0f && lp.mWidthRatioOfParent <= 1f) {
+                            if (lp.mWidthRatioOfParent > 0f && lp.mWidthRatioOfParent <= 1f) {
                                 int widthSize = (int) (MeasureSpec.getSize(widthMeasureSpec) * lp.mWidthRatioOfParent);
                                 int childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
                                 int childHeightSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight(), MeasureSpec.EXACTLY);
@@ -1311,8 +1311,12 @@ public class EasyScrollLayout extends FrameLayout {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
             mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_easylayout_layoutGravity, GRAVITY_OUT_INVALID);
             mParallaxMultiplier = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0);
+            mTrigeerExpandRatio = a.getFloat(R.styleable.EasyScrollLayout_trigeerExpandRatio, 1.2f);
             if (mLayoutOutGravity == GRAVITY_OUT_LEFT) {
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);
+                if(mTrigeerExpandRatio> 0.8f || mTrigeerExpandRatio <0.2f){
+                    mTrigeerExpandRatio = 0.5f;
+                }
                 mIgnoreScroll = true;
             }
             if (mLayoutOutGravity == GRAVITY_OUT_RIGHT) {
