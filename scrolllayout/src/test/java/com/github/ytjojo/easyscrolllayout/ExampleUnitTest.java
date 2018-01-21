@@ -14,11 +14,16 @@ public class ExampleUnitTest {
         int b = 0x2;
         int c= 0x4;
         int d= 0x8;
-
+        System.out.println(" " + (b&d) );
         System.out.println(" " + (b|a) );
+        System.out.println(" " + ((b|c)&0x10) );
+        System.out.println(" " + (0|a) );
         System.out.println(" " + (b&b) );
         System.out.println(" " + ((0|a)|a|b|c) );
         System.out.println(" " + (((0|a)|a|b|c)&c) );
+        System.out.println(" " + (((0|a)|a|b|c|d)) );
+        System.out.println(" " + (((0|a)|a|b|c)&c) );
+        System.out.println(" " + (((0|a)|a|b|c|d)&c) );
 
     }
 }
