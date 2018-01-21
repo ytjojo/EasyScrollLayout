@@ -113,6 +113,7 @@ public class EasyScrollLayout extends FrameLayout {
         mMinimumVelocity = ViewConfiguration.get(context)
                 .getScaledMinimumFlingVelocity();
 
+
         mVelocityTracker = VelocityTracker.obtain();
 
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
