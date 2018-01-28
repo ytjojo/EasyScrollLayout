@@ -85,7 +85,6 @@ public class EasyScrollLayout extends FrameLayout {
 
     private final int[] mScrollConsumed = new int[2];
     private int mNestedYOffset;
-    private int mChildYOffset;
     ContentChildHolder mContentChildHolder;
     View mInnerTopView;
     View mOutTopView;
@@ -509,7 +508,6 @@ public class EasyScrollLayout extends FrameLayout {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mNestedYOffset = 0;
-                mChildYOffset = 0;
                 mVelocityTracker.clear();
                 mLastMotionY = (int) event.getY();
                 mLastMotionX = (int) event.getX();
@@ -856,7 +854,6 @@ public class EasyScrollLayout extends FrameLayout {
     private void dispatchVerticalScroll(MotionEvent event, int dy) {
 //        Logger.e("parentScrollY    " + getScrollY());
         int activePointerIndex = event.findPointerIndex(mActivePointerId);
-        float curY = event.getY(activePointerIndex);
         parentPreScroll( dy, mScrollConsumed);
         int preScrollConsumed = mScrollConsumed[1];
         if (preScrollConsumed != 0) {
@@ -867,30 +864,13 @@ public class EasyScrollLayout extends FrameLayout {
         mNestedYOffset += mScrollConsumed[1];
         int unconsumedY = (dy - mScrollConsumed[1]);
         childScroll(event, 0, unconsumedY, mScrollConsumed);
-        mChildYOffset += mScrollConsumed[1];
-        unconsumedY = unconsumedY - mScrollConsumed[1];
-
-        int totaldy = (int) (curY - mFirstMotionY);
-        int childConsumed = mScrollConsumed[1];
-        if (Math.abs(dy) < Math.abs(childConsumed) || dy * childConsumed < 0) {
-            Logger.e("出错了 dy " + dy + " child " + childConsumed + "   preScrollConsumed" + preScrollConsumed);
-        }
-        Logger.e(mNestedYOffset + "mChildYOffset  " + mChildYOffset + "totaldy  " + totaldy + " dy " + dy + " child " + childConsumed);
     }
 
     private void dispatchHorizontalScroll(MotionEvent event, int dx) {
         int activePointerIndex = event.findPointerIndex(mActivePointerId);
-        float curX = event.getX(activePointerIndex);
         mHorizontalScrollHandlar.scrollConsumed(dx, mScrollConsumed);
-        int preScrollConsumed = mScrollConsumed[0];
         int unconsumedX = (dx - mScrollConsumed[0]);
         childScroll(event, unconsumedX, 0, mScrollConsumed);
-        unconsumedX = unconsumedX - mScrollConsumed[0];
-        int totaldX = (int) (curX - mFirstMotionX);
-        int childConsumed = mScrollConsumed[0];
-        if (Math.abs(dx) < Math.abs(childConsumed) || dx * childConsumed < 0) {
-            Logger.e("出错了 dy " + dx + " child " + childConsumed + "   preScrollConsumed" + preScrollConsumed);
-        }
     }
 
     private void parentPreScroll(int dy, int[] consumed) {
@@ -1313,18 +1293,22 @@ public class EasyScrollLayout extends FrameLayout {
             mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_easylayout_layoutGravity, GRAVITY_OUT_INVALID);
             mParallaxMultiplier = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0);
             mTrigeerExpandRatio = a.getFloat(R.styleable.EasyScrollLayout_trigeerExpandRatio, 1.2f);
+            float defaultOverScrollRatio = 0.7f;
             if (mLayoutOutGravity == GRAVITY_OUT_LEFT) {
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);
                 if(mTrigeerExpandRatio> 0.8f || mTrigeerExpandRatio <0.2f){
                     mTrigeerExpandRatio = 0.5f;
                 }
                 mIgnoreScroll = true;
+                defaultOverScrollRatio = 0f;
             }
             if (mLayoutOutGravity == GRAVITY_OUT_RIGHT) {
                 mIgnoreScroll = true;
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outRightWidth_ratioOfParent, 0);
+                defaultOverScrollRatio = 0f;
             }
-            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, 0.7f);
+            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio,defaultOverScrollRatio);
+
             a.recycle();
         }
 

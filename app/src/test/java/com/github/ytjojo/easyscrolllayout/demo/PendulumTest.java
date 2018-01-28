@@ -40,4 +40,13 @@ public class PendulumTest {
             Thread.sleep(pendulum.DELTA_TIME);
         }
     }
+    @Test
+    public void floatTest(){
+        float a = 0.5f;
+        int y = 10;
+        int dy = 5;
+        float aay = (y + dy *a);
+        float ssy = (y/a +dy )*a;
+        System.out.print(aay + "        "+ ssy);
+    }
 }
