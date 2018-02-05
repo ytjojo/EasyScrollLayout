@@ -38,20 +38,20 @@ public class ListViewActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stickylayout);
-        TextView tvHeader = (TextView) findViewById(R.id.tvHeader);
-        tvHeader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"click header",Toast.LENGTH_SHORT).show();
-            }
-        });
-        tvHeader.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toast.makeText(getApplicationContext(),"Long click header",Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
+//        TextView tvHeader = (TextView) findViewById(R.id.tvHeader);
+//        tvHeader.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getApplicationContext(),"click header",Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        tvHeader.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                Toast.makeText(getApplicationContext(),"Long click header",Toast.LENGTH_SHORT).show();
+//                return true;
+//            }
+//        });
         mListView = (ListView) findViewById(R.id.listview);
         List<Map<String, Object>> listems = new ArrayList<Map<String, Object>>();
         for (int i = 0; i < name.length; i++) {
@@ -136,33 +136,33 @@ public class ListViewActivity extends AppCompatActivity {
 
         final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
         final EasyScrollLayout easyScrollLayout = (EasyScrollLayout) findViewById(R.id.easyScrolllayout);
-        easyScrollLayout.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
-            @Override
-            public void onStartLoad() {
-                contentWraperView.setCanBottomFooterLoad(false);
-                easyScrollLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        easyScrollLayout.setTopHeaderLoadComplete();
-                        contentWraperView.setCanBottomFooterLoad(true);
-                    }
-                },3000);
-
-            }
-        });
-        contentWraperView.setBottomFooterOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
-            @Override
-            public void onStartLoad() {
-                easyScrollLayout.setCanTopHeaderLoad(false);
-                contentWraperView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        contentWraperView.setLoadComplete();
-                        easyScrollLayout.setCanTopHeaderLoad(true);
-                    }
-                }, 3000);
-            }
-        });
+//        easyScrollLayout.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
+//            @Override
+//            public void onStartLoad() {
+//                contentWraperView.setCanBottomFooterLoad(false);
+//                easyScrollLayout.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        easyScrollLayout.setTopHeaderLoadComplete();
+//                        contentWraperView.setCanBottomFooterLoad(true);
+//                    }
+//                },3000);
+//
+//            }
+//        });
+//        contentWraperView.setBottomFooterOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
+//            @Override
+//            public void onStartLoad() {
+//                easyScrollLayout.setCanTopHeaderLoad(false);
+//                contentWraperView.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        contentWraperView.setLoadComplete();
+//                        easyScrollLayout.setCanTopHeaderLoad(true);
+//                    }
+//                }, 3000);
+//            }
+//        });
 
     }
 }

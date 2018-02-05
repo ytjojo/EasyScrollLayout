@@ -469,25 +469,26 @@ public class ContentWraperView extends FrameLayout {
             consumed[1] = consumed[0] = 0;
             return;
         }
-        final int lastScrolly = getScrollY();
+        final int lastScrollY = getScrollY();
         int scolldy = dy;
-        if (dy > 0 && lastScrolly > 0) {
-            if (lastScrolly - dy < 0) {
-                scolldy = lastScrolly;
+        if (dy > 0 && lastScrollY > 0) {
+            if (lastScrollY - dy < 0) {
+                scolldy = lastScrollY;
             }
         }
-        if (dy < 0 && lastScrolly < 0) {
-            if (lastScrolly - dy > 0) {
-                scolldy = lastScrolly;
+        if (dy < 0 && lastScrollY < 0) {
+            if (lastScrollY - dy > 0) {
+                scolldy = lastScrollY;
             }
         }
         scrollBy(0, (int) -scolldy);
-        consumed[1] = lastScrolly - getScrollY();
+        consumed[1] = lastScrollY - getScrollY();
         if (consumed[1] != 0) {
             if (!mScroller.isFinished()) {
                 mScroller.abortAnimation();
             }
         }
+        consumed[3] += lastScrollY -  getScrollY();
         Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
     }
 
@@ -496,17 +497,17 @@ public class ContentWraperView extends FrameLayout {
             consumed[1] = consumed[0] = 0;
             return;
         }
-        final int lastScrolly = getScrollY();
+        final int lastScrollY = getScrollY();
         float totalY;
-        int finalScrollY = lastScrolly;
-        if (lastScrolly < 0) {
-            totalY = lastScrolly / (1 - mFrictionFactor);
+        int finalScrollY = lastScrollY;
+        if (lastScrollY < 0) {
+            totalY = lastScrollY / (1 - mFrictionFactor);
             if (dy < 0 && totalY - dy * (1 - mFrictionFactor) > 0) {
                 finalScrollY = 0;
             } else {
                 finalScrollY = (int) ((totalY - dy) * (1 - mFrictionFactor));
             }
-        } else if (lastScrolly == 0) {
+        } else if (lastScrollY == 0) {
             totalY = 0;
             if (dy > 0) {
                 finalScrollY = (int) ((totalY - dy) * (1 - mFrictionFactor));
@@ -520,58 +521,64 @@ public class ContentWraperView extends FrameLayout {
             }
         } else {
             if (mInnerBottomView != null) {
-                if (lastScrolly - dy < 0) {
+                if (lastScrollY - dy < 0) {
                     finalScrollY = 0;
                 } else {
-                    if (lastScrolly <= mBottomFooterIndicator.getLimitValue()) {
+                    if (lastScrollY <= mBottomFooterIndicator.getLimitValue()) {
                         if (dy > 0) {
-                            finalScrollY = lastScrolly - dy;
+                            finalScrollY = lastScrollY - dy;
                         } else {
-                            if (lastScrolly - dy > mBottomFooterIndicator.getLimitValue()) {
-                                float ss = dy - mBottomFooterIndicator.getLimitValue() + lastScrolly;
+                            if (lastScrollY - dy > mBottomFooterIndicator.getLimitValue()) {
+                                float ss = dy - mBottomFooterIndicator.getLimitValue() + lastScrollY;
                                 finalScrollY = (int) (mBottomFooterIndicator.getLimitValue() - ss * (1 - mFrictionFactor));
                             } else {
-                                finalScrollY = lastScrolly - dy;
+                                finalScrollY = lastScrollY - dy;
                             }
                         }
                     } else {
                         if (dy > 0) {
-                            if (lastScrolly - dy * (1 - mFrictionFactor) < mBottomFooterIndicator.getLimitValue()) {
-                                float ss = dy - (lastScrolly - mBottomFooterIndicator.getLimitValue()) / (1 - mFrictionFactor);
+                            if (lastScrollY - dy * (1 - mFrictionFactor) < mBottomFooterIndicator.getLimitValue()) {
+                                float ss = dy - (lastScrollY - mBottomFooterIndicator.getLimitValue()) / (1 - mFrictionFactor);
                                 finalScrollY = (int) (mBottomFooterIndicator.getLimitValue() - ss);
                             } else {
-                                finalScrollY = (int) (lastScrolly - dy * (1 - mFrictionFactor));
+                                finalScrollY = (int) (lastScrollY - dy * (1 - mFrictionFactor));
                             }
                         } else {
-                            finalScrollY = (int) (lastScrolly - dy * (1 - mFrictionFactor));
+                            finalScrollY = (int) (lastScrollY - dy * (1 - mFrictionFactor));
                         }
                     }
                 }
 
             } else if (mOutBottomView != null) {
-                if (lastScrolly - dy * (1 - mFrictionFactor) < 0) {
+                if (lastScrollY - dy * (1 - mFrictionFactor) < 0) {
                     finalScrollY = 0;
                 } else {
-                    finalScrollY = (int) (lastScrolly - dy * (1 - mFrictionFactor));
+                    finalScrollY = (int) (lastScrollY - dy * (1 - mFrictionFactor));
                 }
             }
 
         }
-        int scolldy = lastScrolly - finalScrollY;
+        int scolldy = lastScrollY - finalScrollY;
         scrollBy(0, -scolldy);
         if (mInnerBottomView != null) {
-            if (lastScrolly < 0) {
-                if (getScrollY() != 0 && getScrollY() != mTopHeaderIndicator.getOverScrollValue()) {
-                    consumed[1] = dy;
-                } else {
-                    consumed[1] = (int) ((lastScrolly - getScrollY()) / (1 - mFrictionFactor));
 
+            if (lastScrollY < 0) {
+                final int curScrollY = getScrollY();
+                if(curScrollY<=0 && curScrollY >= mTopHeaderIndicator.getOverScrollValue()){
+                    if (curScrollY != 0 && curScrollY != mTopHeaderIndicator.getOverScrollValue()) {
+                        consumed[1] = dy;
+                    } else {
+                        consumed[1] = (int) ((lastScrollY - curScrollY) / (1 - mFrictionFactor));
+                    }
+                }else {
+                    consumed[1] = dy;
                 }
-            } else if (lastScrolly > 0) {
+
+            } else if (lastScrollY > 0) {
                 if (getScrollY() == 0) {
-                    consumed[1] = (lastScrolly - getScrollY());
-                } else if (lastScrolly < mBottomFooterIndicator.getOverScrollValue() && getScrollY() == mBottomFooterIndicator.getOverScrollValue()) {
-                    consumed[1] = (int) ((lastScrolly - getScrollY()) / (1 - mFrictionFactor));
+                    consumed[1] = (lastScrollY - getScrollY());
+                } else if (lastScrollY < mBottomFooterIndicator.getOverScrollValue() && getScrollY() == mBottomFooterIndicator.getOverScrollValue()) {
+                    consumed[1] = (int) ((lastScrollY - getScrollY()) / (1 - mFrictionFactor));
                 } else {
                     consumed[1] = dy;
                 }
@@ -584,12 +591,12 @@ public class ContentWraperView extends FrameLayout {
             }
         } else {
             final int curScrollY = getScrollY();
-            if (lastScrolly != curScrollY) {
+            if (lastScrollY != curScrollY) {
 
                 if ((curScrollY == 0 || curScrollY == mTopHeaderIndicator.getOverScrollValue()
                         || curScrollY == mBottomFooterIndicator.getOverScrollValue())) {
 
-                    consumed[1] = (int) ((lastScrolly - getScrollY()) / (1 - mFrictionFactor));
+                    consumed[1] = (int) ((lastScrollY - getScrollY()) / (1 - mFrictionFactor));
                 } else {
                     consumed[1] = dy;
                 }
@@ -601,6 +608,7 @@ public class ContentWraperView extends FrameLayout {
                 mScroller.abortAnimation();
             }
         }
+        consumed[3] += lastScrollY - getScrollY();
         Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
     }
 

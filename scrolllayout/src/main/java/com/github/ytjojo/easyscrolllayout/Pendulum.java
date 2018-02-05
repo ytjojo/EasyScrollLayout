@@ -45,7 +45,7 @@ public class Pendulum {
         mAngle += (float) (mAngularVelocity * DELTA_TIME) / 1000;
 //        System.out.println(Math.toDegrees(mAngle) );
         if (mAngle < 0) {
-            System.out.println("cur  " + (System.currentTimeMillis() - cur));
+//            System.out.println("cur  " + (System.currentTimeMillis() - cur));
         }
         mOffsetX = cosine * RADIUS;
         mOffsetY = (float) ((Math.sqrt(1 - cosine * cosine) * RADIUS - RADIUS));
@@ -138,7 +138,6 @@ public class Pendulum {
             for (int j = 0; j < DOTS_COUNT; j++) {
                 int cX = (int) (dotCollection.curRadius * Math.cos((j * OUTER_DOTS_POSITION_ANGLE - 10) * Math.PI / 180));
                 int cY = (int) (dotCollection.curRadius * Math.sin((j * OUTER_DOTS_POSITION_ANGLE - 10) * Math.PI / 180));
-                Logger.e("cx" + cX + " cy" + cY);
                 canvas.drawCircle(cX + dotCollection.positionX, cY + dotCollection.positionY, dotCollection.dotSize, paint);
             }
         }

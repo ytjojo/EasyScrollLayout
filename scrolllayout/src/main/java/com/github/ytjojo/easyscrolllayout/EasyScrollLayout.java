@@ -83,8 +83,9 @@ public class EasyScrollLayout extends FrameLayout {
     private MotionEvent mLastMoveEvent;
     private float mInnerTopParallaxMult = 0.5f;
 
-    private final int[] mScrollConsumed = new int[2];
+    private final int[] mScrollConsumed = new int[4];
     private int mNestedYOffset;
+    private float mFrictionFactor = 0.6f;
     ContentChildHolder mContentChildHolder;
     View mInnerTopView;
     View mOutTopView;
@@ -132,13 +133,13 @@ public class EasyScrollLayout extends FrameLayout {
                     case GRAVITY_OUT_LEFT:
                         mOutLeftView = child;
                         if (mHorizontalScrollHandlar == null) {
-                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this,isDrawerLayoutStyle);
+                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this, isDrawerLayoutStyle);
                         }
                         break;
                     case GRAVITY_OUT_RIGHT:
                         mOutRightView = child;
                         if (mHorizontalScrollHandlar == null) {
-                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this,isDrawerLayoutStyle);
+                            mHorizontalScrollHandlar = new HorizontalScrollHandlar(EasyScrollLayout.this, isDrawerLayoutStyle);
                         }
                         break;
 
@@ -170,21 +171,27 @@ public class EasyScrollLayout extends FrameLayout {
     public HorizontalScrollHandlar getHorizontalScrollHandlar() {
         return mHorizontalScrollHandlar;
     }
-    public void setLeftComplete(){
+
+    public void setLeftComplete() {
         mHorizontalScrollHandlar.setLeftComplete();
     }
-    public void setRightComplete(){
+
+    public void setRightComplete() {
         mHorizontalScrollHandlar.setRightComplete();
     }
-    public void setLeftOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+
+    public void setLeftOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback) {
         mHorizontalScrollHandlar.getLeftRefreshInidicator().setOnStartLoadCallback(callback);
     }
-    public void setRightOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+
+    public void setRightOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback) {
         mHorizontalScrollHandlar.getRightRefreshIndicator().setOnStartLoadCallback(callback);
     }
-    public void setTopHeaderOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback){
+
+    public void setTopHeaderOnStartLoadCallback(BaseRefreshIndicator.OnStartLoadCallback callback) {
         mTopHeaderIndicator.setOnStartLoadCallback(callback);
     }
+
     public void setTopHeaderLoadComplete() {
 
         if (mOutTopView == null || !ViewCompat.isLaidOut(mOutTopView)) {
@@ -373,7 +380,7 @@ public class EasyScrollLayout extends FrameLayout {
                 mOrientation |= ORIENTATION_VERTICAL;
                 mTopHeaderIndicator.setOverScrollValue(mMinVerticalScrollRange);
                 mTopHeaderIndicator.setLimitValue(0);
-                mTopHeaderIndicator.setTriggerValue((int) (-height*lp.mTrigeerExpandRatio));
+                mTopHeaderIndicator.setTriggerValue((int) (-height * lp.mTrigeerExpandRatio));
                 mTopHeaderIndicator.setStableValue(-height);
                 break;
             case GRAVITY_OUT_LEFT:
@@ -530,7 +537,7 @@ public class EasyScrollLayout extends FrameLayout {
                 final int rawX = (int) event.getRawX();
                 final int rawY = (int) event.getRawY();
                 mContentChildHolder.mVerticalScrollCheckHandlar.onDownInit(rawX, rawY);
-                if (mHorizontalScrollHandlar != null&&( mOrientation & ORIENTATION_HORIZONTAL) ==ORIENTATION_HORIZONTAL) {
+                if (mHorizontalScrollHandlar != null && (mOrientation & ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL) {
                     mHorizontalScrollHandlar.onDownEvent(mFirstMotionX, mFirstMotionY, EasyScrollLayout.this);
                 }
                 mLastEventPoint.set(mFirstMotionX, mFirstMotionY);
@@ -853,16 +860,16 @@ public class EasyScrollLayout extends FrameLayout {
 
     private void dispatchVerticalScroll(MotionEvent event, int dy) {
 //        Logger.e("parentScrollY    " + getScrollY());
-        int activePointerIndex = event.findPointerIndex(mActivePointerId);
-        parentPreScroll( dy, mScrollConsumed);
+        parentPreScroll(dy, mScrollConsumed);
         int preScrollConsumed = mScrollConsumed[1];
         if (preScrollConsumed != 0) {
             if (!mScroller.isFinished()) {
                 mScroller.abortAnimation();
             }
         }
-        mNestedYOffset += mScrollConsumed[1];
         int unconsumedY = (dy - mScrollConsumed[1]);
+        mNestedYOffset += mScrollConsumed[1] - mScrollConsumed[3];
+        Logger.e("" + mNestedYOffset + "  " + mScrollConsumed[1] + "  scrollY" + mScrollConsumed[3]);
         childScroll(event, 0, unconsumedY, mScrollConsumed);
     }
 
@@ -874,27 +881,80 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     private void parentPreScroll(int dy, int[] consumed) {
-        consumed[1] = consumed[0] = 0;
+        consumed[0] = consumed[1] = consumed[2] = consumed[3] = 0;
         if (!canPreScroll(dy)) {
             mContentChildHolder.preScrollConsumed(dy, consumed);
             return;
         }
         mContentChildHolder.preScrollUp(dy, consumed);
-        dy  -= consumed[1];
-        if(dy ==0){
+        dy -= consumed[1];
+        if (dy == 0) {
             return;
         }
+        int childonsumedDy = consumed[1];
         consumed[1] = consumed[0] = 0;
-        int lastScrolly = getScrollY();
-        scrollBy(0, -dy);
-        int consumedDy = consumed[1] = lastScrolly - getScrollY();
-        Logger.e(dy + "parentPreScroll " + consumedDy);
+        scrollBy(dy, consumed);
+        int consumedDy = consumed[1];
         if (dy - consumedDy != 0) {
             consumed[1] = 0;
             mContentChildHolder.preScrollConsumed(dy - consumedDy, consumed);
             consumed[1] = consumedDy + consumed[1];
         }
+        consumed[1] += childonsumedDy;
 
+    }
+
+    private void scrollBy(int dy, int[] consumed) {
+        int lastScrollY = getScrollY();
+        if (mFrictionFactor > 0) {
+            if (lastScrollY > 0) {
+                if (lastScrollY - dy < 0) {
+                    scrollBy(0, (int) ((lastScrollY - dy) * (1 - mFrictionFactor)));
+                } else {
+                    scrollBy(0, -dy);
+                }
+            } else if (lastScrollY < 0) {
+                if (lastScrollY - dy * (1 - mFrictionFactor) > 0) {
+                    scrollBy(0, (int) -(dy - lastScrollY / (1 - mFrictionFactor) + lastScrollY));
+                } else {
+                    scrollBy(0, (int) (-dy * (1 - mFrictionFactor)));
+                }
+            } else {
+                if (dy < 0) {
+                    scrollBy(0, -dy);
+                } else {
+                    scrollBy(0, (int) (-dy * (1 - mFrictionFactor)));
+                }
+            }
+            final int curScrollY = getScrollY();
+            if (lastScrollY < 0) {
+                if (curScrollY < 0) {
+                    consumed[1] = dy;
+                } else if (curScrollY == 0) {
+                    consumed[1] = (int) ((lastScrollY - curScrollY) / (1 - mFrictionFactor));
+                } else {
+                    consumed[1] = dy;
+                }
+            } else if (lastScrollY > 0) {
+                if (curScrollY >= 0) {
+                    consumed[1] = lastScrollY - getScrollY();
+                } else {
+                    consumed[1] = dy;
+                }
+            } else {
+                if (curScrollY > 0) {
+                    consumed[1] = dy;
+                } else if (curScrollY < 0) {
+                    consumed[1] = dy;
+                }
+
+            }
+        } else {
+            scrollBy(0, -dy);
+            consumed[1] = consumed[1] = lastScrollY - getScrollY();
+        }
+        consumed[3] += lastScrollY - getScrollY();
+        Logger.e(dy + "parentPreScroll " + consumed[1]);
     }
 
     private void childScroll(MotionEvent event, int dx, int dy, int[] consumed) {
@@ -909,8 +969,7 @@ public class EasyScrollLayout extends FrameLayout {
             dispatchTouchEventSupper(event);
         } else if (dy != 0) {
             float curX = event.getX(activePointerIndex);
-            float curY = event.getY(activePointerIndex);
-            event.offsetLocation(mFirstMotionX - curX, 0);
+            event.offsetLocation(mFirstMotionX - curX, -mNestedYOffset);
             dispatchTouchEventSupper(event);
         }
 
@@ -937,7 +996,8 @@ public class EasyScrollLayout extends FrameLayout {
             mLastMoveEvent.recycle();
             mLastMoveEvent = null;
         }
-        mScrollConsumed[0] = mScrollConsumed[1] = 0;
+        mNestedYOffset = 0;
+        mScrollConsumed[0] = mScrollConsumed[1] = mScrollConsumed[2] = mScrollConsumed[3] = 0;
     }
 
     private void onSecondaryPointerUp(MotionEvent ev) {
@@ -1135,7 +1195,7 @@ public class EasyScrollLayout extends FrameLayout {
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         Logger.e(disallowIntercept + "disallowIntercept");
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
-        if(!isEnabled()){
+        if (!isEnabled()) {
             return;
         }
         if (mIsUnableToDrag) {
@@ -1166,8 +1226,8 @@ public class EasyScrollLayout extends FrameLayout {
             /**
              * 如果child已经requestDisallowInterceptTouchEvent 仍然不能拖拽，就忽略此次滑动
              */
-            if(dy - mTouchSlop > 0 || dx - mTouchSlop > 0){
-                if(!mIsUnableToDrag && !mDragging){
+            if (dy - mTouchSlop > 0 || dx - mTouchSlop > 0) {
+                if (!mIsUnableToDrag && !mDragging) {
                     mIsUnableToDrag = true;
                 }
             }
@@ -1186,7 +1246,7 @@ public class EasyScrollLayout extends FrameLayout {
         return result;
     }
 
-    private void drawGradientDrawable(View child,Canvas canvas) {
+    private void drawGradientDrawable(View child, Canvas canvas) {
         if (mGradientDrawable == null) {
             mGradientDrawable = new GradientDrawable();
             mGradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
@@ -1200,7 +1260,7 @@ public class EasyScrollLayout extends FrameLayout {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        if (mHorizontalScrollHandlar ==null|| !mHorizontalScrollHandlar.isDrawerLayoutStyle) {
+        if (mHorizontalScrollHandlar == null || !mHorizontalScrollHandlar.isDrawerLayoutStyle) {
             return;
         }
         if (mHorizontalScrollHandlar.getScrollX() < 0) {
@@ -1210,7 +1270,7 @@ public class EasyScrollLayout extends FrameLayout {
                 }
                 if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
                     mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
-                    mShadowDrawable.setBounds(0, mOutRightView.getTop(),mOutRightView.getLeft(), mOutRightView.getBottom());
+                    mShadowDrawable.setBounds(0, mOutRightView.getTop(), mOutRightView.getLeft(), mOutRightView.getBottom());
                 } else {
                     mShadowDrawable.setmShadowGravity(Gravity.LEFT);
                     mShadowDrawable.setBounds(mContentChildHolder.mDirectChild.getRight(), mOutRightView.getTop(), getMeasuredWidth(), mOutRightView.getBottom());
@@ -1228,7 +1288,7 @@ public class EasyScrollLayout extends FrameLayout {
                     mShadowDrawable.setBounds(mOutLeftView.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
                 } else {
                     mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
-                    mShadowDrawable.setBounds(0, mOutLeftView.getTop(),mContentChildHolder.mDirectChild.getLeft(), mOutLeftView.getBottom());
+                    mShadowDrawable.setBounds(0, mOutLeftView.getTop(), mContentChildHolder.mDirectChild.getLeft(), mOutLeftView.getBottom());
 
                 }
                 mShadowDrawable.draw(canvas);
@@ -1272,7 +1332,6 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
 
-
     public static class LayoutParams extends FrameLayout.LayoutParams {
         float mOverScrollRatio = 0.7f;
         int mMinScrollY;
@@ -1296,18 +1355,22 @@ public class EasyScrollLayout extends FrameLayout {
             float defaultOverScrollRatio = 0.7f;
             if (mLayoutOutGravity == GRAVITY_OUT_LEFT) {
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);
-                if(mTrigeerExpandRatio> 0.8f || mTrigeerExpandRatio <0.2f){
+                if (mTrigeerExpandRatio > 0.8f || mTrigeerExpandRatio < 0.2f) {
                     mTrigeerExpandRatio = 0.5f;
                 }
                 mIgnoreScroll = true;
                 defaultOverScrollRatio = 0f;
             }
             if (mLayoutOutGravity == GRAVITY_OUT_RIGHT) {
+                mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);
+                if (mTrigeerExpandRatio > 0.8f || mTrigeerExpandRatio < 0.2f) {
+                    mTrigeerExpandRatio = 0.5f;
+                }
                 mIgnoreScroll = true;
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outRightWidth_ratioOfParent, 0);
                 defaultOverScrollRatio = 0f;
             }
-            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio,defaultOverScrollRatio);
+            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, defaultOverScrollRatio);
 
             a.recycle();
         }
