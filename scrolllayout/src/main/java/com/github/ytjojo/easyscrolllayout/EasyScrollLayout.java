@@ -85,6 +85,7 @@ public class EasyScrollLayout extends FrameLayout {
 
     private final int[] mScrollConsumed = new int[4];
     private int mNestedYOffset;
+    private int mNestedXOffset;
     private float mFrictionFactor = 0.6f;
     ContentChildHolder mContentChildHolder;
     View mInnerTopView;
@@ -515,6 +516,7 @@ public class EasyScrollLayout extends FrameLayout {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mNestedYOffset = 0;
+                mNestedXOffset = 0;
                 mVelocityTracker.clear();
                 mLastMotionY = (int) event.getY();
                 mLastMotionX = (int) event.getX();
@@ -874,9 +876,10 @@ public class EasyScrollLayout extends FrameLayout {
     }
 
     private void dispatchHorizontalScroll(MotionEvent event, int dx) {
-        int activePointerIndex = event.findPointerIndex(mActivePointerId);
+        mScrollConsumed[0] = mScrollConsumed[1] = mScrollConsumed[2] = mScrollConsumed[3] = 0;
         mHorizontalScrollHandlar.scrollConsumed(dx, mScrollConsumed);
         int unconsumedX = (dx - mScrollConsumed[0]);
+        mNestedXOffset += mScrollConsumed[0] - mScrollConsumed[2];
         childScroll(event, unconsumedX, 0, mScrollConsumed);
     }
 
@@ -959,13 +962,14 @@ public class EasyScrollLayout extends FrameLayout {
 
     private void childScroll(MotionEvent event, int dx, int dy, int[] consumed) {
         if (dy == 0 && dx == 0) {
-            consumed[1] = consumed[0] = 0;
+            consumed[1] = consumed[0] = consumed[2] = consumed[3] = 0;
+
             return;
         }
         int activePointerIndex = event.findPointerIndex(mActivePointerId);
         if (dx != 0) {
             float curY = event.getY(activePointerIndex);
-            event.offsetLocation(0, mFirstMotionY - curY);
+            event.offsetLocation(-mNestedXOffset, mFirstMotionY - curY);
             dispatchTouchEventSupper(event);
         } else if (dy != 0) {
             float curX = event.getX(activePointerIndex);
@@ -997,6 +1001,7 @@ public class EasyScrollLayout extends FrameLayout {
             mLastMoveEvent = null;
         }
         mNestedYOffset = 0;
+        mNestedXOffset = 0;
         mScrollConsumed[0] = mScrollConsumed[1] = mScrollConsumed[2] = mScrollConsumed[3] = 0;
     }
 
@@ -1344,6 +1349,7 @@ public class EasyScrollLayout extends FrameLayout {
         int mTopWhenLayout;
         boolean mEnable;
         int mStableScrollValue;
+        float mFrictionFactor;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
@@ -1352,6 +1358,7 @@ public class EasyScrollLayout extends FrameLayout {
             mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_easylayout_layoutGravity, GRAVITY_OUT_INVALID);
             mParallaxMultiplier = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0);
             mTrigeerExpandRatio = a.getFloat(R.styleable.EasyScrollLayout_trigeerExpandRatio, 1.2f);
+            mFrictionFactor = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_frictionfactor,0f);
             float defaultOverScrollRatio = 0.7f;
             if (mLayoutOutGravity == GRAVITY_OUT_LEFT) {
                 mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);

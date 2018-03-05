@@ -24,6 +24,7 @@
         <com.github.ytjojo.easyscrolllayout.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            app:scrollmaster_frictionfactor="0.5"
             app:easylayout_layoutGravity="outleft">
 
             <ImageView
@@ -36,6 +37,7 @@
         <com.github.ytjojo.easyscrolllayout.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            app:scrollmaster_frictionfactor="0.5"
             app:easylayout_layoutGravity="outright">
 
             <ImageView

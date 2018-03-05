@@ -34,6 +34,7 @@ public class HorizontalScrollHandlar {
     LeftRefreshIndicator mLeftRefreshInidicator;
     EasyScrollLayout mParentView;
     EasyScrollLayout.OnScollListener mOnScollListener;
+    float mFrictionFactor;
 
     public void setOnScollListener(EasyScrollLayout.OnScollListener l) {
         this.mOnScollListener = l;
@@ -77,6 +78,9 @@ public class HorizontalScrollHandlar {
             int width = mOutLeftView.getMeasuredWidth();
             mOutLeftView.setClickable(true);
             EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutLeftView.getLayoutParams();
+            if (lp.mFrictionFactor > 0f) {
+                mFrictionFactor = lp.mFrictionFactor;
+            }
             if (lp.mOverScrollRatio > 0) {
                 mMaxHorizontalScrollRange = (int) (width * (1f + lp.mOverScrollRatio));
 
@@ -94,6 +98,9 @@ public class HorizontalScrollHandlar {
             mOutRightView.setClickable(true);
             int width = mOutRightView.getMeasuredWidth();
             EasyScrollLayout.LayoutParams lp = (EasyScrollLayout.LayoutParams) mOutRightView.getLayoutParams();
+            if (lp.mFrictionFactor > 0f) {
+                mFrictionFactor = lp.mFrictionFactor;
+            }
             if (lp.mOverScrollRatio > 0) {
                 mMinHorizontalScrollRange = (int) (-width * (1f + lp.mOverScrollRatio));
             } else {
@@ -127,10 +134,56 @@ public class HorizontalScrollHandlar {
             mScroller.abortAnimation();
 //            mParentView.setLayerType(View.LAYER_TYPE_NONE,null);
         }
-        int startX = mScrollX;
-        offsetLeftAndRight(dx);
-        consumed[0] = mScrollX - startX;
+        if (mFrictionFactor == 0f) {
+            int startX = mScrollX;
+            offsetLeftAndRight(dx);
+            consumed[0] = mScrollX - startX;
+            consumed[2] += consumed[0];
+        } else {
+            scrollWithFactor(dx, consumed);
+        }
+
         mParentView.getParent().requestDisallowInterceptTouchEvent(true);
+    }
+
+    private void scrollWithFactor(int dx, int[] consumed) {
+        final int startX = mScrollX;
+        offsetLeftAndRight((int) (dx * (1 - mFrictionFactor)));
+        if (mScrollX == 0) {
+            if (dx == 0) {
+                consumed[0] = mScrollX - startX;
+                consumed[2] += consumed[0];
+            } else if (dx > 0) {
+
+                consumed[0] = dx < mMaxHorizontalScrollRange ? dx : mMaxHorizontalScrollRange;
+                consumed[2] += mScrollX - startX;
+            } else {
+                consumed[0] = dx                                                                     > mMinHorizontalScrollRange ? dx : mMinHorizontalScrollRange;
+                consumed[2] += mScrollX - startX;
+            }
+        } else if (mScrollX > 0) {
+            if (mScrollX == 0 || mScrollX == mMaxHorizontalScrollRange) {
+                if (mScrollX != startX) {
+                    consumed[0] = (int) ((mScrollX - startX) / (1 - mFrictionFactor));
+                } else {
+                    consumed[0] = 0;
+                }
+            } else {
+                consumed[0] = dx;
+            }
+            consumed[2] += mScrollX - startX;
+        } else {
+            if (mScrollX == 0 || mScrollX == mMinHorizontalScrollRange) {
+                if (mScrollX != startX) {
+                    consumed[0] = (int) ((mScrollX - startX) / (1 - mFrictionFactor));
+                } else {
+                    consumed[0] = 0;
+                }
+            } else {
+                consumed[0] = dx;
+            }
+            consumed[2] += mScrollX - startX;
+        }
     }
 
     float mLeftParallaxMult = 0.5f;
@@ -190,7 +243,7 @@ public class HorizontalScrollHandlar {
 
 
         mScrollX = targetScrollX;
-        Logger.e("offsetDx" + offsetDx + "mScrollX "+ mScrollX);
+        Logger.e("offsetDx" + offsetDx + "mScrollX " + mScrollX);
         offsetContenViews();
         offsetLeftView();
         offsetRightView();
@@ -198,7 +251,7 @@ public class HorizontalScrollHandlar {
             mLeftRefreshInidicator.onScrollChanged(mLastScrollX, mScrollX);
             mRightRefreshIndicator.onScrollChanged(mLastScrollX, mScrollX);
         } else {
-            if (mOnScollListener != null&& mLastScrollX != mScrollX) {
+            if (mOnScollListener != null && mLastScrollX != mScrollX) {
                 int offsetRange = mLastScrollX < 0 || mScrollX < 0 ? mMinHorizontalScrollRange : mMaxHorizontalScrollRange;
                 mOnScollListener.onScroll(mScrollX / offsetRange, mScrollX, offsetRange);
             }
@@ -525,7 +578,7 @@ public class HorizontalScrollHandlar {
                 huntingScrollChild(contentWraperView.mContentView, mPoint);
                 return mIsDownInOuterViews;
             }
-            if (isPointInView ) {
+            if (isPointInView) {
                 huntingScrollChild(mDirectContentView, mPoint);
                 return mIsDownInOuterViews;
             }
