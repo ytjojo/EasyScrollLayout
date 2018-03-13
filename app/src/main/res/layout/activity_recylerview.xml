@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                     android:id="@+id/StickyNavLayout"
-                                                     android:layout_width="match_parent"
-                                                     android:layout_height="match_parent"
-                                                     android:orientation="vertical">
+<com.github.ytjojo.scrollmaster.ScrollMasterView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:id="@+id/StickyNavLayout"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             android:layout_gravity="right|bottom"/>
     </FrameLayout>
 
-    <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+    <com.github.ytjojo.scrollmaster.DefaultLoadView
         app:sm_layoutGravity="outtop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -34,7 +34,7 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-    </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+    </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recylerview"
@@ -43,4 +43,4 @@
         />
 
 
-</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
+</com.github.ytjojo.scrollmaster.ScrollMasterView>

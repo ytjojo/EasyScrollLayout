@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                     android:id="@+id/StickyNavLayout"
-                                                     android:layout_width="match_parent"
-                                                     android:layout_height="match_parent"
-                                                     android:orientation="vertical">
+<com.github.ytjojo.scrollmaster.ScrollMasterView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:id="@+id/StickyNavLayout"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:orientation="vertical">
 
-    <com.github.ytjojo.easyscrolllayout.EasyScrollLayout
+    <com.github.ytjojo.scrollmaster.ScrollMasterView
         android:id="@+id/horizontal_ScrollMaster"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+        <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:sm_frictionfactor="0.5"
@@ -32,9 +32,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher_round"/>
-        </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+        </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
-        <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+        <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:sm_frictionfactor="0.5"
@@ -45,8 +45,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher_round"/>
-        </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
-    </com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
+        </com.github.ytjojo.scrollmaster.DefaultLoadView>
+    </com.github.ytjojo.scrollmaster.ScrollMasterView>
 
     <TextView
         android:layout_width="match_parent"
@@ -54,4 +54,4 @@
         android:text="please pull recylerview horizontal"/>
 
 
-</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
+</com.github.ytjojo.scrollmaster.ScrollMasterView>

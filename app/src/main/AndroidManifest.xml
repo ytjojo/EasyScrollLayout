@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
 
-    package="com.github.ytjojo.easyscrolllayout.demo">
+    package="com.github.ytjojo.scrollmaster.demo">
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -52,7 +52,7 @@
       android:smallScreens="true" />
   <application
       tools:replace="android:icon, android:theme"
-      android:name="com.github.ytjojo.easyscrolllayout.demo.AppApplication"
+      android:name="com.github.ytjojo.scrollmaster.demo.AppApplication"
       android:allowBackup="true"
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
@@ -63,7 +63,7 @@
 
 
     <activity
-        android:name="com.github.ytjojo.easyscrolllayout.demo.MainActivity"
+        android:name="com.github.ytjojo.scrollmaster.demo.MainActivity"
         android:label="@string/app_name"
         android:theme="@style/AppTheme.NoActionBar">
       <intent-filter>
@@ -78,15 +78,15 @@
       <action android:name="android.intent.action.VIEW"/>
       </intent-filter>
     </activity>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ListViewActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ViewPagerAcitivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.WebViewActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.DrawerViewpagerActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.DrawerBannerActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.DrawerRecylerViewWithHeaderActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.HorizentalLoadActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.HorizentalLoadItemActivity"/>
-    <activity android:name="com.github.ytjojo.easyscrolllayout.demo.ViewPagerEachWithRefreshLoadMoreActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.ListViewActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.ViewPagerAcitivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.WebViewActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.DrawerViewpagerActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.DrawerBannerActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.DrawerRecylerViewWithHeaderActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.HorizentalLoadActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.HorizentalLoadItemActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.ViewPagerEachWithRefreshLoadMoreActivity"/>
   </application>
 
 </manifest>

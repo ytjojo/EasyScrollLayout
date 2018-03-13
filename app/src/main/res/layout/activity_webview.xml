@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                     android:layout_width="match_parent"
-                                                     android:id="@+id/easyScrolllayout"
-                                                     android:layout_height="match_parent"
-                                                     android:orientation="vertical">
+<com.github.ytjojo.scrollmaster.ScrollMasterView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:layout_width="match_parent"
+                                                 android:id="@+id/easyScrolllayout"
+                                                 android:layout_height="match_parent"
+                                                 android:orientation="vertical">
 
 
     <LinearLayout
@@ -29,7 +29,7 @@
             android:text="header"/>
     </LinearLayout>
 
-    <com.github.ytjojo.easyscrolllayout.ContentWraperView
+    <com.github.ytjojo.scrollmaster.ContentWraperView
         android:id="@+id/contentWraperview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"></WebView>
 
-        <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+        <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:sm_contentwrper_layoutGravity="outbottom">
@@ -50,9 +50,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher_round"/>
-        </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+        </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
-        <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+        <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:sm_contentwrper_layoutGravity="outtop">
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher_round"/>
-        </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+        </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -77,5 +77,5 @@
                 android:text="bottomView"/>
         </LinearLayout>
 
-    </com.github.ytjojo.easyscrolllayout.ContentWraperView>
-</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
+    </com.github.ytjojo.scrollmaster.ContentWraperView>
+</com.github.ytjojo.scrollmaster.ScrollMasterView>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.ytjojo.easyscrolllayout.EasyScrollLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                     android:id="@+id/StickyNavLayout"
-                                                     android:layout_width="match_parent"
-                                                     android:layout_height="match_parent"
-                                                     android:orientation="vertical"
-                                                     app:sm_isDrawerLayoutStyle="true">
+<com.github.ytjojo.scrollmaster.ScrollMasterView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:id="@+id/StickyNavLayout"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:orientation="vertical"
+                                                 app:sm_isDrawerLayoutStyle="true">
 
 
     <LinearLayout
@@ -66,4 +66,4 @@
             android:padding="8dp"
             android:text="outLeftView"/>
     </LinearLayout>
-</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
+</com.github.ytjojo.scrollmaster.ScrollMasterView>

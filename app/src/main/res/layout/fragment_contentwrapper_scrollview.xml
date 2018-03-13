@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.ytjojo.easyscrolllayout.ContentWraperView xmlns:android="http://schemas.android.com/apk/res/android"
-                                                      xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                      android:layout_width="match_parent"
-                                                      android:layout_height="match_parent"
-                                                      android:background="@android:color/white"
-                                                      android:orientation="vertical">
+<com.github.ytjojo.scrollmaster.ContentWraperView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                  xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                  android:layout_width="match_parent"
+                                                  android:layout_height="match_parent"
+                                                  android:background="@android:color/white"
+                                                  android:orientation="vertical">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -45,7 +45,7 @@ This class is the base class of physics-based animations. It manages the animati
 This class is the base class of physics-based animations. It manages the animation's lifecycle such as start() and cancel(). This base class also handles the common setup for all the subclass animations. For example, DynamicAnimation supports adding DynamicAnimation.OnAnimationEndListener and DynamicAnimation.OnAnimationUpdateListener so that the important animation events can be observed through the callbacks. The start conditions for any subclass of DynamicAnimation can be set using setStartValue(float) and setStartVelocity(float)
 "/>
     </ScrollView>
-    <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+    <com.github.ytjojo.scrollmaster.DefaultLoadView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:sm_contentwrper_layoutGravity="outbottom">
@@ -55,9 +55,9 @@ This class is the base class of physics-based animations. It manages the animati
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@mipmap/ic_launcher_round"/>
-    </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
+    </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
-    <com.github.ytjojo.easyscrolllayout.DefaultLoadView
+    <com.github.ytjojo.scrollmaster.DefaultLoadView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:sm_contentwrper_layoutGravity="outtop">
@@ -67,5 +67,5 @@ This class is the base class of physics-based animations. It manages the animati
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@mipmap/ic_launcher_round"/>
-    </com.github.ytjojo.easyscrolllayout.DefaultLoadView>
-</com.github.ytjojo.easyscrolllayout.ContentWraperView>
+    </com.github.ytjojo.scrollmaster.DefaultLoadView>
+</com.github.ytjojo.scrollmaster.ContentWraperView>

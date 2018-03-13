@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.ytjojo.easyscrolllayout.EasyScrollLayout
+<com.github.ytjojo.scrollmaster.ScrollMasterView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,7 +8,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
 
-    <com.github.ytjojo.easyscrolllayout.ContentWraperView
+    <com.github.ytjojo.scrollmaster.ContentWraperView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            tools:context="com.github.ytjojo.easyscrolllayout.demo.MainActivity"
+            tools:context="com.github.ytjojo.scrollmaster.demo.MainActivity"
             tools:showIn="@layout/activity_main"
             >
 
@@ -88,7 +88,7 @@
 
             </LinearLayout>
 
-            <com.github.ytjojo.easyscrolllayout.PendulumView
+            <com.github.ytjojo.scrollmaster.PendulumView
                 android:layout_width="match_parent"
                 android:layout_height="120dp"/>
 
@@ -112,7 +112,7 @@
 
             </LinearLayout>
         </LinearLayout>
-    </com.github.ytjojo.easyscrolllayout.ContentWraperView>
+    </com.github.ytjojo.scrollmaster.ContentWraperView>
 
-</com.github.ytjojo.easyscrolllayout.EasyScrollLayout>
+</com.github.ytjojo.scrollmaster.ScrollMasterView>
 
