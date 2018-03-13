@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:orientation="horizontal"
-            app:isDrawerLayoutStyle="true"
-            app:contentwrper_layoutGravity="outtop">
+            app:sm_isDrawerLayoutStyle="true"
+            app:sm_contentwrper_layoutGravity="outtop">
 
             <TextView
                 android:layout_width="wrap_content"

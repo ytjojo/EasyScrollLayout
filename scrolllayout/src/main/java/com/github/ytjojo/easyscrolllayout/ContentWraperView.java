@@ -54,8 +54,8 @@ public class ContentWraperView extends FrameLayout {
         mMinimumVelocity = ViewConfiguration.get(context)
                 .getScaledMinimumFlingVelocity();
 
-        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
-        isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollMasterView);
+        isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
         a.recycle();
         mTopHeaderIndicator = new TopHeaderIndicator();
         mBottomFooterIndicator = new BottomFooterIndicator();
@@ -296,12 +296,12 @@ public class ContentWraperView extends FrameLayout {
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
-            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
-            mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_contentwrper_layoutGravity, GRAVITY_OUT_INVALID);
-            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, 0.7f);
-            mTrigeerExpandRatio = a.getFloat(R.styleable.EasyScrollLayout_trigeerExpandRatio, 1.2f);
-            isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
-            isHeaderDrawerLayoutStyle = a.getBoolean(R.styleable.EasyScrollLayout_isDrawerLayoutStyle, false);
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollMasterView);
+            mLayoutOutGravity = a.getInt(R.styleable.ScrollMasterView_sm_contentwrper_layoutGravity, GRAVITY_OUT_INVALID);
+            mOverScrollRatio = a.getFloat(R.styleable.ScrollMasterView_sm_overscrollratio, 0.7f);
+            mTrigeerExpandRatio = a.getFloat(R.styleable.ScrollMasterView_sm_trigeerExpandRatio, 1.2f);
+            isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
+            isHeaderDrawerLayoutStyle = a.getBoolean(R.styleable.ScrollMasterView_sm_isDrawerLayoutStyle, false);
             if (isHeaderDrawerLayoutStyle && (mTrigeerExpandRatio < 0.2f || mTrigeerExpandRatio > 0.8f)) {
                 mTrigeerExpandRatio = 0.5f;
             }

@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        app:easylayout_layoutGravity="innertop"
-        app:isDrawerLayoutStyle="false"
+        app:sm_layoutGravity="innertop"
+        app:sm_isDrawerLayoutStyle="false"
         >
 
         <android.support.v7.widget.RecyclerView
@@ -24,8 +24,8 @@
         <com.github.ytjojo.easyscrolllayout.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:scrollmaster_frictionfactor="0.5"
-            app:easylayout_layoutGravity="outleft">
+            app:sm_frictionfactor="0.5"
+            app:sm_layoutGravity="outleft">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -37,8 +37,8 @@
         <com.github.ytjojo.easyscrolllayout.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:scrollmaster_frictionfactor="0.5"
-            app:easylayout_layoutGravity="outright">
+            app:sm_frictionfactor="0.5"
+            app:sm_layoutGravity="outright">
 
             <ImageView
                 android:layout_width="wrap_content"

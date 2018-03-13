@@ -117,10 +117,10 @@ public class EasyScrollLayout extends FrameLayout {
 
         mVelocityTracker = VelocityTracker.obtain();
 
-        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
-        isSnap = a.getBoolean(R.styleable.EasyScrollLayout_isSnap, false);
-        isDrawerLayoutStyle = a.getBoolean(R.styleable.EasyScrollLayout_isDrawerLayoutStyle, false);
-        mInnerTopParallaxMult = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0f);
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollMasterView);
+        isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
+        isDrawerLayoutStyle = a.getBoolean(R.styleable.ScrollMasterView_sm_isDrawerLayoutStyle, false);
+        mInnerTopParallaxMult = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0f);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -1354,14 +1354,14 @@ public class EasyScrollLayout extends FrameLayout {
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
 
-            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.EasyScrollLayout);
-            mLayoutOutGravity = a.getInt(R.styleable.EasyScrollLayout_easylayout_layoutGravity, GRAVITY_OUT_INVALID);
-            mParallaxMultiplier = a.getFloat(R.styleable.EasyScrollLayout_parallaxMultiplier, 0);
-            mTrigeerExpandRatio = a.getFloat(R.styleable.EasyScrollLayout_trigeerExpandRatio, 1.2f);
-            mFrictionFactor = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_frictionfactor,0f);
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollMasterView);
+            mLayoutOutGravity = a.getInt(R.styleable.ScrollMasterView_sm_layoutGravity, GRAVITY_OUT_INVALID);
+            mParallaxMultiplier = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0);
+            mTrigeerExpandRatio = a.getFloat(R.styleable.ScrollMasterView_sm_trigeerExpandRatio, 1.2f);
+            mFrictionFactor = a.getFloat(R.styleable.ScrollMasterView_sm_frictionfactor,0f);
             float defaultOverScrollRatio = 0.7f;
             if (mLayoutOutGravity == GRAVITY_OUT_LEFT) {
-                mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);
+                mWidthRatioOfParent = a.getFloat(R.styleable.ScrollMasterView_sm_left_widthRatioOfParent, 0);
                 if (mTrigeerExpandRatio > 0.8f || mTrigeerExpandRatio < 0.2f) {
                     mTrigeerExpandRatio = 0.5f;
                 }
@@ -1369,15 +1369,15 @@ public class EasyScrollLayout extends FrameLayout {
                 defaultOverScrollRatio = 0f;
             }
             if (mLayoutOutGravity == GRAVITY_OUT_RIGHT) {
-                mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outleftWidth_ratioOfParent, 0);
+                mWidthRatioOfParent = a.getFloat(R.styleable.ScrollMasterView_sm_left_widthRatioOfParent, 0);
                 if (mTrigeerExpandRatio > 0.8f || mTrigeerExpandRatio < 0.2f) {
                     mTrigeerExpandRatio = 0.5f;
                 }
                 mIgnoreScroll = true;
-                mWidthRatioOfParent = a.getFloat(R.styleable.EasyScrollLayout_outRightWidth_ratioOfParent, 0);
+                mWidthRatioOfParent = a.getFloat(R.styleable.ScrollMasterView_sm_right_widthRatioOfParent, 0);
                 defaultOverScrollRatio = 0f;
             }
-            mOverScrollRatio = a.getFloat(R.styleable.EasyScrollLayout_scrollmaster_overscrollratio, defaultOverScrollRatio);
+            mOverScrollRatio = a.getFloat(R.styleable.ScrollMasterView_sm_overscrollratio, defaultOverScrollRatio);
 
             a.recycle();
         }

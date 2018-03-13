@@ -12,7 +12,7 @@
     <com.github.ytjojo.easyscrolllayout.DefaultLoadView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:contentwrper_layoutGravity="outbottom">
+        app:sm_contentwrper_layoutGravity="outbottom">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
     <com.github.ytjojo.easyscrolllayout.DefaultLoadView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:contentwrper_layoutGravity="outtop">
+        app:sm_contentwrper_layoutGravity="outtop">
 
         <ImageView
             android:layout_width="wrap_content"

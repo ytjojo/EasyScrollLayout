@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="EasyScrollLayout">
-        <attr name="scrollFlags">
+    <declare-styleable name="ScrollMasterView">
+        <attr name="sm_scrollFlags">
             <flag name="scroll" value="0x1"/>
             <flag name="quickreturn" value="0x2"/>
             <flag name="snap" value="0x4"/>
         </attr>
-
-        <attr name="HeaderQuickReturnHeight" format="dimension">
-            <enum name="allHeaderHeigth" value="-1"/>
-        </attr>
-        <attr name="isSnap" format="boolean"/>
-        <attr name="isDrawerLayoutStyle" format="boolean"/>
-
-        <attr name="easylayout_layoutGravity">
+        <attr name="sm_isSnap" format="boolean"/>
+        <attr name="sm_isDrawerLayoutStyle" format="boolean"/>
+        <attr name="sm_layoutGravity">
             <flag name="outleft" value="0x0"/>
             <flag name="outtop" value="0x1"/>
             <flag name="outright" value="0x2"/>
             <flag name="innertop" value="0x3"/>
         </attr>
-        <attr name="contentwrper_layoutGravity">
+        <attr name="sm_contentwrper_layoutGravity">
             <flag name="outtop" value="0x1"/>
             <flag name="outbottom" value="0x2"/>
             <flag name="innerbottom" value="0x3"/>
         </attr>
-        <attr name="parallaxMultiplier" format="float"/>
-        <attr name="scrollmaster_overscrollratio" format="float"/>
-        <attr name="outleftWidth_ratioOfParent" format="float"/>
-        <attr name="trigeerExpandRatio" format="float"/>
-        <attr name="outRightWidth_ratioOfParent" format="float"/>
-        <attr name="scrollmaster_frictionfactor" format="float"/>
+        <attr name="sm_parallaxMultiplier" format="float"/>
+        <attr name="sm_overscrollratio" format="float"/>
+        <attr name="sm_left_widthRatioOfParent" format="float"/>
+        <attr name="sm_trigeerExpandRatio" format="float"/>
+        <attr name="sm_right_widthRatioOfParent" format="float"/>
+        <attr name="sm_frictionfactor" format="float"/>
     </declare-styleable>
 </resources>

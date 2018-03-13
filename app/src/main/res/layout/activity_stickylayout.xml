@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/easyScrolllayout"
     android:orientation="vertical" android:layout_width="match_parent"
-    app:isSnap="true"
+    app:sm_isSnap="true"
     android:layout_height="match_parent">
 
     <com.github.ytjojo.easyscrolllayout.DefaultLoadView
-        app:easylayout_layoutGravity="outtop"
+        app:sm_layoutGravity="outtop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
@@ -20,8 +20,8 @@
     <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->
         <!--android:gravity="center"-->
-        <!--app:parallaxMultiplier="0.5"-->
-        <!--app:easylayout_layoutGravity="innertop"-->
+        <!--app:sm_parallaxMultiplier="0.5"-->
+        <!--app:sm_layoutGravity="innertop"-->
         <!--android:orientation="vertical"-->
         <!--android:layout_height="300dp">-->
         <!--<ImageView-->
@@ -41,7 +41,7 @@
         android:id="@+id/contentWraperview"
         android:layout_width="match_parent"
         android:background="@android:color/white"
-        app:isSnap="true"
+        app:sm_isSnap="true"
         android:layout_height="match_parent">
         <ListView
             android:id="@+id/listview"
@@ -51,7 +51,7 @@
             <!--android:layout_width="match_parent"-->
             <!--android:gravity="center"-->
             <!--android:background="#00ffee"-->
-            <!--app:contentwrper_layoutGravity="innerbottom"-->
+            <!--app:sm_contentwrper_layoutGravity="innerbottom"-->
             <!--android:layout_height="300dp">-->
             <!--<TextView-->
                 <!--android:text="bottomView"-->
@@ -60,7 +60,7 @@
         <!--</LinearLayout>-->
 
         <com.github.ytjojo.easyscrolllayout.DefaultLoadView
-            app:contentwrper_layoutGravity="outbottom"
+            app:sm_contentwrper_layoutGravity="outbottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView

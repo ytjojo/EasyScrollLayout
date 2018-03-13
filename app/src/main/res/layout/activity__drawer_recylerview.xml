@@ -3,7 +3,7 @@
                                                      xmlns:app="http://schemas.android.com/apk/res-auto"
                                                      android:layout_width="match_parent"
                                                      android:layout_height="match_parent"
-                                                     app:isDrawerLayoutStyle="true"
+                                                     app:sm_isDrawerLayoutStyle="true"
                                                      android:orientation="vertical">
 
     <LinearLayout
@@ -12,7 +12,7 @@
         android:background="#00ee00"
         android:gravity="center"
         android:orientation="vertical"
-        app:easylayout_layoutGravity="outleft">
+        app:sm_layoutGravity="outleft">
 
         <TextView
             android:layout_width="wrap_content"
@@ -27,8 +27,8 @@
         android:background="#003ef0"
         android:gravity="center"
         android:orientation="vertical"
-        app:easylayout_layoutGravity="outright"
-        app:parallaxMultiplier="0.5">
+        app:sm_layoutGravity="outright"
+        app:sm_parallaxMultiplier="0.5">
 
         <TextView
             android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
             android:layout_height="100dp"
             android:background="#eeff00"
             android:gravity="center"
-            app:contentwrper_layoutGravity="outtop">
+            app:sm_contentwrper_layoutGravity="outtop">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -66,7 +66,7 @@
             android:layout_height="300dp"
             android:background="#00ffee"
             android:gravity="center"
-            app:contentwrper_layoutGravity="innerbottom">
+            app:sm_contentwrper_layoutGravity="innerbottom">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
             android:layout_height="100dp"
             android:background="#eeff00"
             android:gravity="center"
-            app:contentwrper_layoutGravity="outbottom">
+            app:sm_contentwrper_layoutGravity="outbottom">
 
             <TextView
                 android:layout_width="wrap_content"

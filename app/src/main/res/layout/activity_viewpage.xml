@@ -10,7 +10,7 @@
     <com.github.ytjojo.easyscrolllayout.DefaultLoadView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:easylayout_layoutGravity="outtop">
+        app:sm_layoutGravity="outtop">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -24,8 +24,8 @@
         android:layout_height="300dp"
         android:gravity="center"
         android:orientation="vertical"
-        app:easylayout_layoutGravity="innertop"
-        app:parallaxMultiplier="0.5">
+        app:sm_layoutGravity="innertop"
+        app:sm_parallaxMultiplier="0.5">
 
         <ImageView
             android:layout_width="match_parent"
