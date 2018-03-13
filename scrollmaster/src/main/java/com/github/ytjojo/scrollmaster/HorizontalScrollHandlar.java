@@ -696,7 +696,7 @@ public class HorizontalScrollHandlar {
         if (mScrollX < 0) {
             int targetX = (mRightRefreshIndicator.getStableValue()) / 2 < mScrollX ? 0 : mRightRefreshIndicator.getStableValue();
             ScrollMasterView.LayoutParams lp = (ScrollMasterView.LayoutParams) mOutRightView.getLayoutParams();
-            if (velocityX != 0 && mScrollX > mRightRefreshIndicator.getStableValue() && mScrollX < mRightRefreshIndicator.getTriggerValue()) {
+            if (velocityX != 0 && mScrollX >= mRightRefreshIndicator.getStableValue() && mScrollX <= 0) {
                 fiing(velocityX, true);
                 return;
             }
@@ -714,7 +714,7 @@ public class HorizontalScrollHandlar {
         } else {
             int targetX = (mLeftRefreshInidicator.getStableValue()) / 2 < mScrollX ? mLeftRefreshInidicator.getStableValue() : 0;
             ScrollMasterView.LayoutParams lp = (ScrollMasterView.LayoutParams) mOutLeftView.getLayoutParams();
-            if (velocityX != 0 && mScrollX < mLeftRefreshInidicator.getStableValue() && mScrollX > mLeftRefreshInidicator.getTriggerValue()) {
+            if (velocityX != 0 && mScrollX <= mLeftRefreshInidicator.getStableValue() && mScrollX >= 0) {
                 fiing(velocityX, true);
                 return;
             }
