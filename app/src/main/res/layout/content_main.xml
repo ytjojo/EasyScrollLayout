@@ -109,6 +109,12 @@
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:text="pager refresh loadmore"/>
+                <TextView
+                    android:id="@+id/tv_refresh_minheightheader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="minheight"/>
 
             </LinearLayout>
         </LinearLayout>

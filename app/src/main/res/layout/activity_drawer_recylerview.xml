@@ -43,18 +43,20 @@
         android:layout_height="match_parent"
         android:background="@android:color/white">
 
-        <LinearLayout
+        <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="#eeff00"
             android:gravity="center"
+            app:sm_parallaxMultiplier="0.5"
             app:sm_contentwrper_layoutGravity="outtop">
 
-            <TextView
+            <ImageView
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="bottomView"/>
-        </LinearLayout>
+               />
+        </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recylerview"
@@ -73,19 +75,21 @@
                 android:layout_height="wrap_content"
                 android:text="bottomView"/>
         </LinearLayout>
-
-        <LinearLayout
+        <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="#eeff00"
             android:gravity="center"
+            app:sm_parallaxMultiplier="0.5"
             app:sm_contentwrper_layoutGravity="outbottom">
 
-            <TextView
+            <ImageView
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="bottomView"/>
-        </LinearLayout>
+                />
+        </com.github.ytjojo.scrollmaster.DefaultLoadView>
+
     </com.github.ytjojo.scrollmaster.ContentWraperView>
 
 </com.github.ytjojo.scrollmaster.ScrollMasterView>

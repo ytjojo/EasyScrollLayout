@@ -524,7 +524,6 @@ public class ScrollMasterView extends FrameLayout {
                 mFirstMotionX = (int) event.getX();
                 mActivePointerId = MotionEventCompat.getPointerId(event, 0);
                 mPrimaryLastY = event.getY();
-                dispatchTouchEventSupper(event);
                 isHandlar = true;
                 isVerticalScroll = false;
                 isHorizontalScroll = false;
@@ -542,6 +541,7 @@ public class ScrollMasterView extends FrameLayout {
                 if (mHorizontalScrollHandlar != null && (mOrientation & ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL) {
                     mHorizontalScrollHandlar.onDownEvent(mFirstMotionX, mFirstMotionY, ScrollMasterView.this);
                 }
+                dispatchTouchEventSupper(event);
                 mLastEventPoint.set(mFirstMotionX, mFirstMotionY);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -807,7 +807,9 @@ public class ScrollMasterView extends FrameLayout {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         if (mHorizontalScrollHandlar != null) {
-            return mHorizontalScrollHandlar.isHorizontallyScrolled();
+            if(!mHorizontalScrollHandlar.mIsDownInOuterViews){
+                return mHorizontalScrollHandlar.isHorizontallyScrolled();
+            }
         }
         return super.onInterceptTouchEvent(ev);
     }
@@ -1199,6 +1201,9 @@ public class ScrollMasterView extends FrameLayout {
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         Logger.e(disallowIntercept + "disallowIntercept");
+        if(mDragging){
+            return;
+        }
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
         if (!isEnabled()) {
             return;

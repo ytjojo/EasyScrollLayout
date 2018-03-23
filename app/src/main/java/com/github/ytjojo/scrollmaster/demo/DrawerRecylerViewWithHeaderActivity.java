@@ -28,7 +28,7 @@ public class DrawerRecylerViewWithHeaderActivity extends AppCompatActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity__drawer_recylerview);
+        setContentView(R.layout.activity_drawer_recylerview);
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recylerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -71,7 +71,7 @@ public class DrawerRecylerViewWithHeaderActivity extends AppCompatActivity {
             }
         });
         final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
-        contentWraperView.setCanTopHeaderLoad(false);
+        contentWraperView.setCanTopHeaderLoad(true);
         contentWraperView.postDelayed(new Runnable() {
             @Override
             public void run() {

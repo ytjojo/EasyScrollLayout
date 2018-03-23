@@ -8,13 +8,14 @@
                                                  app:sm_isDrawerLayoutStyle="true">
 
     <LinearLayout
+        android:id="@+id/right_view"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:background="#003ef0"
         android:gravity="center"
         android:orientation="vertical"
-        app:sm_layoutGravity="outright"
         app:sm_frictionfactor="0.5"
+        app:sm_layoutGravity="outright"
         app:sm_parallaxMultiplier="0.5">
 
         <TextView
@@ -24,42 +25,38 @@
             android:text="outRightView"/>
     </LinearLayout>
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_left"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:background="#00ee00"
         android:gravity="center"
         android:orientation="vertical"
-        app:sm_layoutGravity="outleft"
         app:sm_frictionfactor="0.5"
+        app:sm_layoutGravity="outleft"
         app:sm_parallaxMultiplier="0.5">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="outLeftView"/>
-    </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="220dp"
-        app:sm_layoutGravity="innertop"
-        app:sm_parallaxMultiplier="0.5">
+    </android.support.v7.widget.RecyclerView>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/banner_viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="220dp"-->
+        <!--app:sm_layoutGravity="innertop"-->
+        <!--app:sm_parallaxMultiplier="0.5">-->
+
+        <!--<android.support.v4.view.ViewPager-->
+            <!--android:id="@+id/banner_viewPager"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
 
 
-        <com.shizhefei.view.indicator.FixedIndicatorView
-            android:id="@+id/banner_indicator"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_gravity="right|bottom"/>
-    </FrameLayout>
-
+        <!--<com.shizhefei.view.indicator.FixedIndicatorView-->
+            <!--android:id="@+id/banner_indicator"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="2dp"-->
+            <!--android:layout_gravity="right|bottom"/>-->
+    <!--</FrameLayout>-->
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"

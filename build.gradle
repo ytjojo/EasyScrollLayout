@@ -10,6 +10,7 @@ buildscript {
     classpath 'com.jakewharton:butterknife-gradle-plugin:8.6.0'
     classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+    classpath 'com.letv.sarrsdesktop:BlockCanaryExPlugin:0.9.9.5'
 
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files

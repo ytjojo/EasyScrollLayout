@@ -72,7 +72,7 @@ public class PendulumView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        canvas.clipRect(0,0,getWidth(),getHeight());
         canvas.save();
         canvas.translate(mCenterX,3*mCenterY/4);
         canvas.drawCircle(mPendulum.getOffsetX() * 25,mPendulum.getOffsetY()* 25,mRadius,mPaint);

@@ -4,8 +4,8 @@
                                                  android:id="@+id/easyScrolllayout"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
+                                                 app:sm_isDrawerLayoutStyle="true"
                                                  android:orientation="vertical">
-
 
     <com.github.ytjojo.scrollmaster.DefaultLoadView
         android:layout_width="match_parent"
@@ -23,6 +23,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        android:minHeight="100dp"
         android:gravity="center"
         android:orientation="vertical"
         app:sm_layoutGravity="innertop"
@@ -44,9 +45,8 @@
             android:textColor="@android:color/white"
             android:text="header"/>
     </FrameLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recylerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></android.support.v4.view.ViewPager>
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 </com.github.ytjojo.scrollmaster.ScrollMasterView>
