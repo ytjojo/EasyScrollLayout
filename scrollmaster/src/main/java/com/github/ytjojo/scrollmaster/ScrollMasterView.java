@@ -96,6 +96,7 @@ public class ScrollMasterView extends FrameLayout {
     int mMaxVerticalScrollRange;
     private int mOrientation = ORIENTATION_INVALID;
     private boolean isDrawerLayoutStyle;
+    int mLayoutStartOffsetY;
 
     public ScrollMasterView(Context context) {
         this(context, null);
@@ -353,8 +354,11 @@ public class ScrollMasterView extends FrameLayout {
                         childTop = parentTop + lp.topMargin;
                         break;
                 }
-                if (child == mContentChildHolder.mDirectChild && mInnerTopView != null && mInnerTopView.getVisibility() == VISIBLE) {
-                    childTop += mInnerTopView.getMeasuredHeight();
+                if (child == mContentChildHolder.mDirectChild) {
+                    childTop = mLayoutStartOffsetY+childTop;
+                    if( mInnerTopView != null && mInnerTopView.getVisibility() == VISIBLE){
+                        childTop += mInnerTopView.getMeasuredHeight();
+                    }
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
                 lp.mTopWhenLayout = child.getTop();
@@ -525,6 +529,7 @@ public class ScrollMasterView extends FrameLayout {
                 mActivePointerId = MotionEventCompat.getPointerId(event, 0);
                 mPrimaryLastY = event.getY();
                 isHandlar = true;
+                mFlingResume.reset();
                 isVerticalScroll = false;
                 isHorizontalScroll = false;
                 mIgnoreTouchEvent = false;
@@ -763,6 +768,7 @@ public class ScrollMasterView extends FrameLayout {
             }
         }
     }
+    FlingResume mFlingResume = new FlingResume(this);
 
     public void toggle() {
         if (this.isLayoutRequested() || mInnerTopView == null || !ViewCompat.isLaidOut(mInnerTopView) || mInnerTopView.isLayoutRequested()) {
@@ -1059,7 +1065,7 @@ public class ScrollMasterView extends FrameLayout {
                     return;
                 }
                 mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap ? mMaxVerticalScrollRange : -2 * mMaxVerticalScrollRange, mMaxVerticalScrollRange);
-
+                mFlingResume.start(getScrollY(),-velocityY);
             }
             ViewCompat.postInvalidateOnAnimation(this);
         }
@@ -1187,6 +1193,7 @@ public class ScrollMasterView extends FrameLayout {
             } else {
                 scrollTo(0, curY);
                 if (mScroller.isFinished()) {
+                    mFlingResume.setTrigger();
                     mTopHeaderIndicator.onStopScroll(getScrollY());
                 }
             }
