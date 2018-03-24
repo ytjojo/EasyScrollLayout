@@ -22,6 +22,7 @@
         </attr>
         <attr name="sm_parallaxMultiplier" format="float"/>
         <attr name="sm_overscrollratio" format="float"/>
+        <attr name="sm_layoutstartoffsety" format="dimension"/>
         <attr name="sm_left_widthRatioOfParent" format="float"/>
         <attr name="sm_trigeerExpandRatio" format="float"/>
         <attr name="sm_right_widthRatioOfParent" format="float"/>

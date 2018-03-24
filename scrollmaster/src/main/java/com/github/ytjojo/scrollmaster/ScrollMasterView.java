@@ -96,7 +96,7 @@ public class ScrollMasterView extends FrameLayout {
     int mMaxVerticalScrollRange;
     private int mOrientation = ORIENTATION_INVALID;
     private boolean isDrawerLayoutStyle;
-    int mLayoutStartOffsetY;
+    int mLayoutStartOffsetY ;
 
     public ScrollMasterView(Context context) {
         this(context, null);
@@ -122,6 +122,7 @@ public class ScrollMasterView extends FrameLayout {
         isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
         isDrawerLayoutStyle = a.getBoolean(R.styleable.ScrollMasterView_sm_isDrawerLayoutStyle, false);
         mInnerTopParallaxMult = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0f);
+        mLayoutStartOffsetY = a.getDimensionPixelOffset(R.styleable.ScrollMasterView_sm_layoutstartoffsety,0);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -387,6 +388,7 @@ public class ScrollMasterView extends FrameLayout {
                 mTopHeaderIndicator.setLimitValue(0);
                 mTopHeaderIndicator.setTriggerValue((int) (-height * lp.mTrigeerExpandRatio));
                 mTopHeaderIndicator.setStableValue(-height);
+                childTop+=mLayoutStartOffsetY;
                 break;
             case GRAVITY_OUT_LEFT:
                 childLeft = -width;
@@ -405,10 +407,10 @@ public class ScrollMasterView extends FrameLayout {
 
             case GRAVITY_INNER_TOP:
                 childLeft = 0;
-                childTop = 0;
+                childTop = 0 + mLayoutStartOffsetY;
                 lp.mMinScrollY = 0;
-                lp.mMaxScrollY = height - child.getMinimumHeight();
-                mMaxVerticalScrollRange = lp.mMaxScrollY;
+                mMaxVerticalScrollRange += height - child.getMinimumHeight();
+                lp.mMaxScrollY = mMaxVerticalScrollRange;
                 mOrientation |= ORIENTATION_VERTICAL;
                 break;
 
@@ -421,6 +423,7 @@ public class ScrollMasterView extends FrameLayout {
         mOrientation = ORIENTATION_INVALID;
         mMinVerticalScrollRange = 0;
         mMaxVerticalScrollRange = 0;
+        mMaxVerticalScrollRange += mLayoutStartOffsetY;
     }
 
     @Override

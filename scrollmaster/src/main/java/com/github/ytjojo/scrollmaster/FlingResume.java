@@ -5,13 +5,15 @@ import android.support.v4.view.ViewCompat;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
 
+import com.orhanobut.logger.Logger;
+
 /**
  * Created by Administrator on 2018/3/24 0024.
  */
 
 public class FlingResume implements Runnable {
     OverScroller mScroller;
-    float mOffsetY;
+    float mEventYOffset;
     ScrollMasterView mScrollMasterView;
     int mEventX;
 
@@ -34,7 +36,9 @@ public class FlingResume implements Runnable {
         if (mScroller.computeScrollOffset()) {
             if (mTrigger && state == 0) {
                 long time = SystemClock.uptimeMillis();
-                event = MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN, mEventX, mOffsetY - mScroller.getCurrY(), 0);
+                mEventYOffset =  mScrollMasterView.getHeight() * 0.75f + mScroller.getCurrY();
+                event = MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
+                Logger.e("1eventY"+ event.getY());
                 state++;
                 mScrollMasterView.dispatchTouchEventSupper(event);
             } else {
@@ -43,17 +47,23 @@ public class FlingResume implements Runnable {
                 }
                 if (state == 2) {
                     long time = SystemClock.uptimeMillis();
-                    event = MotionEvent.obtain(time, time, MotionEvent.ACTION_MOVE, mEventX, mOffsetY - mScroller.getCurrY(), 0);
+                    event = MotionEvent.obtain(time, time, MotionEvent.ACTION_MOVE, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
+                    Logger.e("2eventY"+ event.getY());
                     mScrollMasterView.dispatchTouchEventSupper(event);
                 }
             }
             ViewCompat.postOnAnimation(mScrollMasterView, this);
         } else {
-            if (state == 2 && mTrigger) {
-                state++;
+            if (mTrigger) {
                 long time = SystemClock.uptimeMillis();
-                event = MotionEvent.obtain(time, time, MotionEvent.ACTION_UP, mEventX, mOffsetY - mScroller.getCurrY(), 0);
+                if(state == 2 ){
+                    event = MotionEvent.obtain(time, time, MotionEvent.ACTION_UP, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
+                }else {
+                    event = MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
+                }
+                Logger.e("3eventY"+ event.getY());
                 mScrollMasterView.dispatchTouchEventSupper(event);
+                state++;
             }
         }
 
@@ -62,7 +72,7 @@ public class FlingResume implements Runnable {
     public void reset() {
         if (state == 1 || state == 2) {
             long time = SystemClock.uptimeMillis();
-            MotionEvent event = MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, mEventX, mOffsetY - mScroller.getCurrY(), 0);
+            MotionEvent event = MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
             mScrollMasterView.dispatchTouchEventSupper(event);
         }
         state = 0;
@@ -74,10 +84,10 @@ public class FlingResume implements Runnable {
 
 
     public void start(int startScrollY, int velocityY) {
-        mOffsetY = mScrollMasterView.getHeight()*0.75f;
         mEventX = mScrollMasterView.getWidth() / 2;
+        int maxY = 4 * mScrollMasterView.getHeight();
         mScroller.fling(0, startScrollY, 0, velocityY,
-                0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
+                0, maxY, 0, maxY);
         ViewCompat.postOnAnimation(mScrollMasterView, this);
     }
 }
