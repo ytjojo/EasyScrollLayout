@@ -122,7 +122,7 @@ public class ScrollMasterView extends FrameLayout {
         isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
         isDrawerLayoutStyle = a.getBoolean(R.styleable.ScrollMasterView_sm_isDrawerLayoutStyle, false);
         mInnerTopParallaxMult = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0f);
-        mLayoutStartOffsetY = a.getDimensionPixelOffset(R.styleable.ScrollMasterView_sm_layoutstartoffsety,0);
+        mLayoutStartOffsetY = a.getDimensionPixelOffset(R.styleable.ScrollMasterView_sm_layoutstartoffsety,-200);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -169,6 +169,9 @@ public class ScrollMasterView extends FrameLayout {
             mOrientation = orientation;
 
         }
+    }
+    public void setLayoutStartOffsetY(int layoutStartOffsetY){
+        this.mLayoutStartOffsetY = layoutStartOffsetY;
     }
 
     public HorizontalScrollHandlar getHorizontalScrollHandlar() {
@@ -253,12 +256,27 @@ public class ScrollMasterView extends FrameLayout {
                 }
             }
         }
-        if (mInnerTopView != null && mContentChildHolder != null) {
-            int heghtSize = MeasureSpec.getSize(heightMeasureSpec) - mInnerTopView.getMinimumHeight();
-            int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
-            measureChild(mContentChildHolder.mDirectChild, widthMeasureSpec, childHeightSpec);
+        if (mContentChildHolder != null) {
+            if(mInnerTopView != null ){
+                int heghtSize = MeasureSpec.getSize(heightMeasureSpec) - mInnerTopView.getMinimumHeight();
+                if(mLayoutStartOffsetY < 0 ){
+                    heghtSize -= mLayoutStartOffsetY;
+                }
+                int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
+                measureChild(mContentChildHolder.mDirectChild, widthMeasureSpec, childHeightSpec);
+            }else {
+                if(mLayoutStartOffsetY < 0 ){
+                    int heghtSize = MeasureSpec.getSize(heightMeasureSpec);
+                    heghtSize -= mLayoutStartOffsetY;
+                    int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
+                    measureChild(mContentChildHolder.mDirectChild, widthMeasureSpec, childHeightSpec);
+                }
+            }
+
+
         }
     }
+
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -356,7 +374,7 @@ public class ScrollMasterView extends FrameLayout {
                         break;
                 }
                 if (child == mContentChildHolder.mDirectChild) {
-                    childTop = mLayoutStartOffsetY+childTop;
+                    childTop += mLayoutStartOffsetY;
                     if( mInnerTopView != null && mInnerTopView.getVisibility() == VISIBLE){
                         childTop += mInnerTopView.getMeasuredHeight();
                     }
@@ -388,7 +406,9 @@ public class ScrollMasterView extends FrameLayout {
                 mTopHeaderIndicator.setLimitValue(0);
                 mTopHeaderIndicator.setTriggerValue((int) (-height * lp.mTrigeerExpandRatio));
                 mTopHeaderIndicator.setStableValue(-height);
-                childTop+=mLayoutStartOffsetY;
+                if(mLayoutStartOffsetY>0){
+                    childTop+=mLayoutStartOffsetY;
+                }
                 break;
             case GRAVITY_OUT_LEFT:
                 childLeft = -width;
@@ -423,7 +443,12 @@ public class ScrollMasterView extends FrameLayout {
         mOrientation = ORIENTATION_INVALID;
         mMinVerticalScrollRange = 0;
         mMaxVerticalScrollRange = 0;
-        mMaxVerticalScrollRange += mLayoutStartOffsetY;
+        if(mLayoutStartOffsetY >  0){
+
+            mMaxVerticalScrollRange += mLayoutStartOffsetY;
+        }else if( mLayoutStartOffsetY < 0 ) {
+            mMinVerticalScrollRange = mLayoutStartOffsetY;
+        }
     }
 
     @Override
@@ -700,49 +725,13 @@ public class ScrollMasterView extends FrameLayout {
     public void dispatchFling(int velocityY, boolean isDownSlide) {
         isFlingToNestScroll = false;
         if (getScrollY() < 0) {
-            LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
-            if (mTopHeaderIndicator.isComplete()) {
-                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
-                    ViewCompat.postInvalidateOnAnimation(this);
-                } else {
-                    mTopHeaderIndicator.onStopScroll(getScrollY());
-                }
-            } else if (mTopHeaderIndicator.isLoading()) {
-//                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
-//                    ViewCompat.postInvalidateOnAnimation(this);
-//                }
-                if (getScrollY() <= lp.mStableScrollValue) {
-                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
-                        ViewCompat.postInvalidateOnAnimation(this);
-                    }
-                } else {
-                    if (velocityY != 0) {
-                        if (velocityY > 0) {
-                            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, lp.mStableScrollValue, getScrollY());
-                        } else {
-                            mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, getScrollY(), 0);
-                        }
-                        ViewCompat.postInvalidateOnAnimation(this);
-                    }
-                }
-            } else if (mTopHeaderIndicator.isPrepare()) {
-                if (getScrollY() <= -mOutTopView.getMeasuredHeight() * lp.mTrigeerExpandRatio) {
-                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
-                        ViewCompat.postInvalidateOnAnimation(this);
-                        mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
-                    } else {
-                        mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
-                        mTopHeaderIndicator.onStopScroll(getScrollY());
-                    }
-                } else {
-                    if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
-                        ViewCompat.postInvalidateOnAnimation(this);
-                    } else {
-                        mTopHeaderIndicator.onStopScroll(getScrollY());
-                    }
-                }
-            }
-
+           if(mOutTopView != null){
+               outTopViewFling(velocityY);
+           }else {
+               if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
+                   ViewCompat.postInvalidateOnAnimation(this);
+               }
+           }
         } else {
             mTopHeaderIndicator.onStopScroll(getScrollY());
             // 手指离开之后，根据加速度进行滑动
@@ -770,6 +759,51 @@ public class ScrollMasterView extends FrameLayout {
 
             }
         }
+    }
+    public void outTopViewFling(int velocityY){
+        LayoutParams lp = (LayoutParams) mOutTopView.getLayoutParams();
+        if (mTopHeaderIndicator.isComplete()) {
+            if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
+                ViewCompat.postInvalidateOnAnimation(this);
+            } else {
+                mTopHeaderIndicator.onStopScroll(getScrollY());
+            }
+        } else if (mTopHeaderIndicator.isLoading()) {
+//                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, -mOutTopView.getMeasuredHeight(), -mOutTopView.getMeasuredHeight())) {
+//                    ViewCompat.postInvalidateOnAnimation(this);
+//                }
+            if (getScrollY() <= lp.mStableScrollValue) {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
+                    ViewCompat.postInvalidateOnAnimation(this);
+                }
+            } else {
+                if (velocityY != 0) {
+                    if (velocityY > 0) {
+                        mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, lp.mStableScrollValue, getScrollY());
+                    } else {
+                        mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, getScrollY(), 0);
+                    }
+                    ViewCompat.postInvalidateOnAnimation(this);
+                }
+            }
+        } else if (mTopHeaderIndicator.isPrepare()) {
+            if (getScrollY() <= -mOutTopView.getMeasuredHeight() * lp.mTrigeerExpandRatio) {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, lp.mStableScrollValue, lp.mStableScrollValue)) {
+                    ViewCompat.postInvalidateOnAnimation(this);
+                    mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
+                } else {
+                    mTopHeaderIndicator.dispatchReleaseBeforeRefresh();
+                    mTopHeaderIndicator.onStopScroll(getScrollY());
+                }
+            } else {
+                if (mScroller.springBack(getScrollX(), getScrollY(), 0, 0, 0, 0)) {
+                    ViewCompat.postInvalidateOnAnimation(this);
+                } else {
+                    mTopHeaderIndicator.onStopScroll(getScrollY());
+                }
+            }
+        }
+
     }
     FlingResume mFlingResume = new FlingResume(this);
 
@@ -1226,10 +1260,14 @@ public class ScrollMasterView extends FrameLayout {
             final int dx = Math.abs(mLastEventPoint.x - mFirstMotionX);
             Logger.e(dx + "dx  dy" + dy);
             if (dy - mTouchSlop > 0 && dx - mTouchSlop > 0) {
-                if (dy - mTouchSlop > dx - mTouchSlop && (mOrientation & ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL) {
-                    isHorizontalScroll = true;
-                    mDragging = true;
-                } else if ((mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL) {
+//                if (dy - mTouchSlop > dx - mTouchSlop && (mOrientation & ORIENTATION_HORIZONTAL) == ORIENTATION_HORIZONTAL) {
+//                    isHorizontalScroll = true;
+//                    mDragging = true;
+//                } else if ((mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL) {
+//                    isVerticalScroll = true;
+//                    mDragging = true;
+//                }
+                if  ((mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL) {
                     isVerticalScroll = true;
                     mDragging = true;
                 }

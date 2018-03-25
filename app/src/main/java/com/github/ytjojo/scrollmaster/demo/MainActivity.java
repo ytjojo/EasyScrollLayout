@@ -10,10 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.github.ytjojo.scrollmaster.ScrollMasterView;
+
 public class MainActivity extends AppCompatActivity {
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		 ScrollMasterView scrollMasterView = (ScrollMasterView) findViewById(R.id.scrollmasterview);
+		scrollMasterView.setLayoutStartOffsetY(0);
 		Uri uri = getIntent().getData();
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
