@@ -119,6 +119,7 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
         canvas.drawCircle(0f, 0f, radius, mPaint);
     }
 
+    PorterDuffXfermode mSRCINPorterDuffXfermode =new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
 
     //绘制圆环
     private void drawRing(Canvas canvas) {
@@ -129,7 +130,7 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
         canvas.drawCircle(0f, 0f, mOuterCircleRadiusProgress * mRadius, mPaint);
         Logger.e(mOuterCircleRadiusProgress + "mOuterCircleRadiusProgress");
         mPaint.setColor(Color.TRANSPARENT);
-        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        mPaint.setXfermode(mSRCINPorterDuffXfermode);
         canvas.drawCircle(0, 0, mInnerCircleRadiusProgress * mRadius + 1, mPaint);
         Logger.e(mInnerCircleRadiusProgress + "mInnerCircleRadiusProgress");
         mPaint.setXfermode(null);

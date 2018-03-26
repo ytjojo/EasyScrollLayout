@@ -16,12 +16,16 @@ public class FlingResume implements Runnable {
     float mEventYOffset;
     ScrollMasterView mScrollMasterView;
     int mEventX;
+    int mMaxVerticalScrollRange;
 
     public FlingResume(ScrollMasterView scrollMasterView) {
         this.mScrollMasterView = scrollMasterView;
         this.mScroller = new OverScroller(mScrollMasterView.getContext());
     }
 
+    public void setMaxVerticalScrollRange(int maxVerticalScrollRange){
+        this.mMaxVerticalScrollRange =maxVerticalScrollRange;
+    }
     int state = 0;
     boolean mTrigger;
 
@@ -34,6 +38,12 @@ public class FlingResume implements Runnable {
     public void run() {
         MotionEvent event;
         if (mScroller.computeScrollOffset()) {
+            if(!mTrigger){
+                mScrollMasterView.scrollTo(0,mScroller.getCurrY());
+                if(mScrollMasterView.getScrollY() >= mMaxVerticalScrollRange){
+                    mTrigger = true;
+                }
+            }
             if (mTrigger && state == 0) {
                 long time = SystemClock.uptimeMillis();
                 mEventYOffset =  mScrollMasterView.getHeight() * 0.75f + mScroller.getCurrY();
@@ -54,7 +64,7 @@ public class FlingResume implements Runnable {
             }
             ViewCompat.postOnAnimation(mScrollMasterView, this);
         } else {
-            if (mTrigger) {
+            if (state == 2|| state ==1) {
                 long time = SystemClock.uptimeMillis();
                 if(state == 2 ){
                     event = MotionEvent.obtain(time, time, MotionEvent.ACTION_UP, mEventX, mEventYOffset - mScroller.getCurrY(), 0);

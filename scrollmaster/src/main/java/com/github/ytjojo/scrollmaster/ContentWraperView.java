@@ -393,7 +393,9 @@ public class ContentWraperView extends FrameLayout {
         if (y < mMinVerticalScrollRange) {
             y = mMinVerticalScrollRange;
         }
-
+        if(y >0 ){
+            Logger.e(y+"");
+        }
         if (mTopHeaderIndicator.isLoading()) {
             final int limitScrollY = mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight();
             if (y > limitScrollY) {
@@ -502,7 +504,7 @@ public class ContentWraperView extends FrameLayout {
         int finalScrollY = lastScrollY;
         if (lastScrollY < 0) {
             totalY = lastScrollY / (1 - mFrictionFactor);
-            if (dy < 0 && totalY - dy * (1 - mFrictionFactor) > 0) {
+            if (dy < 0 && (totalY - dy) * (1 - mFrictionFactor) > 0) {
                 finalScrollY = 0;
             } else {
                 finalScrollY = (int) ((totalY - dy) * (1 - mFrictionFactor));
@@ -614,10 +616,7 @@ public class ContentWraperView extends FrameLayout {
 
     public void preScrollUp(int dy, int[] consumed) {
         final int lastScrolly = getScrollY();
-        if (dy < 0 && lastScrolly < 0) {
-            preScrollConsumed(dy, consumed);
-        }
-        if (dy > 0 && lastScrolly > 0) {
+        if ((dy < 0 && lastScrolly < 0)||(dy > 0 && lastScrolly > 0) ) {
             preScrollConsumed(dy, consumed);
         }
     }

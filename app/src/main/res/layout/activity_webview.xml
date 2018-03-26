@@ -7,9 +7,9 @@
                                                  android:orientation="vertical">
 
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="100dp"
         android:gravity="center"
         android:orientation="vertical"
         app:sm_layoutGravity="innertop"
@@ -23,11 +23,12 @@
 
         <TextView
             android:id="@+id/tvHeader"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="header"/>
-    </LinearLayout>
+    </FrameLayout>
 
     <com.github.ytjojo.scrollmaster.ContentWraperView
         android:id="@+id/contentWraperview"
@@ -35,10 +36,10 @@
         android:layout_height="match_parent"
         >
 
-        <WebView
+        <com.github.ytjojo.scrollmaster.demo.WebView
             android:id="@+id/webview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></WebView>
+            android:layout_height="match_parent"></com.github.ytjojo.scrollmaster.demo.WebView>
 
         <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="match_parent"

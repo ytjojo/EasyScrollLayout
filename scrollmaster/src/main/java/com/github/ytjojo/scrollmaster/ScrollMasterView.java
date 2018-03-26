@@ -18,6 +18,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.MotionEvent;
@@ -122,7 +123,7 @@ public class ScrollMasterView extends FrameLayout {
         isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
         isDrawerLayoutStyle = a.getBoolean(R.styleable.ScrollMasterView_sm_isDrawerLayoutStyle, false);
         mInnerTopParallaxMult = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0f);
-        mLayoutStartOffsetY = a.getDimensionPixelOffset(R.styleable.ScrollMasterView_sm_layoutstartoffsety,-200);
+        mLayoutStartOffsetY = a.getDimensionPixelOffset(R.styleable.ScrollMasterView_sm_layoutstartoffsety,0);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -454,6 +455,7 @@ public class ScrollMasterView extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        this.removeCallbacks(mFlingResume);
     }
 
     TopHeaderIndicator mTopHeaderIndicator;
@@ -529,6 +531,7 @@ public class ScrollMasterView extends FrameLayout {
 
     Point mLastEventPoint = new Point();
     boolean mIgnoreTouchEvent;
+    SparseArray<Integer> mNestScrollOffsetYs = new SparseArray<>(5);
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -549,12 +552,14 @@ public class ScrollMasterView extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 mNestedYOffset = 0;
                 mNestedXOffset = 0;
+                mNestScrollOffsetYs.clear();
                 mVelocityTracker.clear();
                 mLastMotionY = (int) event.getY();
                 mLastMotionX = (int) event.getX();
                 mFirstMotionY = (int) event.getY();
                 mFirstMotionX = (int) event.getX();
                 mActivePointerId = MotionEventCompat.getPointerId(event, 0);
+                mNestScrollOffsetYs.put(mActivePointerId,0);
                 mPrimaryLastY = event.getY();
                 isHandlar = true;
                 mFlingResume.reset();
@@ -669,10 +674,12 @@ public class ScrollMasterView extends FrameLayout {
                 mFirstMotionY = mLastMotionY;
                 mFirstMotionX = mLastMotionX;
                 mLastEventPoint.set(mLastMotionX, mLastMotionY);
+                mNestScrollOffsetYs.put(mActivePointerId,0);
                 isHandlar = dispatchTouchEventSupper(event);
                 break;
             case MotionEventCompat.ACTION_POINTER_UP:
                 onSecondaryPointerUp(event);
+
                 isHandlar = dispatchTouchEventSupper(event);
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -916,7 +923,10 @@ public class ScrollMasterView extends FrameLayout {
         }
         int unconsumedY = (dy - mScrollConsumed[1]);
         mNestedYOffset += mScrollConsumed[1] - mScrollConsumed[3];
-        Logger.e("" + mNestedYOffset + "  " + mScrollConsumed[1] + "  scrollY" + mScrollConsumed[3]);
+        int value = mNestScrollOffsetYs.get(mActivePointerId);
+        value += mScrollConsumed[1] - mScrollConsumed[3];
+        mNestScrollOffsetYs.put(mActivePointerId, value);
+        Logger.e("mNestedYOffset" + mNestedYOffset + "  " + mScrollConsumed[1] + "  scrollY" + mScrollConsumed[3]);
         childScroll(event, 0, unconsumedY, mScrollConsumed);
     }
 
@@ -1017,8 +1027,11 @@ public class ScrollMasterView extends FrameLayout {
             event.offsetLocation(-mNestedXOffset, mFirstMotionY - curY);
             dispatchTouchEventSupper(event);
         } else if (dy != 0) {
+//            float curX = event.getX(activePointerIndex);
+//            event.offsetLocation(mFirstMotionX - curX, -mNestedYOffset);
+//            dispatchTouchEventSupper(event);
             float curX = event.getX(activePointerIndex);
-            event.offsetLocation(mFirstMotionX - curX, -mNestedYOffset);
+            event.offsetLocation(mFirstMotionX - curX, -mNestScrollOffsetYs.get(mActivePointerId));
             dispatchTouchEventSupper(event);
         }
 
@@ -1029,7 +1042,7 @@ public class ScrollMasterView extends FrameLayout {
 
         if (dy > 0 && mContentChildHolder.reachChildTop()) {
             return true;
-        } else if (dy < 0) {
+        } else if (dy < 0 && getScrollY()< mMaxVerticalScrollRange) {
             return true;
         }
         return false;
@@ -1055,6 +1068,7 @@ public class ScrollMasterView extends FrameLayout {
                 MotionEventCompat.ACTION_POINTER_INDEX_SHIFT;
         int index = MotionEventCompat.getActionIndex(ev);
         final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+        mNestScrollOffsetYs.put(pointerId,0);
         Log.e(TAG, pointerIndex + "pointerIndex" + pointerId + " = id    up" + index + "count =" + MotionEventCompat.getPointerCount(ev));
         if (pointerId == mActivePointerId) {
             // This was our active pointer going up. Choose a new
@@ -1066,6 +1080,7 @@ public class ScrollMasterView extends FrameLayout {
             if (mVelocityTracker != null) {
                 mVelocityTracker.clear();
             }
+
         }
     }
 
@@ -1101,8 +1116,9 @@ public class ScrollMasterView extends FrameLayout {
                 if (getScrollY() == mMaxVerticalScrollRange) {
                     return;
                 }
-                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap ? mMaxVerticalScrollRange : -2 * mMaxVerticalScrollRange, mMaxVerticalScrollRange);
+//                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap ? mMaxVerticalScrollRange : -2 * mMaxVerticalScrollRange, mMaxVerticalScrollRange);
                 mFlingResume.start(getScrollY(),-velocityY);
+                mFlingResume.setMaxVerticalScrollRange(mMaxVerticalScrollRange);
             }
             ViewCompat.postInvalidateOnAnimation(this);
         }
