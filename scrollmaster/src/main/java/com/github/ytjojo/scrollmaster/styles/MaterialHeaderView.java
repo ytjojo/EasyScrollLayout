@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -44,7 +45,9 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(widthMeasureSpec, MeasureSpec.makeMeasureSpec((int) Utils.dipToPixels(getContext(),100),MeasureSpec.EXACTLY));
+        if(getLayoutParams().height== ViewGroup.LayoutParams.WRAP_CONTENT){
+            setMeasuredDimension(widthMeasureSpec, MeasureSpec.makeMeasureSpec((int) Utils.dipToPixels(getContext(),60),MeasureSpec.EXACTLY));
+        }
     }
 
     protected void init(AttributeSet attrs, int defStyle) {
@@ -62,6 +65,7 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
         layoutParams.gravity = Gravity.CENTER;
 //        addView(circleProgressBar);
         mImageView = new ImageView(getContext());
+        mImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         materialDrawable = new MaterialDrawable(getContext(),this);
         materialDrawable.setBackgroundColor(progressBg);
         materialDrawable.setColorSchemeColors(mSchemeColors);
@@ -98,7 +102,7 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
     @Override
     public void onUIRefreshPrepare(BaseRefreshIndicator indicator) {
         ViewCompat.setPivotX(mImageView,0.5f);
-        ViewCompat.setPivotY(mImageView,0.5f);
+        ViewCompat.setPivotX(mImageView,0.5f);
         ViewCompat.setScaleX(mImageView, 0.001f);
         ViewCompat.setScaleY(mImageView, 0.001f);
         materialDrawable.setStartEndTrim(0,0.8f);
@@ -116,6 +120,7 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
 
     @Override
     public void onUIReleaseBeforeRefresh(BaseRefreshIndicator indicator) {
+        materialDrawable.showArrow(false);
     }
 
     @Override

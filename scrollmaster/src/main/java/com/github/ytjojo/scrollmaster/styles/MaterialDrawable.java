@@ -63,6 +63,20 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
     private static final float CENTER_RADIUS_LARGE = 12.5f;
     private static final float STROKE_WIDTH_LARGE = 3f;
 
+
+    /**
+     * Layout info for the arrowhead in dp
+     */
+    private static final int ARROW_WIDTH = 10;
+    private static final int ARROW_HEIGHT = 5;
+    private static final float ARROW_OFFSET_ANGLE = 5;
+
+    /**
+     * Layout info for the arrowhead for the large spinner in dp
+     */
+    private static final int ARROW_WIDTH_LARGE = 12;
+    private static final int ARROW_HEIGHT_LARGE = 6;
+    private static final float MAX_PROGRESS_ARC = .8f;
     private static final float MAX_PROGRESS_ANGLE = .8f;
     private static final int CIRCLE_BG_LIGHT = 0xFFFAFAFA;
     private static final int MAX_ALPHA = 255;
@@ -95,19 +109,7 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
      */
     private float mRotation;
 
-    /**
-     * Layout info for the arrowhead in dp
-     */
-    private static final int ARROW_WIDTH = 10;
-    private static final int ARROW_HEIGHT = 5;
-    private static final float ARROW_OFFSET_ANGLE = 5;
 
-    /**
-     * Layout info for the arrowhead for the large spinner in dp
-     */
-    private static final int ARROW_WIDTH_LARGE = 12;
-    private static final int ARROW_HEIGHT_LARGE = 6;
-    private static final float MAX_PROGRESS_ARC = .8f;
 
     /**
      * Circle Drawable *
@@ -131,9 +133,9 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
     private ShapeDrawable mCircle;
     private int mTop;
     private int mDiameter;
-    View mParent;
+    View mAnimExcutor;
     public MaterialDrawable(Context context,View parent) {
-        mParent = parent;
+        mAnimExcutor = parent;
         mResources = context.getResources();
 
         mRing = new Ring(mCallback);
@@ -289,16 +291,6 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
         mRing.setColorIndex(0);
     }
 
-//
-//    @Override
-//    public int getIntrinsicHeight() {
-//        return (int) mHeight;
-//    }
-//
-//    @Override
-//    public int getIntrinsicWidth() {
-//        return (int) mWidth;
-//    }
 
     @Override
     public void draw(Canvas c) {
@@ -370,30 +362,129 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
         }
         return false;
     }
-
+    boolean mFinishing;
     @Override
     public void start() {
         mAnimation.reset();
         mRing.storeOriginals();
+        setStartEndTrim(0,0);
         // Already showing some part of the ring
         if (mRing.getEndTrim() != mRing.getStartTrim()) {
-            mParent.startAnimation(mFinishAnimation);
-        } else {
+            mFinishing = true;
+            mAnimation.setDuration(ANIMATION_DURATION / 2);
+            mAnimExcutor.startAnimation(mAnimation);
+            mRing.setShowArrow(false);
             mRing.setColorIndex(0);
             mRing.resetOriginals();
-            mParent.startAnimation(mAnimation);
+        } else {
+            mRing.setShowArrow(false);
+            mRing.setColorIndex(0);
+            mRing.resetOriginals();
+            mAnimation.setDuration(ANIMATION_DURATION);
+            mAnimExcutor.startAnimation(mAnimation);
         }
     }
 
     @Override
     public void stop() {
-        mParent.clearAnimation();
+        mAnimExcutor.clearAnimation();
         setRotation(0);
         mRing.setShowArrow(false);
         mRing.setColorIndex(0);
         mRing.resetOriginals();
     }
 
+    private void setupAnimators1() {
+        final Ring ring = mRing;
+        final Animation animation = new Animation() {
+            @Override
+            public void applyTransformation(float interpolatedTime, Transformation t) {
+                if (mFinishing) {
+                    applyFinishTranslation(interpolatedTime, ring);
+                } else {
+                    // The minProgressArc is calculated from 0 to create an
+                    // angle that
+                    // matches the stroke width.
+                    final float minProgressArc = (float) Math.toRadians(
+                            ring.getStrokeWidth() / (2 * Math.PI * ring.getCenterRadius()));
+                    final float startingEndTrim = ring.getStartingEndTrim();
+                    final float startingTrim = ring.getStartingStartTrim();
+                    final float startingRotation = ring.getStartingRotation();
+
+                    // Offset the minProgressArc to where the endTrim is
+                    // located.
+                    final float minArc = MAX_PROGRESS_ARC - minProgressArc;
+                    float endTrim = startingEndTrim + (minArc
+                            * START_CURVE_INTERPOLATOR.getInterpolation(interpolatedTime));
+                    float startTrim = startingTrim + (MAX_PROGRESS_ARC
+                            * END_CURVE_INTERPOLATOR.getInterpolation(interpolatedTime));
+
+                    final float sweepTrim =  endTrim-startTrim;
+                    //Avoid the ring to be a full circle
+                    if(Math.abs(sweepTrim)>=1){
+                        endTrim = startTrim+0.5f;
+                    }
+
+                    ring.setEndTrim(endTrim);
+
+                    ring.setStartTrim(startTrim);
+
+                    final float rotation = startingRotation + (0.25f * interpolatedTime);
+                    ring.setRotation(rotation);
+
+                    float groupRotation = ((720.0f / NUM_POINTS) * interpolatedTime)
+                            + (720.0f * (mRotationCount / NUM_POINTS));
+                    setRotation(groupRotation);
+                }
+            }
+        };
+        animation.setRepeatCount(Animation.INFINITE);
+        animation.setRepeatMode(Animation.RESTART);
+        animation.setInterpolator(LINEAR_INTERPOLATOR);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mRotationCount = 0;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                // do nothing
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                ring.storeOriginals();
+                ring.goToNextColor();
+                ring.setStartTrim(ring.getEndTrim());
+                if (mFinishing) {
+                    // finished closing the last ring from the swipe gesture; go
+                    // into progress mode
+                    mFinishing = false;
+                    animation.setDuration(ANIMATION_DURATION);
+                    ring.setShowArrow(false);
+                } else {
+                    mRotationCount = (mRotationCount + 1) % (NUM_POINTS);
+                }
+            }
+        });
+        mAnimation = animation;
+    }
+
+    private void applyFinishTranslation(float interpolatedTime, Ring ring) {
+        // shrink back down and complete a full rotation before
+        // starting other circles
+        // Rotation goes between [0..1].
+        float targetRotation = (float) (Math.floor(ring.getStartingRotation() / MAX_PROGRESS_ARC)
+                + 1f);
+        final float startTrim = ring.getStartingStartTrim()
+                + (ring.getStartingEndTrim() - ring.getStartingStartTrim()) * interpolatedTime;
+        ring.setStartTrim(startTrim);
+        final float rotation = ring.getStartingRotation()
+                + ((targetRotation - ring.getStartingRotation()) * interpolatedTime);
+        ring.setRotation(rotation);
+    }
     private void setupAnimators() {
         final Ring ring = mRing;
         final Animation finishRingAnimation = new Animation() {
@@ -425,7 +516,7 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
                 ring.goToNextColor();
                 ring.storeOriginals();
                 ring.setShowArrow(false);
-                mParent.startAnimation(mAnimation);
+                mAnimExcutor.startAnimation(mAnimation);
             }
 
             @Override
