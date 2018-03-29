@@ -20,6 +20,7 @@ import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
+
 /**
  * Created by Administrator on 2017/11/24 0024.
  */
@@ -393,9 +394,6 @@ public class ContentWraperView extends FrameLayout {
         if (y < mMinVerticalScrollRange) {
             y = mMinVerticalScrollRange;
         }
-        if(y >0 ){
-            Logger.e(y+"");
-        }
         if (mTopHeaderIndicator.isLoading()) {
             final int limitScrollY = mInnerBottomView == null ? 0 : mInnerBottomView.getMeasuredHeight();
             if (y > limitScrollY) {
@@ -457,7 +455,7 @@ public class ContentWraperView extends FrameLayout {
 
     public void preScrollConsumed(int dy, int[] consumed) {
         if (mFrictionFactor > 0.9f) {
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException("mFrictionFactor too big");
         }
         if (mFrictionFactor > 0) {
             preScrollConsumedWithFactor(dy, consumed);

@@ -186,4 +186,7 @@ public abstract class BaseRefreshIndicator {
     public interface OnStartLoadCallback{
         void onStartLoad();
     }
+    public float getProgress(int curValue) {
+        return (curValue*1f/Math.abs(getStableValue()-getLimitValue()));
+    }
 }

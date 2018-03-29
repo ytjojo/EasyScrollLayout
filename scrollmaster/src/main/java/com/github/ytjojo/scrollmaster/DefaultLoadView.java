@@ -128,11 +128,9 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
         mPaint.setStyle(Paint.Style.FILL);
 
         canvas.drawCircle(0f, 0f, mOuterCircleRadiusProgress * mRadius, mPaint);
-        Logger.e(mOuterCircleRadiusProgress + "mOuterCircleRadiusProgress");
         mPaint.setColor(Color.TRANSPARENT);
         mPaint.setXfermode(mSRCINPorterDuffXfermode);
         canvas.drawCircle(0, 0, mInnerCircleRadiusProgress * mRadius + 1, mPaint);
-        Logger.e(mInnerCircleRadiusProgress + "mInnerCircleRadiusProgress");
         mPaint.setXfermode(null);
         canvas.restore();
     }

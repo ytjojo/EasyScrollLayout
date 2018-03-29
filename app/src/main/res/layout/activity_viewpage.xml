@@ -7,18 +7,13 @@
                                                  android:orientation="vertical">
 
 
-    <com.github.ytjojo.scrollmaster.DefaultLoadView
+    <com.github.ytjojo.scrollmaster.styles.MaterialHeaderView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:sm_frictionfactor="0.5"
         app:sm_layoutGravity="outtop">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@mipmap/ic_launcher_round"/>
-    </com.github.ytjojo.scrollmaster.DefaultLoadView>
+    </com.github.ytjojo.scrollmaster.styles.MaterialHeaderView>
 
     <FrameLayout
         android:layout_width="match_parent"

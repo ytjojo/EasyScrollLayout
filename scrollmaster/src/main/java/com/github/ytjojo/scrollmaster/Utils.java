@@ -20,6 +20,9 @@ public class Utils {
     public static double mapValueFromRangeToRange(double value, double fromLow, double fromHigh, double toLow, double toHigh) {
         return toLow + ((value - fromLow) / (fromHigh - fromLow) * (toHigh - toLow));
     }
+    public static float mapValueFromRangeToRange(float value, float start,float end) {
+        return Math.abs((value- start)/(start-end));
+    }
 
     public static double clamp(double value, double low, double high) {
         return Math.min(Math.max(value, low), high);
@@ -65,10 +68,10 @@ public class Utils {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
 
-    public static float spring(float input){
+    public static float spring(float input) {
         float tension = 8;//min 4 max 12;
-        float friction= 20;//min 1 max 30;
+        float friction = 20;//min 1 max 30;
 
-        return (float) (1-Math.pow(Math.E,-tension * input)* Math.cos(friction * input));
+        return (float) (1 - Math.pow(Math.E, -tension * input) * Math.cos(friction * input));
     }
 }
