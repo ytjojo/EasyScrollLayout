@@ -79,15 +79,16 @@
       </intent-filter>
     </activity>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.ListViewActivity"/>
-    <activity android:name="com.github.ytjojo.scrollmaster.demo.ViewPagerAcitivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.RV_HD_RF_LMAcitivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.WebViewActivity"/>
-    <activity android:name="com.github.ytjojo.scrollmaster.demo.DrawerViewpagerActivity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.DL_VP_HD_Activity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.DrawerBannerActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.DrawerRecylerViewWithHeaderActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.HorizentalLoadActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.HorizentalLoadItemActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.ViewPagerEachWithRefreshLoadMoreActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.OuterTopMinHeightActvity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.WeiboActivity"/>
   </application>
 
 </manifest>

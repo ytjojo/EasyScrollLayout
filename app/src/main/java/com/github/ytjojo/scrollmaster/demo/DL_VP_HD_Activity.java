@@ -7,34 +7,22 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
-import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.gxz.PagerSlidingTabStrip;
 
 import java.util.HashMap;
 
 /**
- * Created by Administrator on 2017/11/26 0026.
+ * Created by Administrator on 2017/11/30 0030.
  */
 
-public class ViewPagerAcitivity extends AppCompatActivity {
+public class DL_VP_HD_Activity extends AppCompatActivity {
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_viewpage);
-        final ScrollMasterView easyScrollLayout = (ScrollMasterView) findViewById(R.id.easyScrolllayout);
-        easyScrollLayout.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
-            @Override
-            public void onStartLoad() {
-                easyScrollLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        easyScrollLayout.setTopHeaderLoadComplete();
-                    }
-                },4000);
-            }
-        });
+        setContentView(R.layout.activity_dl_vp_hd);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-
+        PagerSlidingTabStrip pagerSlidingTabStrip = (PagerSlidingTabStrip) findViewById(R.id.tab);
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             HashMap<Integer,Fragment> map =new HashMap<>();
             @Override
@@ -52,15 +40,15 @@ public class ViewPagerAcitivity extends AppCompatActivity {
                     case 1:
 
                         fragment =   new ScrollViewFragment();
-                    break;
+                        break;
                     case 2:
 
                         fragment =   new NestedScrollFragment();
-                    break;
+                        break;
                     case 3:
 
                         fragment =   new WebViewFragment();
-                    break;
+                        break;
                 }
                 map.put(position,fragment);
                 return fragment;
@@ -70,6 +58,24 @@ public class ViewPagerAcitivity extends AppCompatActivity {
             public int getCount() {
                 return 4;
             }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+
+                switch (position){
+                    case 0:
+                    return "RecycleView";
+                    case 1:
+                    return "ScrollView";
+                    case 2:
+                    return "NestedScrollView";
+                    case 3:
+                    return "WebView";
+
+                }
+                return super.getPageTitle(position);
+            }
         });
+        pagerSlidingTabStrip.setViewPager(viewPager);
     }
 }

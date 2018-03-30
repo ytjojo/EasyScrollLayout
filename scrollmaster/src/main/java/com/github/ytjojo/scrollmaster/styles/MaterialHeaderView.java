@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
 import com.github.ytjojo.scrollmaster.UIHandler;
 import com.github.ytjojo.scrollmaster.Utils;
-import com.orhanobut.logger.Logger;
 
 public class MaterialHeaderView extends FrameLayout implements UIHandler {
 
@@ -106,12 +105,14 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
         ViewCompat.setScaleX(mImageView, 0.001f);
         ViewCompat.setScaleY(mImageView, 0.001f);
         materialDrawable.setStartEndTrim(0,0.8f);
+        materialDrawable.setArrowScale(1);
         materialDrawable.showArrow(true);
     }
 
     @Override
     public void onUIRefreshBegin(BaseRefreshIndicator indicator) {
-       materialDrawable.start();
+        materialDrawable.setStartEndTrim(0,0f);
+        materialDrawable.start();
     }
 
     @Override
@@ -121,13 +122,18 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
     @Override
     public void onUIReleaseBeforeRefresh(BaseRefreshIndicator indicator) {
         materialDrawable.showArrow(false);
+        materialDrawable.setProgressRotation(0.8f);
     }
 
     @Override
     public void onUIScrollChanged(BaseRefreshIndicator indicator, int scrollValue, byte status) {
         float progress = indicator.getProgress(scrollValue);
         materialDrawable.setProgressRotation(Math.min(progress,1));
-        Logger.e("onUIScrollChanged"+ progress);
+        if(progress> 1.15f){
+            progress = 1.15f;
+        }
+        ViewCompat.setPivotX(mImageView,0.5f);
+        ViewCompat.setPivotX(mImageView,0.5f);
         ViewCompat.setScaleX(mImageView, progress);
         ViewCompat.setScaleY(mImageView, progress);
 

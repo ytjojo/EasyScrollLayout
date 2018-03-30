@@ -260,9 +260,6 @@ public class ScrollMasterView extends FrameLayout {
         if (mContentChildHolder != null) {
             if(mInnerTopView != null ){
                 int heghtSize = MeasureSpec.getSize(heightMeasureSpec) - mInnerTopView.getMinimumHeight();
-                if(mLayoutStartOffsetY < 0 ){
-                    heghtSize -= mLayoutStartOffsetY;
-                }
                 int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
                 measureChild(mContentChildHolder.mDirectChild, widthMeasureSpec, childHeightSpec);
             }else {
@@ -281,7 +278,7 @@ public class ScrollMasterView extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-
+//        super.onLayout(changed,l,t,r,b);
         resetValue();
         layoutChildren(l, t, r, b, false);
         if (mState == INITSTATE) {
@@ -431,6 +428,9 @@ public class ScrollMasterView extends FrameLayout {
                 childTop = 0 + mLayoutStartOffsetY;
                 lp.mMinScrollY = 0;
                 mMaxVerticalScrollRange += height - child.getMinimumHeight();
+                if(mLayoutStartOffsetY < 0){
+                    mMaxVerticalScrollRange +=mLayoutStartOffsetY;
+                }
                 lp.mMaxScrollY = mMaxVerticalScrollRange;
                 mOrientation |= ORIENTATION_VERTICAL;
                 break;
@@ -1428,6 +1428,7 @@ public class ScrollMasterView extends FrameLayout {
             mParallaxMultiplier = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0);
             mTrigeerExpandRatio = a.getFloat(R.styleable.ScrollMasterView_sm_trigeerExpandRatio, 1.2f);
             mFrictionFactor = a.getFloat(R.styleable.ScrollMasterView_sm_frictionfactor,0f);
+            mIgnoreScroll = a.getBoolean(R.styleable.ScrollMasterView_sm_ignorescroll,false);
             float defaultOverScrollRatio = 0.7f;
             if (mLayoutOutGravity == GRAVITY_OUT_LEFT) {
                 mWidthRatioOfParent = a.getFloat(R.styleable.ScrollMasterView_sm_left_widthRatioOfParent, 0);

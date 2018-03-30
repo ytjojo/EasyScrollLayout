@@ -142,7 +142,7 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
         mRing.setColors(COLORS);
 
         updateSizes(DEFAULT);
-        setupAnimators();
+        setupAnimators1();
         createCircleDrawable();
         setBackgroundColor(CIRCLE_BG_LIGHT);
         mDiameter = dp2px(40);
@@ -367,15 +367,14 @@ class MaterialDrawable extends Drawable implements Animatable,Drawable.Callback 
     public void start() {
         mAnimation.reset();
         mRing.storeOriginals();
-        setStartEndTrim(0,0);
         // Already showing some part of the ring
         if (mRing.getEndTrim() != mRing.getStartTrim()) {
             mFinishing = true;
             mAnimation.setDuration(ANIMATION_DURATION / 2);
             mAnimExcutor.startAnimation(mAnimation);
-            mRing.setShowArrow(false);
-            mRing.setColorIndex(0);
-            mRing.resetOriginals();
+//            mRing.setShowArrow(false);
+//            mRing.setColorIndex(0);
+//            mRing.resetOriginals();
         } else {
             mRing.setShowArrow(false);
             mRing.setColorIndex(0);

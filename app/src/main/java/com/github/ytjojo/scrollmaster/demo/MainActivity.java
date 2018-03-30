@@ -39,14 +39,14 @@ public class MainActivity extends AppCompatActivity {
 		findViewById(R.id.tv_viewpager).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,ViewPagerAcitivity.class);
+				Intent intent = new Intent(MainActivity.this,RV_HD_RF_LMAcitivity.class);
 				startActivity(intent);
 			}
 		});
 		findViewById(R.id.tv_viewpagerh).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,DrawerViewpagerActivity.class);
+				Intent intent = new Intent(MainActivity.this,DL_VP_HD_Activity.class);
 				startActivity(intent);
 			}
 		});
@@ -89,6 +89,13 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this,OuterTopMinHeightActvity .class);
+				startActivity(intent);
+			}
+		});
+		findViewById(R.id.tv_weibo).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,WeiboActivity .class);
 				startActivity(intent);
 			}
 		});

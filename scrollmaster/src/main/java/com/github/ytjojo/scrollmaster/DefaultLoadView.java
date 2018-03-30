@@ -244,6 +244,9 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
 
     @Override
     public void onUIReset(BaseRefreshIndicator indicator) {
+        if(mRepeateAnimator != null && mRepeateAnimator.isRunning()){
+            mRepeateAnimator.cancel();
+        }
         resetState();
     }
 
@@ -259,9 +262,7 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
 
     @Override
     public void onUIRefreshComplete(BaseRefreshIndicator indicator) {
-        if(mRepeateAnimator != null && mRepeateAnimator.isRunning()){
-            mRepeateAnimator.cancel();
-        }
+
     }
 
     @Override

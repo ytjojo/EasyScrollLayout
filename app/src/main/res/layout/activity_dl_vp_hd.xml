@@ -5,31 +5,40 @@
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
                                                  android:orientation="vertical"
+                                                 app:sm_layoutstartoffsety="-80dp"
                                                  app:sm_isDrawerLayoutStyle="true">
 
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="240dp"
         android:background="@android:color/white"
         android:gravity="center"
         android:orientation="vertical"
+        android:minHeight="40dp"
         app:sm_layoutGravity="innertop"
-        app:sm_parallaxMultiplier="0.5">
+       >
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/example"/>
-
-        <TextView
-            android:id="@+id/tvHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="header"/>
-    </LinearLayout>
+        <com.gxz.PagerSlidingTabStrip
+            android:id="@+id/tab"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:pstsDividerColor="@android:color/transparent"
+            app:pstsIndicatorColor="@color/accent_material_light"
+            app:pstsIndicatorHeight="3dp"
+            app:pstsUnderlineHeight="0dp"
+            app:pstsShouldExpand="false"
+            app:pstsTextSelectedColor="@color/accent_material_light"
+            app:pstsUnderlineColor="@color/colorAccent" />
+    </FrameLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"

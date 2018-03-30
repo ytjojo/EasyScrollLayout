@@ -27,5 +27,6 @@
         <attr name="sm_trigeerExpandRatio" format="float"/>
         <attr name="sm_right_widthRatioOfParent" format="float"/>
         <attr name="sm_frictionfactor" format="float"/>
+        <attr name="sm_ignorescroll" format="boolean"/>
     </declare-styleable>
 </resources>

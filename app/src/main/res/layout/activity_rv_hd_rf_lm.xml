@@ -17,7 +17,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="240dp"
         android:gravity="center"
         android:orientation="vertical"
         app:sm_layoutGravity="innertop"
@@ -28,20 +28,23 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/example"/>
-
-        <TextView
-            android:id="@+id/tvHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@android:color/white"
-            android:text="header"/>
     </FrameLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
+    <com.github.ytjojo.scrollmaster.ContentWraperView
+        android:id="@+id/contentWraperview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></android.support.v4.view.ViewPager>
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recylerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+        <com.github.ytjojo.scrollmaster.styles.MaterialHeaderView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:sm_frictionfactor="0.5"
+            app:sm_contentwrper_layoutGravity="outbottom">
+
+        </com.github.ytjojo.scrollmaster.styles.MaterialHeaderView>
+
+    </com.github.ytjojo.scrollmaster.ContentWraperView>
+
 </com.github.ytjojo.scrollmaster.ScrollMasterView>
