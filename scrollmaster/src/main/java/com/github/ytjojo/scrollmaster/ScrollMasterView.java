@@ -605,6 +605,7 @@ public class ScrollMasterView extends FrameLayout {
                         isHorizontalScroll = true;
                         mDragging = true;
                         dispatchHorizontalScroll(vtev, dx);
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         mLastMotionY = y;
                         mLastMotionX = x;
                     } else if (yDiff > mTouchSlop && yDiff > xDiff && (mOrientation & ORIENTATION_VERTICAL) == ORIENTATION_VERTICAL) {
@@ -1264,6 +1265,23 @@ public class ScrollMasterView extends FrameLayout {
         if(mDragging){
             return;
         }
+        if(mOrientation ==ORIENTATION_HORIZONTAL ){
+            final int dy = Math.abs(mLastEventPoint.y - mFirstMotionY);
+            final int dx = Math.abs(mLastEventPoint.x - mFirstMotionX);
+            if (dy - mTouchSlop > 0 && dx - mTouchSlop > 0 && dx > dy) {
+                ViewParent parent = getParent();
+                while (parent !=null){
+                    if(parent instanceof ScrollMasterView){
+                        ScrollMasterView scrollMasterView = (ScrollMasterView) parent;
+                        scrollMasterView.setUnableToDrag();
+                        break;
+                    }
+                    parent = parent.getParent();
+                }
+                isHorizontalScroll = true;
+                mDragging = true;
+            }
+        }
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
         if (!isEnabled()) {
             return;
@@ -1307,6 +1325,10 @@ public class ScrollMasterView extends FrameLayout {
             }
         }
 
+    }
+
+    public void setUnableToDrag(){
+        mIsUnableToDrag = true;
     }
 
     ShadowDrawable mShadowDrawable;
