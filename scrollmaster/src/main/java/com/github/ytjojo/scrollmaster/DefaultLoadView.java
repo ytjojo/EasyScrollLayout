@@ -96,6 +96,8 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
             lp.gravity = Gravity.CENTER;
             this.addView(mImageView, lp);
         }
+        mImageView.setScaleX(0.0f);
+        mImageView.setScaleY(0.0f);
 //        mImageView.setPivotX(0.5f);
 //        mImageView.setPivotY(0.5f);
     }
