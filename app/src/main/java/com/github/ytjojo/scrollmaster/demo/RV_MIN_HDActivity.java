@@ -3,21 +3,26 @@ package com.github.ytjojo.scrollmaster.demo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.github.ytjojo.scrollmaster.demo.util.StatusBarUtil;
+import com.github.ytjojo.scrollmaster.util.AnimateScrimUtil;
 
 /**
  * Created by Administrator on 2018/3/23 0023.
  */
 
-public class OuterTopMinHeightActvity extends AppCompatActivity {
+public class RV_MIN_HDActivity extends AppCompatActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceStat) {
         super.onCreate(savedInstanceStat);
@@ -58,5 +63,18 @@ public class OuterTopMinHeightActvity extends AppCompatActivity {
             }
 
         });
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
+        StatusBarUtil.darkMode(this);
+        StatusBarUtil.setPaddingSmart(this,toolbar);
+        View header = findViewById(R.id.header);
+        header.setMinimumHeight(header.getMinimumHeight()+ StatusBarUtil.getStatusBarHeight(this));
+        AnimateScrimUtil.setScrimBackgroud(easyScrollLayout,toolbar,getResources().getColor(R.color.colorPrimary));
+
     }
 }

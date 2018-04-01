@@ -174,6 +174,9 @@ public class ScrollMasterView extends FrameLayout {
     public void setLayoutStartOffsetY(int layoutStartOffsetY){
         this.mLayoutStartOffsetY = layoutStartOffsetY;
     }
+    public int getLayoutStartOffsetY(){
+        return mLayoutStartOffsetY;
+    }
 
     public HorizontalScrollHandlar getHorizontalScrollHandlar() {
         return mHorizontalScrollHandlar;
@@ -283,9 +286,7 @@ public class ScrollMasterView extends FrameLayout {
         layoutChildren(l, t, r, b, false);
         if (mState == INITSTATE) {
             mState = STATE_EXPAND;
-            if (mOnScollListener != null) {
-                mOnScollListener.onScroll(0f, getScrollY(), mMaxVerticalScrollRange);
-            }
+            dispatchOnScroll(0f, getScrollY(), mMaxVerticalScrollRange);
         }
 
         if (mHorizontalScrollHandlar != null) {
@@ -679,8 +680,8 @@ public class ScrollMasterView extends FrameLayout {
                 isHandlar = dispatchTouchEventSupper(event);
                 break;
             case MotionEventCompat.ACTION_POINTER_UP:
+                mNestScrollOffsetYs.put(mActivePointerId,0);
                 onSecondaryPointerUp(event);
-
                 isHandlar = dispatchTouchEventSupper(event);
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -1193,26 +1194,22 @@ public class ScrollMasterView extends FrameLayout {
             }
             if (mInnerTopView != null) {
                 if (getScrollY() >= 0) {
-                    float offsetRatio = ((float) scrollY) / mMaxVerticalScrollRange;
-                    if (mOnScollListener != null) {
-                        if (offsetRatio == 0) {
-                            mState = STATE_EXPAND;
+                    float offsetRatio = ((float) scrollY) / max;
+                    if (offsetRatio == 0) {
+                        mState = STATE_EXPAND;
 
-                        } else if (offsetRatio == 1) {
-                            mState = STATE_COLLAPSED;
-                        }
-                        mOnScollListener.onScroll(offsetRatio, scrollY, max);
+                    } else if (offsetRatio == 1) {
+                        mState = STATE_COLLAPSED;
                     }
+                    dispatchOnScroll(offsetRatio, scrollY, max);
                     if (mInnerTopParallaxMult != 0) {
                         int totalOffset = (int) ((mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight()) * mInnerTopParallaxMult);
                         float verticalOffset = totalOffset * offsetRatio;
                         ViewCompat.setTranslationY(mInnerTopView, (int) verticalOffset);
                     }
                 } else if (lastScrolly > 0 && y <= 0) {
-                    if (mOnScollListener != null) {
-                        mOnScollListener.onScroll(0f, 0, max);
-                        mState = STATE_EXPAND;
-                    }
+                    dispatchOnScroll(0f,0,max);
+                    mState = STATE_EXPAND;
                     if (mInnerTopParallaxMult != 0) {
                         ViewCompat.setTranslationY(mInnerTopView, 0);
                     }
@@ -1549,10 +1546,20 @@ public class ScrollMasterView extends FrameLayout {
         }
     }
 
-    public OnScollListener mOnScollListener;
 
-    public void setOnScollListener(OnScollListener l) {
-        this.mOnScollListener = l;
+    ArrayList<OnScollListener> mOnScollListeners;
+    public void addOnScrollListener(OnScollListener l){
+        if(mOnScollListeners == null){
+            mOnScollListeners = new ArrayList<>();
+        }
+        mOnScollListeners.add(l);
+    }
+    public void dispatchOnScroll(float offsetRatio, int positionOffsetPixels, int offsetRange){
+        if(mOnScollListeners != null) {
+            for(OnScollListener l: mOnScollListeners){
+                l.onScroll(offsetRatio,positionOffsetPixels,offsetRange);
+            }
+        }
     }
 
     public interface OnScollListener {

@@ -15,7 +15,7 @@ import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.animation.Interpolator;
 
-import static com.github.ytjojo.scrollmaster.ScrimUtil.constrain;
+import static com.github.ytjojo.scrollmaster.GradientScrimDrawableUtil.constrain;
 
 /**
  * https://github.com/MasayukiSuda/EasingInterpolator

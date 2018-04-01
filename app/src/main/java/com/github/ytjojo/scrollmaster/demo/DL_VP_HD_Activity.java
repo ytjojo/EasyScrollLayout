@@ -6,7 +6,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
+import com.github.ytjojo.scrollmaster.GradientScrimDrawableUtil;
+import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.github.ytjojo.scrollmaster.demo.util.StatusBarUtil;
+import com.github.ytjojo.scrollmaster.util.AnimateScrimUtil;
 import com.gxz.PagerSlidingTabStrip;
 
 import java.util.HashMap;
@@ -23,6 +28,7 @@ public class DL_VP_HD_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_dl_vp_hd);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         PagerSlidingTabStrip pagerSlidingTabStrip = (PagerSlidingTabStrip) findViewById(R.id.tab);
+        ScrollMasterView scrollMasterView = (ScrollMasterView) findViewById(R.id.scrollmasterview);
         viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             HashMap<Integer,Fragment> map =new HashMap<>();
             @Override
@@ -77,5 +83,9 @@ public class DL_VP_HD_Activity extends AppCompatActivity {
             }
         });
         pagerSlidingTabStrip.setViewPager(viewPager);
+        StatusBarUtil.immersive(this);
+        View header = findViewById(R.id.header);
+        header.setMinimumHeight(header.getMinimumHeight()+StatusBarUtil.getStatusBarHeight(this));
+        AnimateScrimUtil.setUpdateScrimAbility(scrollMasterView,header,findViewById(R.id.dummyView));
     }
 }

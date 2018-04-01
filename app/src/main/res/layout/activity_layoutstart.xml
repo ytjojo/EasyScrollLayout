@@ -8,13 +8,15 @@
                                                      android:orientation="vertical"
                                                      android:id="@+id/easyScrolllayout"
                                                      android:layout_width="match_parent"
-                                                     app:sm_layoutstartoffsety="130dp"
+                                                     app:sm_layoutstartoffsety="?attr/actionBarSize"
                                                      android:layout_height="match_parent">
         <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             app:sm_frictionfactor="0.3"
+            app:sm_overscrollratio="0.4"
+            app:sm_trigeerExpandRatio="1.1"
             app:sm_layoutGravity="outtop">
             <ImageView
                 android:src="@mipmap/ic_launcher_round"
@@ -36,9 +38,9 @@
     <com.github.mmin18.widget.RealtimeBlurView
         android:id="@+id/blurView"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
-        app:realtimeBlurRadius="20dp"
-        app:realtimeOverlayColor="#aa3bb2ff"
+        android:layout_height="?attr/actionBarSize"
+        app:realtimeBlurRadius="10dp"
+        app:realtimeOverlayColor="#8a3bb2ff"
         app:sm_ignorescroll="true"/>
     <android.support.v7.widget.Toolbar style="@style/AppTheme.Toolbar.Light"
                                        android:id="@+id/toolbar"

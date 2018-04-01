@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.github.ytjojo.scrollmaster.ScrollMasterView xmlns:android="http://schemas.android.com/apk/res/android"
                                                  xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                 android:id="@+id/StickyNavLayout"
+                                                 android:id="@+id/scrollmasterview"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
                                                  android:orientation="vertical"
@@ -10,12 +10,13 @@
 
 
     <FrameLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:background="@android:color/white"
         android:gravity="center"
         android:orientation="vertical"
-        android:minHeight="40dp"
+        android:minHeight="?attr/actionBarSize"
         app:sm_layoutGravity="innertop"
        >
 
@@ -24,11 +25,18 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/example"/>
+        <View
+            android:id="@+id/dummyView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@color/colorPrimary"
+            />
         <com.gxz.PagerSlidingTabStrip
             android:id="@+id/tab"
             android:layout_gravity="bottom"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="?attr/actionBarSize"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             app:pstsDividerColor="@android:color/transparent"

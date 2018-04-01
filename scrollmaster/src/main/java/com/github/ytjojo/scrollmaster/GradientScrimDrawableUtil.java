@@ -14,11 +14,11 @@ import android.view.Gravity;
  * https://github.com/romannurik/muzei/blob/master/main/src/main/java/com/google/android/apps/muzei/util/ScrimUtil.java
  * Utility methods for creating prettier gradient scrims.
  */
-public class ScrimUtil {
+public class GradientScrimDrawableUtil {
 
     private static final LruCache<Integer, Drawable> cubicGradientScrimCache = new LruCache<>(10);
 
-    private ScrimUtil() {
+    private GradientScrimDrawableUtil() {
     }
 
     /**

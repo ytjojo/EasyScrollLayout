@@ -87,7 +87,7 @@
     <activity android:name="com.github.ytjojo.scrollmaster.demo.HorizentalLoadActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.HorizentalLoadItemActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.ViewPagerEachWithRefreshLoadMoreActivity"/>
-    <activity android:name="com.github.ytjojo.scrollmaster.demo.OuterTopMinHeightActvity"/>
+    <activity android:name="com.github.ytjojo.scrollmaster.demo.RV_MIN_HDActivity"/>
     <activity android:name="com.github.ytjojo.scrollmaster.demo.WeiboActivity"/>
   </application>
 

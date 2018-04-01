@@ -4,7 +4,7 @@
                                                  android:id="@+id/easyScrolllayout"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
-                                                 app:sm_isDrawerLayoutStyle="true"
+
                                                  android:orientation="vertical">
 
     <com.github.ytjojo.scrollmaster.DefaultLoadView
@@ -21,9 +21,10 @@
     </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
     <FrameLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:minHeight="100dp"
+        android:layout_height="260dp"
+        android:minHeight="?attr/actionBarSize"
         android:gravity="center"
         android:orientation="vertical"
         app:sm_layoutGravity="innertop"
@@ -34,19 +35,16 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/example"/>
-
-        <TextView
-            android:id="@+id/tvHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@android:color/white"
-            android:text="header"/>
     </FrameLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recylerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+    <android.support.v7.widget.Toolbar style="@style/AppTheme.Toolbar.Light"
+                                       android:id="@+id/toolbar"
+                                       android:background="@android:color/transparent"
+                                       android:theme="@style/AppTheme.Toolbar.Dark"
+                                       app:sm_ignorescroll="true"
+                                       app:title="标题"/>
+
 </com.github.ytjojo.scrollmaster.ScrollMasterView>

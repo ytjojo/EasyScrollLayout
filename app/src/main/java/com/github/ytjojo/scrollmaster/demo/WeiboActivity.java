@@ -7,9 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 
 import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.github.ytjojo.scrollmaster.demo.util.StatusBarUtil;
 
 /**
  * Created by Administrator on 2018/3/30 0030.
@@ -38,5 +40,12 @@ public class WeiboActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setBackgroundColor(Color.WHITE);
         recyclerView.setAdapter(new BaseRecyclerViewAdapter(R.layout.item_simple));
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        StatusBarUtil.darkMode(this);
+//        StatusBarUtil.setPaddingSmart(this, recyclerView);
+        recyclerView.setClipToPadding(false);
+        easyScrollLayout.setLayoutStartOffsetY(easyScrollLayout.getLayoutStartOffsetY()+StatusBarUtil.getStatusBarHeight(this));
+        StatusBarUtil.setPaddingSmart(this, toolbar);
+        StatusBarUtil.setPaddingSmart(this, findViewById(R.id.blurView));
     }
 }
