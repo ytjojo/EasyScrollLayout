@@ -38,7 +38,8 @@ public class RV_HD_SCALEIMGActivity extends AppCompatActivity {
         headerView.setMinimumHeight((int) (headerView.getMinimumHeight()+ statusBarHeight));
         final int actionbarSize = getResources().getDimensionPixelOffset(R.dimen.actionBarSize);
         final float minImageHeight = actionbarSize * 0.85f;
-        final float ratio = minImageHeight/ Utils.dipToPixels(this,60);
+        final float imageWidth = Utils.dipToPixels(this,60);
+        final float ratio = minImageHeight/imageWidth ;
         int widthPixels = getResources().getDisplayMetrics().widthPixels;
         final int minMarginLeft = (int) Utils.dipToPixels(this,120);
 
