@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.github.ytjojo.scrollmaster.ScrollMasterView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:id="@+id/scrollmasterview"
+                                                 android:orientation="vertical"
+
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/header"
+        app:sm_layoutGravity="innertop"
+        android:minHeight="?attr/actionBarSize"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:src="@drawable/headback"
+        android:layout_height="240dp">
+
+    </ImageView>
+    <android.support.v7.widget.Toolbar style="@style/AppTheme.Toolbar.Light"
+                                       android:id="@+id/toolbar"
+                                       android:background="@android:color/transparent"
+                                       android:theme="@style/AppTheme.Toolbar.Dark"
+                                       app:sm_ignorescroll="true"
+                                       app:title="标题"/>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_marginTop="90dp"
+        android:id="@+id/iv_photo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/photo1"
+        app:civ_border_color="@android:color/white"
+        app:civ_border_width="2dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="60dp"
+        android:layout_height="60dp"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recylerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+</com.github.ytjojo.scrollmaster.ScrollMasterView>

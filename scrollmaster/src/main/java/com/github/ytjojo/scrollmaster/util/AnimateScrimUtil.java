@@ -3,9 +3,11 @@ package com.github.ytjojo.scrollmaster.util;
 import android.animation.ValueAnimator;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
+import android.support.v4.util.Pools;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -113,7 +115,11 @@ public class AnimateScrimUtil {
     public static void setScrimBackgroud(ScrollMasterView masterView, final View actionbar, @ColorInt int color) {
         ColorDrawable drawable = new ColorDrawable(color);
         drawable.setAlpha(0);
-        actionbar.setBackground(drawable);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            actionbar.setBackground(drawable);
+        }else {
+            actionbar.setBackgroundDrawable(drawable);
+        }
         masterView.addOnScrollListener(new ScrollMasterView.OnScollListener() {
             @Override
             public void onScroll(float offsetRatio, int positionOffsetPixels, int offsetRange) {

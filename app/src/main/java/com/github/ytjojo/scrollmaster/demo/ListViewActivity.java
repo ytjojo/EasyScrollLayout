@@ -89,7 +89,7 @@ public class ListViewActivity extends AppCompatActivity {
         }
         SimpleAdapter simpleadapter = new SimpleAdapter(this, listems,
                 R.layout.item_list_simple, new String[] { "name", "head", "desc" },
-                new int[] {R.id.name,R.id.head,R.id.desc});
+                new int[] {R.id.name,R.id.photo,R.id.desc});
         mListView.setAdapter(simpleadapter);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
