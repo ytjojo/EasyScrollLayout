@@ -14,8 +14,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.OverScroller;
 import android.widget.ScrollView;
 
-import com.orhanobut.logger.Logger;
-
 /**
  * Created by Administrator on 2017/11/29 0029.
  */
@@ -243,7 +241,7 @@ public class HorizontalScrollHandlar {
 
 
         mScrollX = targetScrollX;
-        Logger.e("offsetDx" + offsetDx + "mScrollX " + mScrollX);
+//        Logger.e("offsetDx" + offsetDx + "mScrollX " + mScrollX);
         offsetContenViews();
         offsetLeftView();
         offsetRightView();
@@ -297,7 +295,7 @@ public class HorizontalScrollHandlar {
                 }
             } else {
                 int offset = (mScrollX - mOutLeftView.getRight());
-                Logger.e("offset" + mScrollX);
+//                Logger.e("offset" + mScrollX);
                 ViewCompat.offsetLeftAndRight(mOutLeftView, offset);
             }
 

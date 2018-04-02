@@ -113,7 +113,7 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
 
     @Override
     public void onUIRefreshBegin(BaseRefreshIndicator indicator) {
-        materialDrawable.setStartEndTrim(0,0f);
+//        materialDrawable.setStartEndTrim(0,0.8f);
         materialDrawable.start();
     }
 
@@ -123,14 +123,14 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
 
     @Override
     public void onUIReleaseBeforeRefresh(BaseRefreshIndicator indicator) {
-        materialDrawable.showArrow(false);
-        materialDrawable.setProgressRotation(0.8f);
+//        materialDrawable.showArrow(false);
+//        materialDrawable.setProgressRotation(0.8f);
     }
 
     @Override
     public void onUIScrollChanged(BaseRefreshIndicator indicator, int scrollValue, byte status) {
         float progress = indicator.getProgress(scrollValue);
-        materialDrawable.setProgressRotation(Math.min(progress,1));
+        materialDrawable.setProgressRotation(Math.min(progress*0.7f,1));
         if(progress> 1.15f){
             progress = 1.15f;
         }

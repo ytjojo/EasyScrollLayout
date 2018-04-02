@@ -48,7 +48,6 @@ public class FlingResume implements Runnable {
                 long time = SystemClock.uptimeMillis();
                 mEventYOffset =  mScrollMasterView.getHeight() * 0.75f + mScroller.getCurrY();
                 event = MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
-                Logger.e("1eventY"+ event.getY());
                 state++;
                 mScrollMasterView.dispatchTouchEventSupper(event);
             } else {
@@ -58,7 +57,6 @@ public class FlingResume implements Runnable {
                 if (state == 2) {
                     long time = SystemClock.uptimeMillis();
                     event = MotionEvent.obtain(time, time, MotionEvent.ACTION_MOVE, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
-                    Logger.e("2eventY"+ event.getY());
                     mScrollMasterView.dispatchTouchEventSupper(event);
                 }
             }
@@ -71,7 +69,6 @@ public class FlingResume implements Runnable {
                 }else {
                     event = MotionEvent.obtain(time, time, MotionEvent.ACTION_CANCEL, mEventX, mEventYOffset - mScroller.getCurrY(), 0);
                 }
-                Logger.e("3eventY"+ event.getY());
                 mScrollMasterView.dispatchTouchEventSupper(event);
                 state++;
             }

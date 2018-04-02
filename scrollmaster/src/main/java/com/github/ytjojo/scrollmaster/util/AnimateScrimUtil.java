@@ -2,12 +2,10 @@ package com.github.ytjojo.scrollmaster.util;
 
 import android.animation.ValueAnimator;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
-import android.support.v4.util.Pools;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -19,7 +17,6 @@ import android.view.animation.LinearInterpolator;
 
 import com.github.ytjojo.scrollmaster.R;
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
-import com.orhanobut.logger.Logger;
 
 /**
  * Created by Administrator on 2018/4/1 0001.
@@ -42,7 +39,6 @@ public class AnimateScrimUtil {
             @Override
             public void onScroll(float offsetRatio, int positionOffsetPixels, int offsetRange) {
                 updateScrimVisibility(dummyView);
-                Logger.e(masterView.getLayoutStartOffsetY() + "positionOffsetPixels" + positionOffsetPixels + "offsetRange" + offsetRange);
                 setScrimsShown(dummyView, positionOffsetPixels > 2 * offsetRange / 3);
             }
         });

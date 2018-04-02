@@ -489,7 +489,7 @@ public class ContentWraperView extends FrameLayout {
             }
         }
         consumed[3] += lastScrollY -  getScrollY();
-        Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
+//        Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
     }
 
     public void preScrollConsumedWithFactor(int dy, int[] consumed) {
@@ -609,7 +609,7 @@ public class ContentWraperView extends FrameLayout {
             }
         }
         consumed[3] += lastScrollY - getScrollY();
-        Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
+//        Logger.e(dy + "contentwraperPreScroll  " + consumed[1]);
     }
 
     public void preScrollUp(int dy, int[] consumed) {

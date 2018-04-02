@@ -277,7 +277,7 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
         if (indicator.getStatus() == BaseRefreshIndicator.PTR_STATUS_PREPARE) {
             if (scrollValue <= Math.abs(indicator.getStableValue() - indicator.getLimitValue())) {
                 float ratio = Math.abs(scrollValue * 1f / (indicator.getStableValue() - indicator.getLimitValue()));
-                Logger.e("percent" + ratio);
+//                Logger.e("percent" + ratio);
                 final float stepRatio = 0.5f;
                 if (ratio <= stepRatio) {
                     float percent1 = ratio / stepRatio;
@@ -300,7 +300,7 @@ public class DefaultLoadView extends FrameLayout implements UIHandler {
                     setCurrentProgress(ACCELERATE_DECELERATE_INTERPOLATOR.getInterpolation(ratio - 0.1f));
                     float scaleXY = (ratio- stepRatio)/ stepRatio;
                     scaleXY = OVERSHOOT_INTERPOLATOR.getInterpolation(scaleXY )*0.8f+0.2f;
-                    Logger.e(scaleXY + "scaleXY" +ratio);
+//                    Logger.e(scaleXY + "scaleXY" +ratio);
                     mImageView.setScaleX(scaleXY);
                     mImageView.setScaleY(scaleXY);
                 }

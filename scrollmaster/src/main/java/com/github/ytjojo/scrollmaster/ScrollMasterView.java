@@ -1258,7 +1258,6 @@ public class ScrollMasterView extends FrameLayout {
 
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        Logger.e(disallowIntercept + "disallowIntercept");
         if(mDragging){
             return;
         }

@@ -4,7 +4,6 @@ import android.support.v4.view.ViewCompat;
 import android.view.View;
 
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
-import com.orhanobut.logger.Logger;
 
 /**
  * Created by Administrator on 2018/4/2 0002.
@@ -43,7 +42,7 @@ public class TransiationScaleBehvior implements ScrollMasterView.OnScollListener
         mTargetView.setScaleY(scale);
         mTargetView.setTranslationX(-(mTargetView.getLeft() - mMinMarginLeft) * offsetRatio);
         mTargetView.setTranslationY(positionOffsetPixels-((mTargetView.getTop()+mViewHeight/2f - mMInBottom) * offsetRatio));
-        Logger.e(((mTargetView.getTop()+mViewHeight/2f - mMInBottom))+"positionOffsetPixels"+ positionOffsetPixels+ " offsetRatio"+ offsetRatio + "offsetRange" + offsetRange );
+//        Logger.e(((mTargetView.getTop()+mViewHeight/2f - mMInBottom))+"positionOffsetPixels"+ positionOffsetPixels+ " offsetRatio"+ offsetRatio + "offsetRange" + offsetRange );
     }
 
     public static void setTranslationScale(final ScrollMasterView scrollMasterView,

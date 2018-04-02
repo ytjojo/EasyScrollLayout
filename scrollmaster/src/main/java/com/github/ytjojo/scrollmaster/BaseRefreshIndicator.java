@@ -2,8 +2,6 @@ package com.github.ytjojo.scrollmaster;
 
 import android.view.View;
 
-import com.orhanobut.logger.Logger;
-
 import java.util.ArrayList;
 
 /**
@@ -129,14 +127,12 @@ public abstract class BaseRefreshIndicator {
     }
 
     public void dispatchReset() {
-        Logger.e("header ::: ------> dispatchReset");
         for (UIHandler uiHandler : mUiHandlers) {
             uiHandler.onUIReset(this);
         }
     }
 
     public void dispatchStartRefresh() {
-        Logger.e("header ::: ------> dispatchStartRefresh");
         for (UIHandler uiHandler : mUiHandlers) {
             uiHandler.onUIRefreshBegin(this);
         }
@@ -146,14 +142,12 @@ public abstract class BaseRefreshIndicator {
     }
 
     public void dispatchRefreshPrepare() {
-        Logger.e("header ::: ------> dispatchRefreshPrepare");
         for (UIHandler uiHandler : mUiHandlers) {
             uiHandler.onUIRefreshPrepare(this);
         }
     }
 
     public void dispatchReleaseBeforeRefresh() {
-        Logger.e("header ::: ------> dispatchReleaseBeforeRefresh");
         for (UIHandler uiHandler : mUiHandlers) {
             uiHandler.onUIReleaseBeforeRefresh(this);
         }
