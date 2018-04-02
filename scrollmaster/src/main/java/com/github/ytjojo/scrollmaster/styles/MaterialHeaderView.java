@@ -64,6 +64,8 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
         layoutParams.gravity = Gravity.CENTER;
 //        addView(circleProgressBar);
         mImageView = new ImageView(getContext());
+        int padding = (int) Utils.dipToPixels(getContext(),3);
+        this.setPadding(0,padding,0,padding);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         materialDrawable = new MaterialDrawable(getContext(),this);
         materialDrawable.setBackgroundColor(progressBg);
@@ -100,8 +102,8 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
 
     @Override
     public void onUIRefreshPrepare(BaseRefreshIndicator indicator) {
-        ViewCompat.setPivotX(mImageView,0.5f);
-        ViewCompat.setPivotX(mImageView,0.5f);
+        ViewCompat.setPivotX(mImageView,0.5f*mImageView.getWidth());
+        ViewCompat.setPivotY(mImageView,0.5f* mImageView.getHeight());
         ViewCompat.setScaleX(mImageView, 0.001f);
         ViewCompat.setScaleY(mImageView, 0.001f);
         materialDrawable.setStartEndTrim(0,0.8f);
@@ -132,8 +134,6 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
         if(progress> 1.15f){
             progress = 1.15f;
         }
-        ViewCompat.setPivotX(mImageView,0.5f);
-        ViewCompat.setPivotX(mImageView,0.5f);
         ViewCompat.setScaleX(mImageView, progress);
         ViewCompat.setScaleY(mImageView, progress);
 
