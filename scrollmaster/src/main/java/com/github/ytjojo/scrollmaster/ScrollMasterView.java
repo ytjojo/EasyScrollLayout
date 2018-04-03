@@ -262,7 +262,7 @@ public class ScrollMasterView extends FrameLayout {
         }
         if (mContentChildHolder != null) {
             if(mInnerTopView != null ){
-                int heghtSize = MeasureSpec.getSize(heightMeasureSpec) - mInnerTopView.getMinimumHeight();
+                int heghtSize = MeasureSpec.getSize(heightMeasureSpec) - ViewCompat.getMinimumHeight(mInnerTopView);
                 int childHeightSpec = MeasureSpec.makeMeasureSpec(heghtSize, MeasureSpec.EXACTLY);
                 measureChild(mContentChildHolder.mDirectChild, widthMeasureSpec, childHeightSpec);
             }else {
@@ -338,7 +338,7 @@ public class ScrollMasterView extends FrameLayout {
                     gravity = DEFAULT_CHILD_GRAVITY;
                 }
 
-                final int layoutDirection = getLayoutDirection();
+                final int layoutDirection = ViewCompat.getLayoutDirection(this);
                 final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
                 final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
 
@@ -428,7 +428,7 @@ public class ScrollMasterView extends FrameLayout {
                 childLeft = 0;
                 childTop = 0 + mLayoutStartOffsetY;
                 lp.mMinScrollY = 0;
-                mMaxVerticalScrollRange += height - child.getMinimumHeight();
+                mMaxVerticalScrollRange += height - ViewCompat.getMinimumHeight(child);
                 if(mLayoutStartOffsetY < 0){
                     mMaxVerticalScrollRange +=mLayoutStartOffsetY;
                 }
@@ -1203,7 +1203,7 @@ public class ScrollMasterView extends FrameLayout {
                     }
                     dispatchOnScroll(offsetRatio, scrollY, max);
                     if (mInnerTopParallaxMult != 0) {
-                        int totalOffset = (int) ((mInnerTopView.getMeasuredHeight() - mInnerTopView.getMinimumHeight()) * mInnerTopParallaxMult);
+                        int totalOffset = (int) ((mInnerTopView.getMeasuredHeight() - ViewCompat.getMinimumHeight(mInnerTopView)) * mInnerTopParallaxMult);
                         float verticalOffset = totalOffset * offsetRatio;
                         ViewCompat.setTranslationY(mInnerTopView, (int) verticalOffset);
                     }
@@ -1338,6 +1338,7 @@ public class ScrollMasterView extends FrameLayout {
         return result;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void drawGradientDrawable(View child, Canvas canvas) {
         if (mGradientDrawable == null) {
             mGradientDrawable = new GradientDrawable();

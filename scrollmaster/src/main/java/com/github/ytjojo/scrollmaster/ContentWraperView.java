@@ -167,7 +167,7 @@ public class ContentWraperView extends FrameLayout {
                     gravity = DEFAULT_CHILD_GRAVITY;
                 }
 
-                final int layoutDirection = getLayoutDirection();
+                final int layoutDirection = ViewCompat.getLayoutDirection(this);
                 final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
                 final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
 
