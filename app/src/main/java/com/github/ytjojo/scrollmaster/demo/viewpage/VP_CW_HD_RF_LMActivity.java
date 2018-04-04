@@ -1,4 +1,4 @@
-package com.github.ytjojo.scrollmaster.demo;
+package com.github.ytjojo.scrollmaster.demo.viewpage;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +18,10 @@ import android.widget.Toast;
 
 import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
 import com.github.ytjojo.scrollmaster.ContentWraperView;
+import com.github.ytjojo.scrollmaster.demo.BaseListViewAdapter;
+import com.github.ytjojo.scrollmaster.demo.BaseRecyclerViewAdapter;
+import com.github.ytjojo.scrollmaster.demo.R;
+import com.github.ytjojo.scrollmaster.demo.ViewpagerFragmentAdapter;
 
 import java.util.ArrayList;
 
@@ -25,11 +29,11 @@ import java.util.ArrayList;
  * Created by Administrator on 2018/1/14 0014.
  */
 
-public class ViewPagerEachWithRefreshLoadMoreActivity extends AppCompatActivity {
+public class VP_CW_HD_RF_LMActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_viewpager_withinnertop);
+        setContentView(R.layout.activity_vp_hd_rf_lm_contentwrap);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         ArrayList<Class<? extends Fragment>> fragments= new ArrayList<>();
         fragments.add(RecyclerViewFragment.class);

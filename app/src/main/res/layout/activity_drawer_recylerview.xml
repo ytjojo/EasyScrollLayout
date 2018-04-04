@@ -42,21 +42,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white">
-
-        <com.github.ytjojo.scrollmaster.DefaultLoadView
+        <com.github.ytjojo.scrollmaster.demo.loadingView.RandomSpinKitView
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:gravity="center"
+            android:layout_height="wrap_content"
             app:sm_parallaxMultiplier="0.5"
-            app:sm_contentwrper_layoutGravity="outtop">
-
-            <ImageView
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher_round"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-               />
-        </com.github.ytjojo.scrollmaster.DefaultLoadView>
+            app:sm_trigeerExpandRatio="0.6"
+            app:sm_overscrollratio="0"
+            app:sm_contentwrper_layoutGravity="outtop"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recylerview"

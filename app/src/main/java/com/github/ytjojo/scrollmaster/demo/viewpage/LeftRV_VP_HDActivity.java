@@ -1,4 +1,4 @@
-package com.github.ytjojo.scrollmaster.demo;
+package com.github.ytjojo.scrollmaster.demo.viewpage;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,12 +12,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.github.ytjojo.scrollmaster.demo.BaseRecyclerViewAdapter;
+import com.github.ytjojo.scrollmaster.demo.NestedScrollFragment;
+import com.github.ytjojo.scrollmaster.demo.R;
+import com.github.ytjojo.scrollmaster.demo.RecyclerViewFragment;
+import com.github.ytjojo.scrollmaster.demo.ScrollViewFragment;
+import com.github.ytjojo.scrollmaster.demo.ViewpagerFragmentAdapter;
+import com.github.ytjojo.scrollmaster.demo.WebViewFragment;
 import com.orhanobut.logger.Logger;
 import com.shizhefei.view.indicator.BannerComponent;
 
 import java.util.ArrayList;
 
-public class DrawerBannerActivity extends AppCompatActivity {
+public class LeftRV_VP_HDActivity extends AppCompatActivity {
     int mLastY;
     int mFirstY;
     private BannerComponent bannerComponent;
@@ -25,7 +32,7 @@ public class DrawerBannerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle arg0) {
         super.onCreate(arg0);
-        setContentView(R.layout.activity_drawer_headerviewpager);
+        setContentView(R.layout.activity_dl_vp_hd_left_recyclerview);
         //ViewPager,Indicator
 //        ViewPager viewPager = (ViewPager) findViewById(R.id.banner_viewPager);
 //        Indicator indicator = (Indicator) findViewById(R.id.banner_indicator);

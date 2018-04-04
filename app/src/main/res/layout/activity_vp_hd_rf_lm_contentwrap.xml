@@ -9,7 +9,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="240dp"
         android:gravity="center"
         android:orientation="vertical"
         app:sm_layoutGravity="innertop"
@@ -20,15 +20,6 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/example"/>
-
-        <TextView
-            android:id="@+id/tvHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:padding="8dp"
-            android:textColor="@android:color/white"
             android:text="header"/>
     </FrameLayout>
 

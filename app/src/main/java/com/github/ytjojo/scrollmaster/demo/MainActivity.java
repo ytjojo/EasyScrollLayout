@@ -5,15 +5,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.github.ytjojo.scrollmaster.demo.viewpage.DL_VP_HD_Activity;
+import com.github.ytjojo.scrollmaster.demo.viewpage.LeftRV_VP_HDActivity;
+import com.github.ytjojo.scrollmaster.demo.viewpage.VP_CW_HD_RF_LMActivity;
 
 public class MainActivity extends AppCompatActivity {
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 		findViewById(R.id.tv_topbanner).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,DrawerBannerActivity.class);
+				Intent intent = new Intent(MainActivity.this,LeftRV_VP_HDActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 		findViewById(R.id.tv_viewpager_refresh_loadmore).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,ViewPagerEachWithRefreshLoadMoreActivity .class);
+				Intent intent = new Intent(MainActivity.this,VP_CW_HD_RF_LMActivity.class);
 				startActivity(intent);
 			}
 		});

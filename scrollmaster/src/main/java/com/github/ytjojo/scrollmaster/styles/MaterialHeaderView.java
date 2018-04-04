@@ -130,7 +130,9 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
     @Override
     public void onUIScrollChanged(BaseRefreshIndicator indicator, int scrollValue, byte status) {
         float progress = indicator.getProgress(scrollValue);
-        materialDrawable.setProgressRotation(Math.min(progress*0.7f,1));
+        if(status!= BaseRefreshIndicator.PTR_STATUS_LOADING){
+            materialDrawable.setProgressRotation(Math.min(progress*0.7f,1));
+        }
         if(progress> 1.15f){
             progress = 1.15f;
         }

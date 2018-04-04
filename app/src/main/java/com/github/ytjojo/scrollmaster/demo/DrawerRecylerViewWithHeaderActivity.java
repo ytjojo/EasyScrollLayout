@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
 import com.github.ytjojo.scrollmaster.ContentWraperView;
 import com.shizhefei.view.indicator.BannerComponent;
 import com.shizhefei.view.indicator.Indicator;
@@ -72,12 +73,29 @@ public class DrawerRecylerViewWithHeaderActivity extends AppCompatActivity {
         });
         final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
         contentWraperView.setCanTopHeaderLoad(true);
-        contentWraperView.postDelayed(new Runnable() {
+        contentWraperView.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
             @Override
-            public void run() {
-                contentWraperView.setLoadComplete();
+            public void onStartLoad() {
+                contentWraperView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        contentWraperView.setLoadComplete();
+                    }
+                },3000);
             }
-        },6000);
+        });
+        contentWraperView.setBottomFooterOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
+            @Override
+            public void onStartLoad() {
+                contentWraperView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        contentWraperView.setLoadComplete();
+                    }
+                },3000);
+            }
+        });
+
 
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder {

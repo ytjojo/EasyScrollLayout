@@ -1,4 +1,4 @@
-package com.github.ytjojo.scrollmaster.demo;
+package com.github.ytjojo.scrollmaster.demo.viewpage;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +10,11 @@ import android.view.View;
 
 import com.github.ytjojo.scrollmaster.GradientScrimDrawableUtil;
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.github.ytjojo.scrollmaster.demo.NestedScrollFragment;
+import com.github.ytjojo.scrollmaster.demo.R;
+import com.github.ytjojo.scrollmaster.demo.RecyclerViewFragment;
+import com.github.ytjojo.scrollmaster.demo.ScrollViewFragment;
+import com.github.ytjojo.scrollmaster.demo.WebViewFragment;
 import com.github.ytjojo.scrollmaster.demo.util.StatusBarUtil;
 import com.github.ytjojo.scrollmaster.util.AnimateScrimUtil;
 import com.gxz.PagerSlidingTabStrip;
