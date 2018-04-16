@@ -9,10 +9,11 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="180dp"
         android:gravity="center"
         android:orientation="vertical"
         app:sm_layoutGravity="innertop"
+        app:sm_isSnap="true"
         app:sm_parallaxMultiplier="0.5">
 
         <ImageView
@@ -65,18 +66,19 @@
                 android:src="@mipmap/ic_launcher_round"/>
         </com.github.ytjojo.scrollmaster.DefaultLoadView>
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="300dp"-->
-            <!--android:background="#00ffee"-->
-            <!--android:gravity="center"-->
-            <!--app:sm_contentwrper_layoutGravity="innerbottom">-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="#00ffee"
+            android:gravity="center"
+            app:sm_isSnap="true"
+            app:sm_contentwrper_layoutGravity="innerbottom">
 
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="bottomView"/>-->
-        <!--</LinearLayout>-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="bottomView"/>
+        </LinearLayout>
 
     </com.github.ytjojo.scrollmaster.ContentWraperView>
 </com.github.ytjojo.scrollmaster.ScrollMasterView>

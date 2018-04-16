@@ -27,9 +27,6 @@ allprojects {
     maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 
   }
-  configurations.all {
-    resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
-  }
   tasks.withType(JavaCompile){
     options.encoding = "UTF-8"
     sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_7

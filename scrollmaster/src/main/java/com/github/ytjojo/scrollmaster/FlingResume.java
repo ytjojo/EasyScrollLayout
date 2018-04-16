@@ -94,7 +94,7 @@ public class FlingResume implements Runnable {
         mEventX = mScrollMasterView.getWidth() / 2;
         int maxY = 4 * mScrollMasterView.getHeight();
         mScroller.fling(0, startScrollY, 0, velocityY,
-                0, maxY, 0, maxY);
+                0, 0, 0, maxY);
         ViewCompat.postOnAnimation(mScrollMasterView, this);
     }
 }

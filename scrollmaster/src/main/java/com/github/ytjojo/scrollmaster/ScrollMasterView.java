@@ -238,6 +238,7 @@ public class ScrollMasterView extends FrameLayout {
                         case GRAVITY_INNER_TOP:
                             mInnerTopView = child;
                             mInnerTopParallaxMult = lp.mParallaxMultiplier;
+                            isSnap = lp.isSnap;
                             break;
                         case GRAVITY_OUT_LEFT:
                             if (lp.mWidthRatioOfParent > 0f && lp.mWidthRatioOfParent <= 1f) {
@@ -1118,9 +1119,13 @@ public class ScrollMasterView extends FrameLayout {
                 if (getScrollY() == mMaxVerticalScrollRange) {
                     return;
                 }
-//                mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap ? mMaxVerticalScrollRange : -2 * mMaxVerticalScrollRange, mMaxVerticalScrollRange);
-                mFlingResume.start(getScrollY(),-velocityY);
-                mFlingResume.setMaxVerticalScrollRange(mMaxVerticalScrollRange);
+                if(isSnap){
+                    mScroller.fling(0, getScrollY(), 0, -velocityY, 0, 0, isSnap ? mMaxVerticalScrollRange : -2 * mMaxVerticalScrollRange, mMaxVerticalScrollRange);
+                }else {
+                    mFlingResume.start(getScrollY(),-velocityY);
+                    mFlingResume.setMaxVerticalScrollRange(mMaxVerticalScrollRange);
+
+                }
             }
             ViewCompat.postInvalidateOnAnimation(this);
         }
@@ -1438,7 +1443,7 @@ public class ScrollMasterView extends FrameLayout {
         boolean mEnable;
         int mStableScrollValue;
         float mFrictionFactor;
-
+        boolean isSnap;
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
 
@@ -1467,7 +1472,7 @@ public class ScrollMasterView extends FrameLayout {
                 defaultOverScrollRatio = 0f;
             }
             mOverScrollRatio = a.getFloat(R.styleable.ScrollMasterView_sm_overscrollratio, defaultOverScrollRatio);
-
+            isSnap = a.getBoolean(R.styleable.ScrollMasterView_sm_isSnap, false);
             a.recycle();
         }
 
@@ -1543,6 +1548,12 @@ public class ScrollMasterView extends FrameLayout {
 
         public void setEnable(boolean mEnable) {
             this.mEnable = mEnable;
+        }
+        public void setSnap(boolean snap){
+            this.isSnap = snap;
+        }
+        public boolean getSnap(){
+            return isSnap;
         }
     }
 

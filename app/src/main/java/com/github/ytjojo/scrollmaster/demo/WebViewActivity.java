@@ -30,7 +30,7 @@ public class WebViewActivity extends AppCompatActivity {
             }
         });
 //        webView.loadUrl("https://github.com/jeasonlzy/okhttp-OkGo");
-        webView.loadUrl("http://www.jianshu.com/p/7caa5f4f49bd");
+        webView.loadUrl("https://www.baidu.com");
         ScrollMasterView easyScrollLayout = (ScrollMasterView) findViewById(R.id.easyScrolllayout);
         final ContentWraperView contentWraperView = (ContentWraperView) findViewById(R.id.contentWraperview);
         contentWraperView.setTopHeaderOnStartLoadCallback(new BaseRefreshIndicator.OnStartLoadCallback() {
