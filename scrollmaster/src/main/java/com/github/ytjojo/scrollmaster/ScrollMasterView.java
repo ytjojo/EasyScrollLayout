@@ -87,7 +87,7 @@ public class ScrollMasterView extends FrameLayout {
     private final int[] mScrollConsumed = new int[4];
     private int mNestedYOffset;
     private int mNestedXOffset;
-    private float mFrictionFactor = 0.6f;
+    private float mFrictionFactor = 0f;
     ContentChildHolder mContentChildHolder;
     View mInnerTopView;
     View mOutTopView;
@@ -396,6 +396,7 @@ public class ScrollMasterView extends FrameLayout {
                 childLeft = 0;
                 childTop = -height;
                 mOutTopView = child;
+                mFrictionFactor = lp.mFrictionFactor;
                 mTopHeaderIndicator.setTargetView(mOutTopView);
                 mMinVerticalScrollRange = (int) (-height * (1f + lp.mOverScrollRatio));
                 lp.mStableScrollValue = -height;
@@ -625,6 +626,7 @@ public class ScrollMasterView extends FrameLayout {
                         isVerticalScroll = true;
                         mDragging = true;
                         dispatchVerticalScroll(vtev, dy);
+
                         mLastMotionY = y;
                         mLastMotionX = x;
                         final ViewParent parent = getParent();
@@ -651,7 +653,11 @@ public class ScrollMasterView extends FrameLayout {
                             if (isVerticalScroll) {
                                 vtev.offsetLocation(mFirstMotionX - x, dy > 0 ? dy - mTouchSlop : mTouchSlop - dy);
                                 dispatchTouchEventSupper(vtev);
+                                dispatchVerticalScroll(null,dy);
+                            }else if(isHorizontalScroll){
+                                dispatchHorizontalScroll(null,dx);
                             }
+
                             mLastMotionY = y;
                             mLastMotionX = x;
                         }
@@ -925,12 +931,13 @@ public class ScrollMasterView extends FrameLayout {
             }
         }
         int unconsumedY = (dy - mScrollConsumed[1]);
-        mNestedYOffset += mScrollConsumed[1] - mScrollConsumed[3];
+        mNestedYOffset += mScrollConsumed[1];
         int value = mNestScrollOffsetYs.get(mActivePointerId);
         value += mScrollConsumed[1] - mScrollConsumed[3];
         mNestScrollOffsetYs.put(mActivePointerId, value);
-        Logger.e("mNestedYOffset" + mNestedYOffset + "  " + mScrollConsumed[1] + "  scrollY" + mScrollConsumed[3]);
-        childScroll(event, 0, unconsumedY, mScrollConsumed);
+        if(event != null){
+            childScroll(event, 0, unconsumedY, mScrollConsumed);
+        }
     }
 
     private void dispatchHorizontalScroll(MotionEvent event, int dx) {
@@ -938,7 +945,9 @@ public class ScrollMasterView extends FrameLayout {
         mHorizontalScrollHandlar.scrollConsumed(dx, mScrollConsumed);
         int unconsumedX = (dx - mScrollConsumed[0]);
         mNestedXOffset += mScrollConsumed[0] - mScrollConsumed[2];
-        childScroll(event, unconsumedX, 0, mScrollConsumed);
+        if(event !=null){
+            childScroll(event, unconsumedX, 0, mScrollConsumed);
+        }
     }
 
     private void parentPreScroll(int dy, int[] consumed) {

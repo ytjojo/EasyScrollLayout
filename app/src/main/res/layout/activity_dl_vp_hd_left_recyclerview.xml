@@ -14,7 +14,7 @@
         android:background="#003ef0"
         android:gravity="center"
         android:orientation="vertical"
-        app:sm_frictionfactor="0.5"
+        app:sm_frictionfactor="0.2"
         app:sm_layoutGravity="outright"
         app:sm_parallaxMultiplier="0.5">
 
@@ -32,7 +32,7 @@
         android:background="#00ee00"
         android:gravity="center"
         android:orientation="vertical"
-        app:sm_frictionfactor="0.5"
+        app:sm_frictionfactor="0.2"
         app:sm_layoutGravity="outleft"
         app:sm_parallaxMultiplier="0.5">
 

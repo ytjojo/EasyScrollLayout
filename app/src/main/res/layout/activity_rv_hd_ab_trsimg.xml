@@ -45,7 +45,7 @@
         android:id="@+id/materiaRefreshHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:sm_frictionfactor="0.5"
+        app:sm_frictionfactor="0.2"
         app:sm_layoutGravity="outtop">
 
     </com.github.ytjojo.scrollmaster.styles.MaterialHeaderView>

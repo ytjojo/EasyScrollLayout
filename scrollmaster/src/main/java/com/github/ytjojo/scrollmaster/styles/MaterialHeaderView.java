@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -51,6 +52,7 @@ public class MaterialHeaderView extends FrameLayout implements UIHandler {
 
     protected void init(AttributeSet attrs, int defStyle) {
         if (isInEditMode()) return;
+        setClipChildren(false);
         setClipToPadding(false);
         setWillNotDraw(false);
         mSchemeColors = new int[4];

@@ -24,7 +24,7 @@
         <com.github.ytjojo.scrollmaster.DefaultLoadView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:sm_frictionfactor="0.5"
+            app:sm_frictionfactor="0.2"
             app:sm_layoutGravity="outleft">
 
             <ImageView
