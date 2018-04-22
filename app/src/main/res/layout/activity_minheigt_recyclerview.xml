@@ -35,7 +35,9 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/example"/>
+
     </FrameLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recylerview"
         android:layout_width="match_parent"
@@ -45,6 +47,14 @@
                                        android:background="@android:color/transparent"
                                        android:theme="@style/AppTheme.Toolbar.Dark"
                                        app:sm_ignorescroll="true"
-                                       app:title="标题"/>
-
+                                       />
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="230dp"
+        android:textSize="21sp"
+        android:text="Material Design Title"
+        android:textColor="@android:color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </com.github.ytjojo.scrollmaster.ScrollMasterView>

@@ -3,6 +3,7 @@ package com.github.ytjojo.scrollmaster.demo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,9 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.ytjojo.scrollmaster.BaseRefreshIndicator;
 import com.github.ytjojo.scrollmaster.ScrollMasterView;
+import com.github.ytjojo.scrollmaster.Utils;
+import com.github.ytjojo.scrollmaster.behavior.TransiationScaleBehvior;
 import com.github.ytjojo.scrollmaster.demo.util.StatusBarUtil;
 import com.github.ytjojo.scrollmaster.util.AnimateScrimUtil;
 
@@ -65,6 +69,7 @@ public class RV_MIN_HDActivity extends AppCompatActivity {
         });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle("");
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -75,6 +80,11 @@ public class RV_MIN_HDActivity extends AppCompatActivity {
         View header = findViewById(R.id.header);
         header.setMinimumHeight(header.getMinimumHeight()+ StatusBarUtil.getStatusBarHeight(this));
         AnimateScrimUtil.setScrimBackgroud(easyScrollLayout,toolbar,getResources().getColor(R.color.colorPrimary));
+        TextView textView  = (TextView) findViewById(R.id.tv_title);
 
+        final int actionbarSize = getResources().getDimensionPixelOffset(R.dimen.actionBarSize);
+        final int minImageHeight = (int) (actionbarSize * 0.52f);
+        final float statusBarHeight = StatusBarUtil.getStatusBarHeight(this);
+        TransiationScaleBehvior.setTranslationScaleCenter(easyScrollLayout,textView,minImageHeight,actionbarSize,statusBarHeight);
     }
 }

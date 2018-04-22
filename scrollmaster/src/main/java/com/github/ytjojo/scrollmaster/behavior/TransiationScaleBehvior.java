@@ -37,7 +37,7 @@ public class TransiationScaleBehvior implements ScrollMasterView.OnScollListener
     @Override
     public void onScroll(float offsetRatio, int positionOffsetPixels, int offsetRange) {
 
-        float scale = mMinScale + (1 - offsetRatio) * mMinScale;
+        float scale = mMinScale + (1 - offsetRatio) * (1-mMinScale);
         mTargetView.setScaleX(scale);
         mTargetView.setScaleY(scale);
         mTargetView.setTranslationX(-(mTargetView.getLeft() - mMinMarginLeft) * offsetRatio);
@@ -52,6 +52,19 @@ public class TransiationScaleBehvior implements ScrollMasterView.OnScollListener
             public void run() {
                 float minBottom =   statusBarHeight+(actionbarSize/2);
 
+                TransiationScaleBehvior behvior = new TransiationScaleBehvior(targetView, mMinMarginLeft, minBottom, minViewHeight);
+                scrollMasterView.addOnScrollListener(behvior);
+            }
+        });
+    }
+    public static void setTranslationScaleCenter(final ScrollMasterView scrollMasterView,
+                                           final View targetView,final int minViewHeight,
+                                           final float actionbarSize, final float statusBarHeight) {
+        targetView.post(new Runnable() {
+            @Override
+            public void run() {
+                float minBottom =   statusBarHeight+(actionbarSize/2);
+               int mMinMarginLeft = (int) ((scrollMasterView.getWidth()- minViewHeight*1f/targetView.getHeight()*targetView.getWidth())/2);
                 TransiationScaleBehvior behvior = new TransiationScaleBehvior(targetView, mMinMarginLeft, minBottom, minViewHeight);
                 scrollMasterView.addOnScrollListener(behvior);
             }
