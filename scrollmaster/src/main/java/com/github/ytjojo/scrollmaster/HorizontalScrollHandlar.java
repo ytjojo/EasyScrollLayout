@@ -250,11 +250,24 @@ public class HorizontalScrollHandlar {
             mRightRefreshIndicator.onScrollChanged(mLastScrollX, mScrollX);
         } else {
             if (mOnScollListener != null && mLastScrollX != mScrollX) {
-                int offsetRange = mLastScrollX < 0 || mScrollX < 0 ? mMinHorizontalScrollRange : mMaxHorizontalScrollRange;
-                mOnScollListener.onScroll(mScrollX / offsetRange, mScrollX, offsetRange);
+                float offsetRange =0;
+                if(mScrollX ==0){
+                    offsetRange = mLastScrollX < 0 ? mMinHorizontalScrollRange : mMaxHorizontalScrollRange;
+                }else {
+                    offsetRange = mScrollX < 0 ? mMinHorizontalScrollRange : mMaxHorizontalScrollRange;
+                }
+
+                mOnScollListener.onScroll(mScrollX / offsetRange, mScrollX, (int) offsetRange);
             }
         }
 
+    }
+    public float getCurOffsetRatio(){
+        float offsetRange =  mScrollX < 0 ? mMinHorizontalScrollRange : mMaxHorizontalScrollRange;
+        if(offsetRange == 0f){
+            return 0f;
+        }
+        return mScrollX / offsetRange;
     }
 
     private void offsetContenViews() {

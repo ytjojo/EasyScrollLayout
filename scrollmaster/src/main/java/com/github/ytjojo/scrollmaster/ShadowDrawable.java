@@ -22,7 +22,8 @@ import static com.github.ytjojo.scrollmaster.GradientScrimDrawableUtil.constrain
  */
 public class ShadowDrawable extends Drawable {
 
-
+    public static int STYLE_GRADIENT =0;
+    public static int STYLE_RECTSHADOW = 1;
     private Paint mPaint;
 
     private RectF mBounds;
@@ -32,7 +33,7 @@ public class ShadowDrawable extends Drawable {
 
     private int mShadowOffset;
 
-
+    private int mShadowStyle = STYLE_GRADIENT;
     /**
      * 阴影颜色
      */
@@ -46,11 +47,13 @@ public class ShadowDrawable extends Drawable {
     private int mShadowGravity = -1;
     Interpolator mInterpolator;
     int mNumStops = 4;
+    float mOffsetRatio;
 
     public ShadowDrawable(Context context, int gravity) {
         mShadowOffset = 0;
         mShadowGravity = gravity;
-        setShadowRadius(dip2px(30, context));
+        setShadowColor(mShadowColor);
+        setShadowRadius(dip2px(36, context));
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         /**
@@ -60,7 +63,6 @@ public class ShadowDrawable extends Drawable {
         mPaint.setDither(true);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(mShadowColor);
-
 //        mPaint.setStrokeWidth(mLineWidth);
         /**
          * 设置阴影
@@ -73,6 +75,11 @@ public class ShadowDrawable extends Drawable {
     SparseArray<LinearGradient> mGradientSparseArray;
 
     private void setGravity(int gravity) {
+
+        if(mShadowStyle ==STYLE_RECTSHADOW){
+            mPaint.setShader(null);
+            return;
+        }
         if (mShadowGravity == gravity&&mBounds.isEmpty()) {
             return;
         }
@@ -162,6 +169,15 @@ public class ShadowDrawable extends Drawable {
     public void draw(Canvas canvas) {
         canvas.save();
         canvas.clipRect(mBounds);
+        if(mShadowStyle == STYLE_GRADIENT){
+            drawGradient(canvas);
+        }else {
+            drawRectShadow(canvas);
+        }
+//        canvas.drawRect(0,0,400,400,mPaint);
+        canvas.restore();
+    }
+    private void drawGradient(Canvas canvas){
         switch (mShadowGravity) {
             case Gravity.LEFT:
                 canvas.translate(mBounds.left,0);
@@ -180,11 +196,15 @@ public class ShadowDrawable extends Drawable {
                 canvas.drawRect(mBounds.left, 0, mBounds.right, mShadowRadius, mPaint);
                 break;
         }
-//        canvas.drawRect(0,0,400,400,mPaint);
-        canvas.restore();
     }
-
+    private void drawRectShadow(Canvas canvas){
+        if(mOffsetRatio ==0f){
+            return;
+        }
+        canvas.drawRect(mBounds.left, mBounds.top, mBounds.right, mBounds.bottom, mPaint);
+    }
     public ShadowDrawable setColor(int color) {
+        setShadowColor(color);
         mPaint.setColor(color);
         return this;
     }
@@ -229,6 +249,7 @@ public class ShadowDrawable extends Drawable {
 
     public void setShadowColor(int shadowColor) {
         this.mShadowColor = shadowColor;
+        this.mMaxAlpha = Color.alpha(mShadowColor);
     }
 
     public float getShadowRadius() {
@@ -244,8 +265,9 @@ public class ShadowDrawable extends Drawable {
         return mShadowGravity;
     }
 
-    public void setmShadowGravity(int gravity) {
+    public void setShadowGravity(int gravity) {
         setGravity(gravity);
+
     }
 
     public static float dip2px(float dipValue, float scale) {
@@ -262,5 +284,26 @@ public class ShadowDrawable extends Drawable {
     public static float dip2px(float dipValue, Context context) {
         float scale = context.getResources().getDisplayMetrics().density;
         return dip2px(dipValue, scale);
+    }
+
+    public float getOffsetRatio() {
+        return mOffsetRatio;
+    }
+    public void setOffsetRatio(float scrollRatio){
+        scrollRatio = Math.abs(scrollRatio);
+        if(scrollRatio>1f){
+            scrollRatio = 1f;
+        }else if(scrollRatio<0f){
+            scrollRatio =0f;
+        }
+        this.mOffsetRatio = scrollRatio;
+        if(mShadowStyle == STYLE_RECTSHADOW){
+            mPaint.setAlpha((int) (mMaxAlpha * mOffsetRatio));
+        }
+    }
+    private int mMaxAlpha;
+    public void setShadowStyle(int shadowStyle){
+        this.mShadowStyle = shadowStyle;
+
     }
 }

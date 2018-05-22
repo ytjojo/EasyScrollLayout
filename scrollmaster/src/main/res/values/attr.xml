@@ -20,6 +20,10 @@
             <flag name="outbottom" value="0x2"/>
             <flag name="innerbottom" value="0x3"/>
         </attr>
+        <attr name="sm_drawer_shadowstyle">
+            <flag name="gradient" value="0x0"/>
+            <flag name="rectshadow" value="0x1"/>
+        </attr>
         <attr name="sm_parallaxMultiplier" format="float"/>
         <attr name="sm_overscrollratio" format="float"/>
         <attr name="sm_layoutstartoffsety" format="dimension"/>

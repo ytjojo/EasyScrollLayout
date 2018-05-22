@@ -5,6 +5,7 @@
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
                                                  android:orientation="vertical"
+                                                 app:sm_drawer_shadowstyle="rectshadow"
                                                  app:sm_layoutstartoffsety="-80dp"
                                                  app:sm_isDrawerLayoutStyle="true">
 

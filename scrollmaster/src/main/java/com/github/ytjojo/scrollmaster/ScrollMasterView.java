@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.SystemClock;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
@@ -124,6 +125,7 @@ public class ScrollMasterView extends FrameLayout {
         isDrawerLayoutStyle = a.getBoolean(R.styleable.ScrollMasterView_sm_isDrawerLayoutStyle, false);
         mInnerTopParallaxMult = a.getFloat(R.styleable.ScrollMasterView_sm_parallaxMultiplier, 0f);
         mLayoutStartOffsetY = a.getDimensionPixelOffset(R.styleable.ScrollMasterView_sm_layoutstartoffsety,0);
+        mShadowStyle = a.getInt(R.styleable.ScrollMasterView_sm_drawer_shadowstyle,0);
         a.recycle();
         setLayerType(LAYER_TYPE_SOFTWARE, null);
         setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -1363,7 +1365,7 @@ public class ScrollMasterView extends FrameLayout {
         mGradientDrawable.setBounds(child.getRight() - 60, child.getTop(), child.getRight(), child.getBottom());
         mGradientDrawable.draw(canvas);
     }
-
+    private int mShadowStyle = ShadowDrawable.STYLE_GRADIENT;
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
@@ -1374,12 +1376,15 @@ public class ScrollMasterView extends FrameLayout {
             if (mContentChildHolder.mDirectChild != null) {
                 if (mShadowDrawable == null) {
                     mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
+                    mShadowDrawable.setShadowStyle(mShadowStyle);
+
                 }
+                mShadowDrawable.setOffsetRatio(mHorizontalScrollHandlar.getCurOffsetRatio());
                 if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
-                    mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
+                    mShadowDrawable.setShadowGravity(Gravity.RIGHT);
                     mShadowDrawable.setBounds(0, mOutRightView.getTop(), mOutRightView.getLeft(), mOutRightView.getBottom());
                 } else {
-                    mShadowDrawable.setmShadowGravity(Gravity.LEFT);
+                    mShadowDrawable.setShadowGravity(Gravity.LEFT);
                     mShadowDrawable.setBounds(mContentChildHolder.mDirectChild.getRight(), mOutRightView.getTop(), getMeasuredWidth(), mOutRightView.getBottom());
 
                 }
@@ -1389,15 +1394,18 @@ public class ScrollMasterView extends FrameLayout {
             if (mContentChildHolder.mDirectChild != null) {
                 if (mShadowDrawable == null) {
                     mShadowDrawable = new ShadowDrawable(getContext(), Gravity.LEFT);
+                    mShadowDrawable.setShadowStyle(mShadowStyle);
                 }
+                mShadowDrawable.setOffsetRatio(mHorizontalScrollHandlar.getCurOffsetRatio());
                 if (mHorizontalScrollHandlar.isOutLeftViewTopOfContent()) {
-                    mShadowDrawable.setmShadowGravity(Gravity.LEFT);
+                    mShadowDrawable.setShadowGravity(Gravity.LEFT);
                     mShadowDrawable.setBounds(mOutLeftView.getRight(), mOutLeftView.getTop(), getMeasuredWidth(), mOutLeftView.getBottom());
                 } else {
-                    mShadowDrawable.setmShadowGravity(Gravity.RIGHT);
+                    mShadowDrawable.setShadowGravity(Gravity.RIGHT);
                     mShadowDrawable.setBounds(0, mOutLeftView.getTop(), mContentChildHolder.mDirectChild.getLeft(), mOutLeftView.getBottom());
 
                 }
+
                 mShadowDrawable.draw(canvas);
             }
         }
@@ -1638,6 +1646,25 @@ public class ScrollMasterView extends FrameLayout {
         }
     }
 
+    public void setDrawShadowStyle(int style){
+        if(mShadowDrawable == null){
+            mShadowDrawable = new ShadowDrawable(getContext(),Gravity.LEFT);
+        }
+        mShadowDrawable.setShadowStyle(style);
+    }
+    public void setDrawerShadowColor(@ColorInt int color){
+        if(mShadowDrawable == null){
+            mShadowDrawable = new ShadowDrawable(getContext(),Gravity.LEFT);
+        }
+        mShadowDrawable.setColor(color);
+    }
+
+    public void setShadowRadius(float radius){
+        if(mShadowDrawable == null){
+            mShadowDrawable = new ShadowDrawable(getContext(),Gravity.LEFT);
+        }
+        mShadowDrawable.setShadowRadius(radius);
+    }
     /**
      * Interpolator from android.support.v4.view.ViewPager. Snappier and more elastic feeling
      * than the default interpolator.
